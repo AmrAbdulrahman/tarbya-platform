@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>أنواع الأنشطة</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.fld{height:44px;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:15px;color:#1E293B;background:#FFFFFF}
+.fld:focus{outline:2px solid #7446F0;outline-offset:-1px;border-color:#7446F0}
+.row:hover{background:#F8FAFC}
+.lbl{font-size:14px;font-weight:600;color:#334155}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1100px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <header style="height: 64px; background: #FFFFFF; border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 16px; padding: 0 32px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700;">ت</div>
+    <nav aria-label="مسار التنقل" style="display: flex; gap: 8px; font-size: 14px; color: #64748B;">
+      <a href="Admin.dc.html" style="text-decoration: none;">الإدارة</a><span>/</span><span>القوائم المرجعية</span><span>/</span><span style="color: #1E293B; font-weight: 600;">أنواع الأنشطة</span>
+    </nav>
+  </header>
+
+  <main style="width: 100%; max-width: 1280px; margin: 0 auto; padding: 28px 32px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
+      <div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 4px;">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447;">أنواع الأنشطة</h1>
+        <span style="font-size: 14px; color: #64748B;">تُستخدم عند إنشاء نشاط فردي، أو لقاء دوري لمجموعة، أو نشاط جماعي لمرة واحدة.</span>
+      </div>
+      <button type="button" onClick="{{startNew}}" style="height: 44px; padding: 0 18px; border-radius: 4px; border: none; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">+ نوع جديد</button>
+    </div>
+
+    <div role="tablist" aria-label="النطاق" style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <sc-for list="{{scopes}}" as="s" hint-placeholder-count="4">
+        <button type="button" role="tab" aria-selected="{{s.on}}" onClick="{{s.pick}}" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid {{s.border}}; background: {{s.bg}}; color: {{s.fg}}; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;">{{s.label}} <span style="font-family: 'Space Grotesk', sans-serif; opacity: .8;">{{s.count}}</span></button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+      <!-- List -->
+      <section style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px;">
+        <div style="overflow-x: auto;">
+          <div style="min-width: 680px;">
+            <div style="display: grid; grid-template-columns: 2fr 1.4fr 1.3fr 90px 100px; gap: 12px; padding: 12px 24px; font-size: 13px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 10px 10px 0 0;">
+              <span>النوع</span><span>النطاق</span><span>الإعدادات</span><span>الاستخدام</span><span>الحالة</span>
+            </div>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+              <div class="row" style="display: grid; grid-template-columns: 2fr 1.4fr 1.3fr 90px 100px; gap: 12px; align-items: center; padding: 12px 24px; border-bottom: 1px solid #F1F5F9; font-size: 15px; background: {{r.rowBg}};">
+                <button type="button" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 10px; min-width: 0; border: none; background: none; padding: 0; font: inherit; color: inherit; text-align: start; cursor: pointer;">
+                  <span style="width: 32px; height: 32px; flex: none; border-radius: 8px; background: {{r.tint}}; color: {{r.color}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">{{r.initial}}</span>
+                  <span style="display: flex; flex-direction: column; min-width: 0;">
+                    <span style="font-weight: 600;">{{r.ar}}</span>
+                    <span style="font-size: 12px; color: #64748B; font-family: 'Space Grotesk', sans-serif;" dir="ltr">{{r.en}}</span>
+                  </span>
+                </button>
+                <span style="font-size: 13px; color: #475569;">{{r.scope}}</span>
+                <span style="font-size: 12px; color: #475569;">{{r.flags}}</span>
+                <span style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: #334155;">{{r.uses}}</span>
+                <span style="justify-self: start; font-size: 12px; font-weight: 600; color: {{r.sc}}; background: {{r.sb}}; border-radius: 999px; padding: 2px 10px;">{{r.status}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <!-- Editor -->
+      <form aria-label="تعديل نوع النشاط" style="flex: 1 1 360px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">{{editTitle}}</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="nar">الاسم (عربي)</label><input id="nar" class="fld" type="text" value="{{sel.ar}}"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="nen">Name (English)</label><input id="nen" class="fld" type="text" dir="ltr" value="{{sel.en}}"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label class="lbl" for="scope">النطاق</label>
+          <select id="scope" class="fld" value="{{sel.scopeId}}">
+            <option value="individual">نشاط فردي (موجِّه ومتابَع)</option>
+            <option value="recurring">لقاء دوري للمجموعة</option>
+            <option value="oneoff">نشاط جماعي لمرة واحدة</option>
+          </select>
+        </div>
+        <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+          <legend class="lbl" style="padding: 0; margin-bottom: 8px;">اللون</legend>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <sc-for list="{{swatches}}" as="c" hint-placeholder-count="6">
+              <button type="button" aria-label="{{c.name}}" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="width: 36px; height: 36px; border-radius: 999px; background: {{c.hex}}; border: 3px solid {{c.ring}}; cursor: pointer; padding: 0;"></button>
+            </sc-for>
+          </div>
+        </fieldset>
+        <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #E2E8F0; padding-top: 12px;">
+          <label style="display: flex; gap: 10px; align-items: center; min-height: 40px; font-size: 14px;"><input type="checkbox" checked="{{sel.rsvp}}" style="width: 18px; height: 18px; accent-color: #7446F0;"> يتطلب تأكيد الحضور</label>
+          <label style="display: flex; gap: 10px; align-items: center; min-height: 40px; font-size: 14px;"><input type="checkbox" checked="{{sel.attendance}}" style="width: 18px; height: 18px; accent-color: #7446F0;"> يُسجَّل فيه الحضور</label>
+          <label style="display: flex; gap: 10px; align-items: center; min-height: 40px; font-size: 14px;"><input type="checkbox" checked="{{sel.feed}}" style="width: 18px; height: 18px; accent-color: #7446F0;"> يظهر في سجل الأعضاء</label>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label class="lbl" for="rem">التذكير الافتراضي</label>
+          <select id="rem" class="fld" value="{{sel.reminder}}">
+            <option value="none">بدون تذكير</option>
+            <option value="3h">قبل 3 ساعات</option>
+            <option value="24h">قبل 24 ساعة</option>
+            <option value="48h">قبل يومين</option>
+          </select>
+        </div>
+        <label style="display: flex; gap: 10px; align-items: center; min-height: 40px; font-size: 14px;"><input type="checkbox" checked="{{sel.active}}" style="width: 18px; height: 18px; accent-color: #7446F0;"> مفعّل (يظهر في القوائم)</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="submit" style="height: 44px; padding: 0 22px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">حفظ</button>
+          <button type="button" class="btn-ghost" style="height: 44px; padding: 0 18px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 15px; cursor: pointer;">إلغاء</button>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.7; color: #64748B;">النوع المستخدم في أنشطة سابقة يُعطَّل ولا يُحذف، حفاظًا على السجل.</p>
+      </form>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { scope: 'all', selected: 'sport', isNew: false, color: null };
+  }
+  renderVals() {
+    const s = this.state;
+    const scopeNames = { individual: 'نشاط فردي', recurring: 'لقاء دوري للمجموعة', oneoff: 'جماعي لمرة واحدة' };
+    const palette = [
+      { id: 'purple', name: 'بنفسجي', hex: '#7446F0', tint: '#EFEAFE', color: '#5A2FD6' },
+      { id: 'navy', name: 'كحلي', hex: '#0F4C81', tint: '#E0EEFA', color: '#0F4C81' },
+      { id: 'green', name: 'أخضر', hex: '#047857', tint: '#ECFDF5', color: '#047857' },
+      { id: 'amber', name: 'كهرماني', hex: '#B45309', tint: '#FFFBEB', color: '#92400E' },
+      { id: 'rose', name: 'وردي', hex: '#BE185D', tint: '#FDF2F8', color: '#9D174D' },
+      { id: 'slate', name: 'رمادي', hex: '#475569', tint: '#F1F5F9', color: '#334155' }
+    ];
+    const pal = {};
+    palette.forEach((p) => { pal[p.id] = p; });
+    const types = [
+      { id: 'outing', ar: 'نزهة', en: 'Outing', scopeId: 'individual', c: 'green', uses: 14, rsvp: false, attendance: false, feed: true, reminder: 'none', active: true },
+      { id: 'travel', ar: 'سفر', en: 'Travel', scopeId: 'individual', c: 'navy', uses: 3, rsvp: false, attendance: false, feed: true, reminder: '48h', active: true },
+      { id: 'sport', ar: 'رياضة', en: 'Sports', scopeId: 'individual', c: 'amber', uses: 22, rsvp: false, attendance: false, feed: true, reminder: '3h', active: true },
+      { id: 'food', ar: 'طعام', en: 'Food', scopeId: 'individual', c: 'rose', uses: 17, rsvp: false, attendance: false, feed: true, reminder: 'none', active: true },
+      { id: 'dars', ar: 'درس / حلقة', en: 'Dars / Halaqa', scopeId: 'recurring', c: 'purple', uses: 96, rsvp: true, attendance: true, feed: true, reminder: '24h', active: true },
+      { id: 'grpsport', ar: 'لقاء رياضي', en: 'Sports meetup', scopeId: 'recurring', c: 'amber', uses: 18, rsvp: true, attendance: true, feed: true, reminder: '3h', active: true },
+      { id: 'camp', ar: 'مخيّم', en: 'Camp', scopeId: 'oneoff', c: 'green', uses: 2, rsvp: true, attendance: true, feed: true, reminder: '48h', active: true },
+      { id: 'visit', ar: 'زيارة', en: 'Visit', scopeId: 'oneoff', c: 'navy', uses: 0, rsvp: true, attendance: true, feed: true, reminder: '24h', active: false }
+    ];
+    const flagText = (t) => [t.rsvp ? 'تأكيد حضور' : null, t.attendance ? 'سجل حضور' : null, t.reminder !== 'none' ? 'تذكير' : null].filter(Boolean).join(' · ') || '—';
+    const visible = s.scope === 'all' ? types : types.filter((t) => t.scopeId === s.scope);
+    const rows = visible.map((t) => {
+      const p = pal[t.c];
+      const on = !s.isNew && s.selected === t.id;
+      return {
+        ar: t.ar, en: t.en, initial: t.ar.charAt(0), tint: p.tint, color: p.color,
+        scope: scopeNames[t.scopeId], flags: flagText(t), uses: t.uses,
+        status: t.active ? 'مفعّل' : 'معطّل', sc: t.active ? '#047857' : '#475569', sb: t.active ? '#ECFDF5' : '#F1F5F9',
+        rowBg: on ? '#F5F2FF' : 'transparent',
+        pick: () => this.setState({ selected: t.id, isNew: false, color: null })
+      };
+    });
+    const count = (id) => id === 'all' ? types.length : types.filter((t) => t.scopeId === id).length;
+    const scopes = [['all', 'الكل'], ['individual', 'أنشطة فردية'], ['recurring', 'لقاءات دورية'], ['oneoff', 'جماعية لمرة واحدة']].map(([id, label]) => {
+      const on = s.scope === id;
+      return { label, count: count(id), on, bg: on ? '#001447' : '#FFFFFF', fg: on ? '#FFFFFF' : '#334155', border: on ? '#001447' : '#D1D5DB', pick: () => this.setState({ scope: id }) };
+    });
+    const blank = { ar: '', en: '', scopeId: 'oneoff', c: 'purple', rsvp: true, attendance: true, feed: true, reminder: '24h', active: true };
+    const sel = s.isNew ? blank : (types.find((t) => t.id === s.selected) || types[0]);
+    const colorId = s.color || sel.c;
+    const swatches = palette.map((p) => ({ name: p.name, hex: p.hex, on: p.id === colorId, ring: p.id === colorId ? '#001447' : '#FFFFFF', pick: () => this.setState({ color: p.id }) }));
+    return {
+      scopes, rows, sel, swatches,
+      editTitle: s.isNew ? 'نوع نشاط جديد' : 'تعديل: ' + sel.ar,
+      startNew: () => this.setState({ isNew: true, color: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

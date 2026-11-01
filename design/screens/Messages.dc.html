@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>الرسائل</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.hdr-btn:hover{background:#F0F5FA !important;color:#7446F0 !important}
+.conv:hover{background:#F8FAFC !important}
+.fld{height:44px;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:15px;color:#1E293B;background:#FFFFFF}
+.fld:focus{outline:2px solid #7446F0;outline-offset:-1px;border-color:#7446F0}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 900px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <!-- Sticky app header -->
+  <header style="position: sticky; top: 0; z-index: 20; height: 64px; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 12px; padding: 0 32px; box-sizing: border-box;">
+    <a href="Main.dc.html" aria-label="الرئيسية" style="width: 32px; height: 32px; border-radius: 8px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none;">ت</a>
+    <div style="flex: 1;"></div>
+    <a href="#" aria-current="page" aria-label="الرسائل" style="position: relative; width: 44px; height: 44px; border-radius: 8px; background: #EFEAFE; color: #5A2FD6; display: flex; align-items: center; justify-content: center;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+      <sc-if value="{{hasUnread}}" hint-placeholder-val="{{true}}">
+        <span style="position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 999px; background: #7446F0; color: #FFFFFF; font-size: 11px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">{{unreadCount}}</span>
+      </sc-if>
+    </a>
+    <a href="Notifications.dc.html" class="hdr-btn" aria-label="الإشعارات، 4 غير مقروءة" style="position: relative; width: 44px; height: 44px; border-radius: 8px; color: #334155; display: flex; align-items: center; justify-content: center;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>
+      <span style="position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 999px; background: #B91C1C; color: #FFFFFF; font-size: 11px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">4</span>
+    </a>
+    <a href="Profile.dc.html" aria-label="الملف الشخصي" style="width: 36px; height: 36px; margin-inline-start: 8px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; text-decoration: none;">أ</a>
+  </header>
+
+  <main style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch;">
+
+    <!-- Conversations -->
+    <section aria-label="المحادثات" style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;">
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #E2E8F0;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #001447; flex: 1;">الرسائل</h1>
+          <button type="button" style="height: 36px; padding: 0 12px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">+ رسالة جديدة</button>
+        </div>
+        <label for="cs" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">بحث في المحادثات</label>
+        <input id="cs" class="fld" type="search" placeholder="ابحث باسم عضو أو مجموعة…" style="height: 40px;">
+      </div>
+      <sc-for list="{{convs}}" as="c" hint-placeholder-count="4">
+        <button type="button" class="conv" onClick="{{c.pick}}" aria-current="{{c.on}}" style="display: flex; gap: 12px; align-items: center; padding: 12px 16px; border: none; border-bottom: 1px solid #F1F5F9; background: {{c.bg}}; font: inherit; color: inherit; text-align: start; cursor: pointer; width: 100%;">
+          <span style="width: 40px; height: 40px; flex: none; border-radius: 999px; background: {{c.tint}}; color: {{c.color}}; display: flex; align-items: center; justify-content: center; font-weight: 700;">{{c.initial}}</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+            <span style="display: flex; gap: 8px; align-items: baseline;"><span style="flex: 1; font-size: 15px; font-weight: {{c.weight}};">{{c.name}}</span><span style="font-size: 12px; color: #64748B;">{{c.when}}</span></span>
+            <span style="font-size: 12px; color: #64748B;">{{c.role}}</span>
+            <span style="font-size: 13px; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{c.preview}}</span>
+          </span>
+          <sc-if value="{{c.unread}}" hint-placeholder-val="{{false}}">
+            <span style="width: 10px; height: 10px; flex: none; border-radius: 999px; background: #7446F0;" aria-label="غير مقروءة"></span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </section>
+
+    <!-- Thread -->
+    <section aria-label="{{cur.name}}" style="flex: 999 1 520px; min-width: 0; min-height: 760px; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #E2E8F0;">
+        <span style="width: 40px; height: 40px; border-radius: 999px; background: {{cur.tint}}; color: {{cur.color}}; display: flex; align-items: center; justify-content: center; font-weight: 700;">{{cur.initial}}</span>
+        <div style="flex: 1; display: flex; flex-direction: column;">
+          <span style="font-size: 16px; font-weight: 600;">{{cur.name}}</span>
+          <span style="font-size: 13px; color: #64748B;">{{cur.role}}</span>
+        </div>
+        <a href="{{cur.profileHref}}" style="font-size: 14px; font-weight: 600; text-decoration: none;">{{cur.profileLabel}}</a>
+      </div>
+
+      <div style="flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #F8FAFC; overflow-y: auto;">
+        <span style="align-self: center; font-size: 12px; color: #64748B; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 999px; padding: 2px 10px;">اليوم</span>
+        <sc-for list="{{thread}}" as="m" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; align-items: {{m.align}}; gap: 2px;">
+            <sc-if value="{{m.showAuthor}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 12px; color: #64748B; padding: 0 4px;">{{m.author}}</span>
+            </sc-if>
+            <div style="max-width: 70%; padding: 10px 14px; border-radius: 12px; background: {{m.bg}}; color: {{m.fg}}; border: {{m.border}}; font-size: 15px; line-height: 1.7;">{{m.text}}</div>
+            <span style="font-size: 11px; color: #64748B; padding: 0 4px;">{{m.time}}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <form style="display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-top: 1px solid #E2E8F0;">
+        <label for="msg" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">اكتب رسالة</label>
+        <input id="msg" class="fld" type="text" value="{{draft}}" onChange="{{onDraft}}" placeholder="اكتب رسالة…" style="flex: 1; width: auto;">
+        <button type="button" onClick="{{send}}" aria-label="إرسال" style="width: 44px; height: 44px; flex: none; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="transform: scaleX(-1);"><path d="M4 12l16-8-6 16-2-7z"></path></svg>
+        </button>
+      </form>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sel: 'saad', draft: '', seen: { saad: true },
+      sent: { saad: [], yousef: [], group: [] }
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const convs = [
+      { id: 'saad', name: 'د. سعد الحربي', role: 'موجِّهي', initial: 'س', tint: '#001447', color: '#FFFFFF', when: '3:40 م', profileHref: 'MyJourney.dc.html', profileLabel: 'رحلتي ←',
+        msgs: [
+          { me: false, text: 'السلام عليكم يا أحمد، كيف حال المتابَعين؟', time: '3:20 م' },
+          { me: true, text: 'وعليكم السلام، بخير الحمد لله. فهد يحتاج اهتمامًا أكثر هذا الشهر.', time: '3:31 م' },
+          { me: false, text: 'هل يناسبك لقاؤنا الأربعاء بدل الثلاثاء؟ نناقش وضع فهد وخطتك في القراءة.', time: '3:40 م' }
+        ] },
+      { id: 'yousef', name: 'يوسف الشمري', role: 'متابَعي', initial: 'ي', tint: '#EFEAFE', color: '#5A2FD6', when: '2:15 م', profileHref: 'Mentee.dc.html', profileLabel: 'الملف ←',
+        msgs: [
+          { me: true, text: 'كيف المراجعة هذا الأسبوع؟', time: '1:50 م' },
+          { me: false, text: 'سمّعت سورة النبأ على أبي، الحمد لله', time: '2:15 م' }
+        ] },
+      { id: 'group', name: 'حلقة الثلاثاء', role: 'مجموعة · 14 عضوًا', initial: 'ح', tint: '#E0EEFA', color: '#0F4C81', when: 'أمس', profileHref: 'Group.dc.html', profileLabel: 'المجموعة ←',
+        msgs: [
+          { me: false, author: 'ناصر العمري', text: 'تذكير: الدرس القادم في المسجد الجامع، الساعة 8 مساءً.', time: 'أمس 6:00 م' },
+          { me: false, author: 'بدر الحربي', text: 'جزاكم الله خيرًا، سأحضر إن شاء الله.', time: 'أمس 6:12 م' }
+        ] }
+    ];
+    const unreadIds = ['saad', 'yousef'].filter((id) => !s.seen[id]);
+    const list = convs.map((c) => {
+      const on = c.id === s.sel;
+      const extra = s.sent[c.id];
+      const last = extra.length ? extra[extra.length - 1] : c.msgs[c.msgs.length - 1].text;
+      const unread = unreadIds.indexOf(c.id) >= 0;
+      return {
+        name: c.name, role: c.role, initial: c.initial, tint: c.tint, color: c.color, when: extra.length ? 'الآن' : c.when,
+        preview: (extra.length ? 'أنت: ' : '') + last, on, unread,
+        bg: on ? '#F5F2FF' : '#FFFFFF', weight: unread ? '700' : '600',
+        pick: () => this.setState({ sel: c.id, seen: Object.assign({}, s.seen, { [c.id]: true }) })
+      };
+    });
+    const cur = convs.find((c) => c.id === s.sel);
+    const bubble = (m) => ({
+      text: m.text, time: m.time, author: m.author || '', showAuthor: !!m.author,
+      align: m.me ? 'flex-start' : 'flex-end',
+      bg: m.me ? '#7446F0' : '#FFFFFF', fg: m.me ? '#FFFFFF' : '#1E293B', border: m.me ? 'none' : '1px solid #E2E8F0'
+    });
+    const thread = cur.msgs.concat(s.sent[cur.id].map((t) => ({ me: true, text: t, time: 'الآن' }))).map(bubble);
+    return {
+      convs: list,
+      cur: { name: cur.name, role: cur.role, initial: cur.initial, tint: cur.tint, color: cur.color, profileHref: cur.profileHref, profileLabel: cur.profileLabel },
+      thread, draft: s.draft,
+      unreadCount: unreadIds.length, hasUnread: unreadIds.length > 0,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      send: () => {
+        const t = (s.draft || '').trim();
+        if (!t) return;
+        this.setState({ draft: '', sent: Object.assign({}, s.sent, { [s.sel]: s.sent[s.sel].concat([t]) }) });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

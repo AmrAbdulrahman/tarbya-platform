@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>الملف الشخصي</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.fld{height:44px;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:15px;color:#1E293B;background:#FFFFFF}
+.fld:focus{outline:2px solid #7446F0;outline-offset:-1px;border-color:#7446F0}
+.lbl{font-size:14px;font-weight:600;color:#334155}
+.side a{display:flex;align-items:center;min-height:44px;padding:0 14px;border-radius:8px;color:#334155;text-decoration:none;font-size:15px}
+.side a:hover{background:#F0F5FA;color:#7446F0}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1300px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <header style="height: 64px; background: #FFFFFF; border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 16px; padding: 0 32px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700;">ت</div>
+    <nav aria-label="مسار التنقل" style="display: flex; gap: 8px; font-size: 14px; color: #64748B;">
+      <a href="Main.dc.html" style="text-decoration: none;">الرئيسية</a><span>/</span><span style="color: #1E293B; font-weight: 600;">الملف الشخصي</span>
+    </nav>
+  </header>
+
+  <main style="width: 100%; max-width: 1120px; margin: 0 auto; padding: 28px 32px 48px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+    <nav class="side" aria-label="أقسام الإعدادات" style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 2px;">
+      <a href="#pic" style="background: #EFEAFE; color: #5A2FD6; font-weight: 600;">الصورة والاسم</a>
+      <a href="#lang">اللغة</a>
+      <a href="#contact">البريد والجوال</a>
+      <a href="#pw">كلمة المرور</a>
+      <a href="#notif">الإشعارات</a>
+    </nav>
+
+    <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447;">الملف الشخصي</h1>
+
+      <!-- Picture & name -->
+      <section id="pic" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center;">
+        <div style="position: relative; width: 96px; height: 96px; flex: none;">
+          <sc-if value="{{hasPic}}" hint-placeholder-val="{{false}}">
+            <div role="img" aria-label="صورة الملف الشخصي" style="width: 96px; height: 96px; border-radius: 999px; background: #CBD5E1; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 12px; text-align: center;">[صورتك]</div>
+          </sc-if>
+          <sc-if value="{{noPic}}" hint-placeholder-val="{{true}}">
+            <div style="width: 96px; height: 96px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700;">أ</div>
+          </sc-if>
+        </div>
+        <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 10px;">
+          <span class="lbl">الصورة الشخصية <span style="font-weight: 400; color: #64748B;">(اختيارية)</span></span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" onClick="{{upload}}" style="height: 40px; padding: 0 16px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">{{uploadLabel}}</button>
+            <sc-if value="{{hasPic}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{removePic}}" class="btn-ghost" style="height: 40px; padding: 0 14px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px; cursor: pointer;">إزالة</button>
+            </sc-if>
+          </div>
+          <span style="font-size: 12px; color: #64748B;">JPG أو PNG، حتى 2 م.ب. تُقصّ دائريًا.</span>
+        </div>
+        <div style="flex: 1 1 100%; display: flex; flex-direction: column; gap: 6px;">
+          <label class="lbl" for="nm">الاسم</label>
+          <input id="nm" class="fld" type="text" value="أحمد السالم">
+        </div>
+      </section>
+
+      <!-- Language -->
+      <section id="lang" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">اللغة الافتراضية</h2>
+          <span style="font-size: 13px; color: #64748B;">تحدد لغة الواجهة واتجاهها، ولغة الإشعارات والبريد.</span>
+        </div>
+        <div role="radiogroup" aria-label="اللغة الافتراضية" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+          <button type="button" role="radio" aria-checked="{{isAr}}" onClick="{{toAr}}" style="min-height: 88px; border: {{arBorder}}; border-radius: 10px; background: {{arBg}}; font: inherit; text-align: start; padding: 14px 16px; display: flex; gap: 12px; align-items: center; cursor: pointer; color: #1E293B;">
+            <span style="width: 44px; height: 44px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: #001447;">ع</span>
+            <span style="display: flex; flex-direction: column; flex: 1;"><span style="font-size: 16px; font-weight: 600;">العربية</span><span style="font-size: 13px; color: #64748B;">من اليمين لليسار</span></span>
+            <span style="width: 20px; height: 20px; border-radius: 999px; border: {{arDot}};"></span>
+          </button>
+          <button type="button" role="radio" aria-checked="{{isEn}}" onClick="{{toEn}}" style="min-height: 88px; border: {{enBorder}}; border-radius: 10px; background: {{enBg}}; font: inherit; text-align: start; padding: 14px 16px; display: flex; gap: 12px; align-items: center; cursor: pointer; color: #1E293B;">
+            <span style="width: 44px; height: 44px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: #001447; font-family: Inter, sans-serif;">En</span>
+            <span lang="en" dir="ltr" style="display: flex; flex-direction: column; flex: 1; font-family: Inter, sans-serif; text-align: left;"><span style="font-size: 16px; font-weight: 600;">English</span><span style="font-size: 13px; color: #64748B;">Left to right</span></span>
+            <span style="width: 20px; height: 20px; border-radius: 999px; border: {{enDot}};"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 4px;">
+        <h2 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #001447;">البريد والجوال</h2>
+        <sc-for list="{{contacts}}" as="c" hint-placeholder-count="2">
+          <div style="display: flex; flex-direction: column; gap: 12px; padding: 12px 0; border-top: 1px solid #F1F5F9;">
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; color: #64748B;">{{c.label}}</span>
+                <span style="font-size: 15px; font-weight: {{c.valueWeight}}; color: {{c.valueColor}};">{{c.value}}</span>
+              </div>
+              <sc-if value="{{c.verified}}" hint-placeholder-val="{{true}}">
+                <span style="font-size: 12px; font-weight: 600; color: #047857; background: #ECFDF5; border-radius: 999px; padding: 2px 10px;">موثّق</span>
+              </sc-if>
+              <sc-if value="{{c.idle}}" hint-placeholder-val="{{true}}">
+                <button type="button" onClick="{{c.open}}" style="height: 40px; padding: 0 14px; border-radius: 4px; border: {{c.btnBorder}}; background: {{c.btnBg}}; color: {{c.btnFg}}; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">{{c.action}}</button>
+              </sc-if>
+            </div>
+
+            <!-- inline: enter new value -->
+            <sc-if value="{{c.editing}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px;">
+                <label class="lbl" for="{{c.inputId}}">{{c.newLabel}}</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <input id="{{c.inputId}}" class="fld" type="{{c.inputType}}" dir="ltr" placeholder="{{c.placeholder}}" style="flex: 1 1 240px; width: auto;">
+                  <button type="button" onClick="{{c.send}}" style="height: 44px; padding: 0 16px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">إرسال رمز التحقق</button>
+                  <button type="button" onClick="{{c.cancel}}" class="btn-ghost" style="height: 44px; padding: 0 14px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px; cursor: pointer;">إلغاء</button>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- inline: verify code -->
+            <sc-if value="{{c.verifying}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px;">
+                <span class="lbl">{{c.sentTo}}</span>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                  <label for="{{c.codeId}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">رمز التحقق</label>
+                  <input id="{{c.codeId}}" class="fld" type="text" inputmode="numeric" maxlength="6" dir="ltr" placeholder="••••••" style="width: 160px; text-align: center; letter-spacing: .4em; font-family: 'Space Grotesk', sans-serif; font-size: 18px;">
+                  <button type="button" onClick="{{c.verify}}" style="height: 44px; padding: 0 16px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">تحقق وحفظ</button>
+                  <button type="button" onClick="{{c.open}}" style="height: 44px; padding: 0 10px; border: none; background: none; color: #7446F0; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">تعديل القيمة</button>
+                </div>
+                <span style="font-size: 12px; color: #64748B;">إعادة الإرسال بعد 0:38</span>
+              </div>
+            </sc-if>
+
+            <!-- inline: done -->
+            <sc-if value="{{c.done}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; gap: 10px; align-items: center; background: #ECFDF5; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #065F46;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12l4 4 10-10"></path></svg>
+                <span style="flex: 1;">{{c.doneText}}</span>
+                <button type="button" onClick="{{c.reset}}" style="height: 36px; padding: 0 8px; border: none; background: none; color: #065F46; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer;">إعادة العرض</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <span style="font-size: 13px; color: #64748B; line-height: 1.7;">كلاهما اختياري. يُستخدم للدخول برمز لمرة واحدة ولاستلام الإشعارات. أي تغيير يتطلب التحقق برمز.</span>
+      </section>
+
+      <!-- Password -->
+      <section id="pw" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">كلمة المرور</h2>
+            <span style="font-size: 13px; color: #64748B;">آخر تغيير قبل 4 أشهر</span>
+          </div>
+          <sc-if value="{{pwClosed}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{openPw}}" class="btn-ghost" style="height: 40px; padding: 0 14px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px; cursor: pointer;">تحديث كلمة المرور</button>
+          </sc-if>
+        </div>
+        <sc-if value="{{pwOpen}}" hint-placeholder-val="{{true}}">
+          <form style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="cur">كلمة المرور الحالية</label><input id="cur" class="fld" type="password" autocomplete="current-password"></div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label class="lbl" for="np">كلمة المرور الجديدة</label>
+                <input id="np" class="fld" type="password" autocomplete="new-password" value="{{pw}}" onChange="{{onPw}}">
+                <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px;">
+                  <span style="height: 4px; border-radius: 999px; background: {{s1}};"></span>
+                  <span style="height: 4px; border-radius: 999px; background: {{s2}};"></span>
+                  <span style="height: 4px; border-radius: 999px; background: {{s3}};"></span>
+                  <span style="height: 4px; border-radius: 999px; background: {{s4}};"></span>
+                </div>
+                <span style="font-size: 12px; color: {{strengthColor}}; font-weight: 600;">{{strengthLabel}}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="cp">تأكيد كلمة المرور</label><input id="cp" class="fld" type="password" autocomplete="new-password"></div>
+            </div>
+            <span style="font-size: 13px; color: #64748B;">8 أحرف على الأقل، تتضمن رقمًا وحرفًا. سيُطلب الدخول من جديد على الأجهزة الأخرى.</span>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" onClick="{{closePw}}" style="height: 44px; padding: 0 20px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">حفظ كلمة المرور</button>
+              <button type="button" onClick="{{closePw}}" class="btn-ghost" style="height: 44px; padding: 0 16px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 15px; cursor: pointer;">إلغاء</button>
+            </div>
+          </form>
+        </sc-if>
+      </section>
+
+      <!-- Notifications -->
+      <section id="notif" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 4px;">
+        <h2 style="margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #001447;">الإشعارات</h2>
+        <div style="display: grid; grid-template-columns: minmax(180px, 1fr) 90px 90px; gap: 8px; font-size: 13px; color: #64748B; font-weight: 600; padding-bottom: 6px;"><span></span><span>التطبيق</span><span>البريد</span></div>
+        <div style="display: grid; grid-template-columns: minmax(180px, 1fr) 90px 90px; gap: 8px; align-items: center; min-height: 44px; border-top: 1px solid #F1F5F9; font-size: 14px;"><span>تذكيرات اللقاءات والأنشطة</span><input type="checkbox" checked aria-label="التطبيق: تذكيرات" style="width: 18px; height: 18px; accent-color: #7446F0;"><input type="checkbox" checked aria-label="البريد: تذكيرات" style="width: 18px; height: 18px; accent-color: #7446F0;"></div>
+        <div style="display: grid; grid-template-columns: minmax(180px, 1fr) 90px 90px; gap: 8px; align-items: center; min-height: 44px; border-top: 1px solid #F1F5F9; font-size: 14px;"><span>تحديثات الموجِّه والخطط</span><input type="checkbox" checked aria-label="التطبيق: تحديثات" style="width: 18px; height: 18px; accent-color: #7446F0;"><input type="checkbox" aria-label="البريد: تحديثات" style="width: 18px; height: 18px; accent-color: #7446F0;"></div>
+        <div style="display: grid; grid-template-columns: minmax(180px, 1fr) 90px 90px; gap: 8px; align-items: center; min-height: 44px; border-top: 1px solid #F1F5F9; font-size: 14px;"><span>متابَعون بحاجة لتواصل</span><input type="checkbox" checked aria-label="التطبيق: تنبيه التواصل" style="width: 18px; height: 18px; accent-color: #7446F0;"><input type="checkbox" checked aria-label="البريد: تنبيه التواصل" style="width: 18px; height: 18px; accent-color: #7446F0;"></div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: 'ar', pic: false, pwOpen: false, pw: '', email: 'idle', phone: 'edit' };
+  }
+  renderVals() {
+    const s = this.state;
+    const isAr = s.lang === 'ar';
+    const card = (on) => ({ border: on ? '2px solid #7446F0' : '1px solid #D1D5DB', bg: on ? '#FAF8FF' : '#FFFFFF', dot: on ? '6px solid #7446F0' : '2px solid #CBD5E1' });
+    const a = card(isAr), e = card(!isAr);
+    const pw = s.pw || '';
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[A-Za-z؀-ۿ]/.test(pw)) score++;
+    if (pw.length >= 12 || /[^A-Za-z0-9؀-ۿ]/.test(pw)) score++;
+    const levels = [
+      { l: 'اكتب كلمة مرور', c: '#64748B', fill: '#E2E8F0' },
+      { l: 'ضعيفة', c: '#B91C1C', fill: '#B91C1C' },
+      { l: 'متوسطة', c: '#B45309', fill: '#B45309' },
+      { l: 'جيدة', c: '#047857', fill: '#047857' },
+      { l: 'قوية', c: '#047857', fill: '#047857' }
+    ];
+    const lv = levels[pw.length ? score : 0];
+    const bar = (i) => (pw.length && score >= i ? lv.fill : '#E2E8F0');
+    // email / phone change happens inline: idle → edit → verify → done
+    const defs = [
+      { id: 'email', label: 'البريد الإلكتروني', has: true, value: '[البريد]', empty: 'غير مُضاف', newLabel: 'البريد الجديد', inputType: 'email', placeholder: 'name@example.com', sentTo: 'أرسلنا رمزًا من 6 أرقام إلى البريد الجديد.', doneText: 'تم تحديث البريد. أرسلنا تنبيهًا إلى البريد السابق.' },
+      { id: 'phone', label: 'رقم الجوال', has: false, value: '[رقم الجوال]', empty: 'غير مُضاف', newLabel: 'رقم الجوال', inputType: 'tel', placeholder: '05XXXXXXXX', sentTo: 'أرسلنا رمزًا من 6 أرقام برسالة نصية إلى الرقم.', doneText: 'تمت إضافة رقم الجوال وتوثيقه.' }
+    ];
+    const go = (id, stage) => () => this.setState({ [id]: stage });
+    const contacts = defs.map((d) => {
+      const st = s[d.id];
+      const has = d.has || st === 'done';
+      return {
+        label: d.label, newLabel: d.newLabel, inputType: d.inputType, placeholder: d.placeholder,
+        sentTo: d.sentTo, doneText: d.doneText,
+        inputId: d.id + '-new', codeId: d.id + '-code',
+        value: has ? d.value : d.empty, valueColor: has ? '#1E293B' : '#64748B', valueWeight: has ? '600' : '400',
+        verified: has,
+        action: has ? 'تغيير' : (d.id === 'phone' ? 'إضافة رقم' : 'إضافة بريد'),
+        btnBg: has ? '#FFFFFF' : '#7446F0', btnFg: has ? '#334155' : '#FFFFFF', btnBorder: has ? '1px solid #D1D5DB' : '1px solid #7446F0',
+        idle: st === 'idle' || st === 'done', editing: st === 'edit', verifying: st === 'verify', done: st === 'done',
+        open: go(d.id, 'edit'), cancel: go(d.id, 'idle'), send: go(d.id, 'verify'), verify: go(d.id, 'done'), reset: go(d.id, 'idle')
+      };
+    });
+    return {
+      contacts,
+      isAr, isEn: !isAr,
+      arBorder: a.border, arBg: a.bg, arDot: a.dot, enBorder: e.border, enBg: e.bg, enDot: e.dot,
+      toAr: () => this.setState({ lang: 'ar' }), toEn: () => this.setState({ lang: 'en' }),
+      hasPic: s.pic, noPic: !s.pic, uploadLabel: s.pic ? 'تغيير الصورة' : 'رفع صورة',
+      upload: () => this.setState({ pic: true }), removePic: () => this.setState({ pic: false }),
+      pwOpen: s.pwOpen, pwClosed: !s.pwOpen,
+      openPw: () => this.setState({ pwOpen: true }), closePw: () => this.setState({ pwOpen: false }),
+      pw, onPw: (ev) => this.setState({ pw: ev.target.value }),
+      s1: bar(1), s2: bar(2), s3: bar(3), s4: bar(4),
+      strengthLabel: lv.l, strengthColor: lv.c
+    };
+  }
+}
+</script>
+</body>
+</html>

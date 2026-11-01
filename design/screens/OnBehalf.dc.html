@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>العمل نيابةً عن عضو</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.row:hover{background:#F8FAFC}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+.fld{height:44px;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:15px;background:#FFFFFF;color:#1E293B;width:100%}
+.fld:focus,textarea:focus{outline:2px solid #7446F0;outline-offset:1px;border-color:#7446F0}
+.tab:focus-visible,.pick:focus-visible{outline:2px solid #7446F0;outline-offset:2px}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1300px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <!-- Acting-on-behalf bar: stays on top of every screen while active -->
+  <div role="status" style="position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 12px 40px; background: #FFFBEB; border-bottom: 2px solid #B45309; color: #78350F;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8" cy="8" r="3"></circle><path d="M2.5 19c.6-3 2.8-4.5 5.5-4.5"></path><path d="M13 13l3-3 3 3M16 10v9"></path></svg>
+    <span style="flex: 1 1 420px; font-size: 15px; line-height: 1.6;">
+      <strong>تعمل الآن نيابةً عن تركي السبيعي.</strong>
+      كل إجراء يُسجَّل باسم «أحمد السالم نيابةً عن تركي السبيعي» ويُشعَر به تركي.
+    </span>
+    <a href="Team.dc.html" style="height: 40px; display: inline-flex; align-items: center; padding: 0 16px; border: 1px solid #B45309; border-radius: 4px; background: #FFFFFF; color: #78350F; font-size: 14px; font-weight: 600; text-decoration: none;">إنهاء والعودة إلى فريقي</a>
+  </div>
+
+  <main style="padding: 28px 40px 48px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box;">
+
+    <!-- Who -->
+    <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px;">
+      <div style="width: 56px; height: 56px; border-radius: 999px; background: #E0EEFA; color: #0F4C81; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700;">ت</div>
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px;">
+        <nav aria-label="مسار الفريق" style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 13px; color: #64748B;">
+          <a href="Team.dc.html" style="text-decoration: none;">فريقي</a><span aria-hidden="true">‹</span>
+          <span>بدر الغامدي</span><span aria-hidden="true">‹</span>
+          <span style="color: #001447; font-weight: 600;">تركي السبيعي</span>
+        </nav>
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447;">تركي السبيعي</h1>
+        <span style="font-size: 14px; color: #475569;">موجِّه لـ 5 متابَعين · مديره بدر الغامدي · آخر دخول قبل 9 أيام</span>
+      </div>
+      <div style="display: flex; gap: 1px; background: #D1D5DB; border: 1px solid #D1D5DB; border-radius: 8px; overflow: hidden;">
+        <div style="background: #FFFFFF; padding: 10px 18px; display: flex; flex-direction: column;"><span style="font-size: 12px; color: #64748B;">متأخرون</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600; color: #B91C1C;">{{lateCount}}</span></div>
+        <div style="background: #FFFFFF; padding: 10px 18px; display: flex; flex-direction: column;"><span style="font-size: 12px; color: #64748B;">متابعات أكتوبر</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600; color: #001447;">2</span></div>
+        <div style="background: #FFFFFF; padding: 10px 18px; display: flex; flex-direction: column;"><span style="font-size: 12px; color: #64748B;">خطط تتراجع</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600; color: #B91C1C;">2</span></div>
+      </div>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+      <!-- His mentees -->
+      <section aria-labelledby="mt-h" style="flex: 1 1 380px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px;">
+        <div style="padding: 18px 24px; border-bottom: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 2px;">
+          <h2 id="mt-h" style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">متابَعو تركي</h2>
+          <span style="font-size: 13px; color: #64748B;">اختر متابَعًا لتسجّل له متابعة باسم تركي.</span>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 0;">
+          <sc-for list="{{mentees}}" as="m" hint-placeholder-count="5">
+            <li>
+              <button type="button" class="pick" onClick="{{m.pick}}" aria-pressed="{{m.selected}}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 24px; border: none; border-bottom: 1px solid #F1F5F9; border-inline-start: 3px solid {{m.edge}}; background: {{m.bg}}; font: inherit; color: #1E293B; cursor: pointer; text-align: start;">
+                <span style="width: 36px; height: 36px; flex: none; border-radius: 999px; background: #EFEAFE; color: #5A2FD6; display: flex; align-items: center; justify-content: center; font-weight: 600;">{{m.initial}}</span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 15px; font-weight: 600;">{{m.name}}</span>
+                  <span style="font-size: 13px; color: #64748B;">{{m.plan}}</span>
+                </span>
+                <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                  <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: {{m.color}};"></span>{{m.last}}</span>
+                  <span style="font-size: 12px; font-weight: 600; color: {{m.color}};">{{m.status}}</span>
+                </span>
+              </button>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+
+      <!-- Action -->
+      <section aria-labelledby="act-h" style="flex: 1.4 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px;">
+        <h2 id="act-h" style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">إجراء نيابةً عن تركي</h2>
+        <div role="tablist" aria-label="نوع الإجراء" style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+            <button type="button" role="tab" class="tab" onClick="{{t.go}}" aria-selected="{{t.on}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">{{t.label}}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{isFollow}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #F8FAFC; border-radius: 8px; font-size: 14px;">
+              <span style="color: #64748B;">المتابَع:</span>
+              <strong>{{selName}}</strong>
+              <span style="color: #64748B;">· الموجِّه المسجَّل: تركي السبيعي</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+              <div style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 6px;">
+                <label for="d" style="font-size: 14px; font-weight: 600; color: #334155;">التاريخ</label>
+                <input id="d" class="fld" type="date" value="2026-11-01">
+              </div>
+              <div style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 6px;">
+                <label for="ch" style="font-size: 14px; font-weight: 600; color: #334155;">طريقة التواصل</label>
+                <select id="ch" class="fld"><option>اتصال هاتفي</option><option>لقاء</option><option>رسالة</option></select>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <label for="nt" style="font-size: 14px; font-weight: 600; color: #334155;">ملاحظات مشتركة</label>
+              <textarea id="nt" rows="3" style="box-sizing: border-box; border: 1px solid #D1D5DB; border-radius: 4px; padding: 10px 12px; font: inherit; font-size: 15px; resize: vertical;">تواصلتُ معه للاطمئنان، ويرغب بلقاء الأسبوع القادم.</textarea>
+            </div>
+            <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+              <legend style="font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 6px;">الإشعارات</legend>
+              <label style="display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 14px;"><input type="checkbox" checked disabled style="width: 18px; height: 18px; accent-color: #7446F0;"> أشعِر تركي بالإجراء <span style="color: #64748B; font-size: 12px;">(إلزامي)</span></label>
+              <label style="display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 14px;"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #7446F0;"> أشعِر المتابَع</label>
+            </fieldset>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isRemind}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <label for="rm" style="font-size: 14px; font-weight: 600; color: #334155;">تذكير يصل إلى {{selName}} من تركي</label>
+            <textarea id="rm" rows="3" style="box-sizing: border-box; border: 1px solid #D1D5DB; border-radius: 4px; padding: 10px 12px; font: inherit; font-size: 15px;">السلام عليكم، تقرير خطتك مستحق هذا الأسبوع. نتطلّع لسماع جديدك.</textarea>
+            <span style="font-size: 13px; color: #64748B;">يظهر للمتابَع: «من تركي السبيعي (أرسله أحمد السالم)».</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isRsvp}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 15px;"><strong>حلقة الثلاثاء</strong> · 3 نوفمبر · 8:00 م — تركي لم يؤكّد بعد.</span>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" style="height: 40px; padding: 0 16px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600;">سيحضر</button>
+              <button type="button" class="btn-ghost" style="height: 40px; padding: 0 16px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px;">يعتذر</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isReview}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px;">
+            <span>تقرير <strong>{{selName}}</strong> عن خطة «الانتظام في صلاة الفجر» ينتظر ردّ تركي منذ 6 أيام.</span>
+            <textarea aria-label="الرد على التقرير" rows="3" style="box-sizing: border-box; border: 1px solid #D1D5DB; border-radius: 4px; padding: 10px 12px; font: inherit; font-size: 15px;">بارك الله فيك، استمر وسنراجع الخطة معًا قريبًا.</textarea>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-top: 4px; border-top: 1px solid #E2E8F0;">
+          <button type="button" onClick="{{submit}}" style="height: 44px; padding: 0 20px; margin-top: 12px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">{{submitLabel}}</button>
+          <span style="margin-top: 12px; font-size: 13px; color: #64748B;">الملاحظات الخاصة بين تركي ومتابَعيه لا تظهر لك.</span>
+        </div>
+        <sc-if value="{{justDone}}" hint-placeholder-val="{{false}}">
+          <div role="status" style="padding: 10px 14px; border-radius: 8px; background: #ECFDF5; color: #065F46; font-size: 14px; font-weight: 600;">تم. سُجِّل في سجل الإجراءات وأُشعِر تركي.</div>
+        </sc-if>
+      </section>
+    </div>
+
+    <!-- Audit log -->
+    <section aria-labelledby="log-h" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding: 18px 24px; border-bottom: 1px solid #E2E8F0;">
+        <h2 id="log-h" style="margin: 0; font-size: 18px; font-weight: 600; color: #001447; flex: 1;">سجل الإجراءات النيابية</h2>
+        <span style="font-size: 13px; color: #64748B;">يراه تركي ومديروه والمشرفون</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <div style="min-width: 760px;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1.6fr 2.4fr 1fr; gap: 12px; padding: 10px 24px; font-size: 13px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+            <span>الوقت</span><span>المنفِّذ</span><span>الإجراء</span><span>الإشعار</span>
+          </div>
+          <sc-for list="{{log}}" as="l" hint-placeholder-count="3">
+            <div class="row" style="display: grid; grid-template-columns: 1.2fr 1.6fr 2.4fr 1fr; gap: 12px; align-items: center; padding: 12px 24px; border-bottom: 1px solid #F1F5F9; font-size: 14px; background: {{l.bg}};">
+              <span style="color: #475569;">{{l.when}}</span>
+              <span><strong>{{l.by}}</strong> <span style="color: #64748B;">نيابةً عن تركي</span></span>
+              <span>{{l.what}}</span>
+              <span style="font-size: 13px; color: #047857; font-weight: 600;">✓ {{l.notified}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 'saad', tab: 'follow', done: {}, log: [], justDone: false };
+  }
+  renderVals() {
+    const { sel, tab, done, log, justDone } = this.state;
+    const S = { ok: ['#047857', 'منتظم'], due: ['#B45309', 'يحتاج تواصل'], late: ['#B91C1C', 'متأخر'], today: ['#047857', 'تواصل اليوم'] };
+    const raw = [
+      { id: 'saad', name: 'سعود البقمي', plan: 'الانتظام في صلاة الفجر · ↓ يتراجع', last: 'قبل 41 يومًا', s: 'late' },
+      { id: 'raed', name: 'رائد الجهني', plan: 'قراءة كتاب شهريًا · – ثابت', last: 'قبل 36 يومًا', s: 'late' },
+      { id: 'bandar', name: 'بندر الشهراني', plan: 'اللياقة البدنية · ↓ يتراجع', last: 'قبل 31 يومًا', s: 'late' },
+      { id: 'mshari', name: 'مشاري الرشيدي', plan: 'حفظ جزء تبارك · ↑ يتحسّن', last: 'قبل 10 أيام', s: 'due' },
+      { id: 'abdulaziz', name: 'عبدالعزيز الفيفي', plan: 'لم تُسند خطة بعد', last: 'قبل 5 أيام', s: 'ok' }
+    ];
+    const mentees = raw.map((m) => {
+      const s = done[m.id] ? 'today' : m.s, on = sel === m.id;
+      return {
+        name: m.name, initial: m.name.charAt(0), plan: m.plan,
+        last: done[m.id] ? 'اليوم' : m.last, color: S[s][0], status: S[s][1],
+        selected: on, bg: on ? '#FAF8FF' : '#FFFFFF', edge: on ? '#7446F0' : 'transparent',
+        pick: () => this.setState({ sel: m.id, justDone: false })
+      };
+    });
+    const selName = raw.find((m) => m.id === sel).name;
+    const T = [
+      ['follow', 'تسجيل متابعة', 'سجّل المتابعة نيابةً عن تركي'],
+      ['remind', 'إرسال تذكير', 'أرسل التذكير'],
+      ['rsvp', 'تأكيد حضور', 'احفظ الرد'],
+      ['review', 'الرد على تقرير', 'أرسل الرد']
+    ];
+    const tabs = T.map(([k, label]) => {
+      const on = tab === k;
+      return { label, on, bg: on ? '#7446F0' : '#FFFFFF', fg: on ? '#FFFFFF' : '#334155', bd: on ? '#7446F0' : '#D1D5DB', go: () => this.setState({ tab: k, justDone: false }) };
+    });
+    const what = {
+      follow: 'سجّل متابعة هاتفية مع ' + selName,
+      remind: 'أرسل تذكيرًا إلى ' + selName,
+      rsvp: 'أكّد حضور تركي لحلقة الثلاثاء',
+      review: 'ردّ على تقرير ' + selName
+    };
+    const base = [
+      { when: '28 أكتوبر · 9:10 م', by: 'بدر الغامدي', what: 'أرسل تذكيرًا إلى رائد الجهني', notified: 'تركي، رائد' },
+      { when: '14 أكتوبر · 6:30 م', by: 'بدر الغامدي', what: 'أكّد حضور تركي للقاء الموجِّهين', notified: 'تركي' }
+    ].map((x) => Object.assign({ bg: '#FFFFFF' }, x));
+    const submit = () => {
+      const entry = { when: 'الآن', by: 'أحمد السالم', what: what[tab], notified: tab === 'rsvp' ? 'تركي' : 'تركي، ' + selName.split(' ')[0], bg: '#FAF8FF' };
+      const nd = tab === 'follow' ? Object.assign({}, done, { [sel]: true }) : done;
+      this.setState({ log: [entry].concat(log), done: nd, justDone: true });
+    };
+    return {
+      mentees, selName, tabs,
+      isFollow: tab === 'follow', isRemind: tab === 'remind', isRsvp: tab === 'rsvp', isReview: tab === 'review',
+      submitLabel: T.find((t) => t[0] === tab)[2],
+      submit, justDone,
+      lateCount: raw.filter((m) => m.s === 'late' && !done[m.id]).length,
+      log: log.concat(base)
+    };
+  }
+}
+</script>
+</body>
+</html>

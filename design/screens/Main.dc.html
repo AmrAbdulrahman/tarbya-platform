@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>لوحة الموجِّه</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;color:#334155;text-decoration:none;font-size:15px;font-weight:500;min-height:44px;box-sizing:border-box}
+.nav-item:hover{background:#F0F5FA;color:#7446F0}
+.row:hover{background:#F8FAFC}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+.hdr-btn:hover{background:#F0F5FA !important;color:#7446F0 !important}
+.drop-item:hover{background:#F8FAFC !important}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1180px; display: flex; flex-wrap: wrap; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA;">
+
+  <!-- Sidebar -->
+  <nav aria-label="القائمة الرئيسية" style="flex: 1 1 240px; max-width: 100%; background: #FFFFFF; border-left: 1px solid #D1D5DB; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box;">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px;">
+      <div style="width: 36px; height: 36px; border-radius: 10px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">ت</div>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 18px; font-weight: 700; color: #001447;">تربية</span>
+        <span style="font-size: 12px; color: #64748B;">منصة الإرشاد</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .02em; color: #64748B; padding: 0 14px 4px;">الإدارة</span>
+      <a class="nav-item" href="Admin.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M17 8v6M14 11h6"></path></svg>
+        المستخدمون
+      </a>
+      <a class="nav-item" href="Admin.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="5" r="2.5"></circle><circle cx="6" cy="19" r="2.5"></circle><circle cx="18" cy="19" r="2.5"></circle><path d="M12 7.5v4M12 11.5l-6 5M12 11.5l6 5"></path></svg>
+        علاقات الإرشاد
+      </a>
+      <a class="nav-item" href="Group.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+        المجموعات
+      </a>
+      <a class="nav-item" href="Admin.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"></path><circle cx="4" cy="6" r="1"></circle><circle cx="4" cy="12" r="1"></circle><circle cx="4" cy="18" r="1"></circle></svg>
+        القوائم المرجعية
+      </a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #E2E8F0; padding-top: 16px;">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .02em; color: #64748B; padding: 0 14px 4px;">فريقي</span>
+      <a class="nav-item" href="Team.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="3" width="6" height="5" rx="1"></rect><rect x="3" y="16" width="6" height="5" rx="1"></rect><rect x="15" y="16" width="6" height="5" rx="1"></rect><path d="M12 8v4M6 16v-4h12v4"></path></svg>
+        لوحة الفريق
+        <span style="margin-inline-start: auto; font-size: 12px; color: #64748B; font-family: 'Space Grotesk', sans-serif;">6</span>
+      </a>
+      <a class="nav-item" href="OnBehalf.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8" cy="8" r="3"></circle><path d="M2.5 19c.6-3 2.8-4.5 5.5-4.5"></path><path d="M13 13l3-3 3 3M16 10v9"></path></svg>
+        العمل نيابةً عن عضو
+      </a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #E2E8F0; padding-top: 16px;">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .02em; color: #64748B; padding: 0 14px 4px;">متابَعيّ</span>
+      <a class="nav-item" href="#" style="background: #EFEAFE; color: #5A2FD6;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+        لوحة المتابَعين
+      </a>
+      <a class="nav-item" href="Mentee.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><circle cx="17.5" cy="9" r="2.5"></circle><path d="M17 14.5c2.4.2 4 1.8 4.5 4.5"></path></svg>
+        المتابَعون
+        <span style="margin-inline-start: auto; font-size: 12px; color: #64748B; font-family: 'Space Grotesk', sans-serif;">6</span>
+      </a>
+      <a class="nav-item" href="FollowUp.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>
+        المتابعات والأنشطة
+      </a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #E2E8F0; padding-top: 16px;">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .02em; color: #64748B; padding: 0 14px 4px;">رحلتي</span>
+      <a class="nav-item" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 19l5-6 4 3 7-9"></path><path d="M15 7h5v5"></path></svg>
+        خطط تطويري
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12l4 4 10-10"></path></svg>
+        أنشطتي ومتابعاتي
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+        التقرير إلى موجِّهي
+      </a>
+      <a class="nav-item" href="Group.dc.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+        مجموعاتي
+      </a>
+    </div>
+    <div style="margin-top: auto; border-top: 1px solid #E2E8F0; padding: 16px 8px 0; display: flex; align-items: center; gap: 10px;">
+      <div style="width: 40px; height: 40px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600;">أ</div>
+      <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+        <span style="font-size: 14px; font-weight: 600;">أحمد السالم</span>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 600; color: #0F4C81; background: #E0EEFA; border-radius: 999px; padding: 1px 8px;">مدير</span>
+          <span style="font-size: 11px; font-weight: 600; color: #5A2FD6; background: #EFEAFE; border-radius: 999px; padding: 1px 8px;">موجِّه</span>
+          <span style="font-size: 11px; font-weight: 600; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 1px 8px;">متابَع</span>
+          <span style="font-size: 11px; font-weight: 600; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 1px 8px;">مشرف مجموعة</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column;">
+
+  <!-- Sticky app header -->
+  <header style="position: sticky; top: 0; z-index: 20; height: 64px; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 12px; padding: 0 40px; box-sizing: border-box;">
+    <div style="position: relative; flex: 0 1 380px;">
+      <label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">ابحث عن عضو</label>
+      <input id="q" type="search" placeholder="ابحث عن عضو بالاسم أو الجوال…" style="width: 100%; height: 40px; box-sizing: border-box; border: 1px solid #D1D5DB; border-radius: 4px; padding: 0 40px 0 12px; font: inherit; font-size: 15px; background: #FFFFFF; color: #1E293B;">
+      <svg style="position: absolute; right: 12px; top: 10px;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4.2-4.2"></path></svg>
+    </div>
+    <div style="flex: 1;"></div>
+
+    <div style="position: relative; display: flex; align-items: center; gap: 4px;">
+      <button type="button" class="hdr-btn" onClick="{{toggleMsg}}" aria-label="الرسائل، 2 غير مقروءة" aria-expanded="{{msgOpen}}" style="position: relative; width: 44px; height: 44px; border-radius: 8px; border: none; background: {{msgBtnBg}}; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+        <span style="position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 999px; background: #7446F0; color: #FFFFFF; font-size: 11px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">2</span>
+      </button>
+      <button type="button" class="hdr-btn" onClick="{{toggleNotif}}" aria-label="الإشعارات، 4 غير مقروءة" aria-expanded="{{notifOpen}}" style="position: relative; width: 44px; height: 44px; border-radius: 8px; border: none; background: {{notifBtnBg}}; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>
+        <span style="position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 999px; background: #B91C1C; color: #FFFFFF; font-size: 11px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">4</span>
+      </button>
+      <a href="Profile.dc.html" aria-label="الملف الشخصي" style="width: 36px; height: 36px; margin-inline-start: 8px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; text-decoration: none;">أ</a>
+
+      <!-- Dropdown panel (same UX for notifications and messages) -->
+      <sc-if value="{{panelOpen}}" hint-placeholder-val="{{true}}">
+        <div role="dialog" aria-label="{{panelTitle}}" style="position: absolute; top: 54px; left: 0; width: 400px; max-width: calc(100vw - 32px); background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; box-shadow: 0 20px 25px -5px rgba(15,23,42,.12), 0 8px 10px -6px rgba(15,23,42,.1); overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid #E2E8F0;">
+            <span style="flex: 1; font-size: 16px; font-weight: 600; color: #001447;">{{panelTitle}}</span>
+            <button type="button" style="height: 32px; padding: 0 8px; border: none; background: none; color: #7446F0; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;">تعليم الكل كمقروء</button>
+          </div>
+          <sc-for list="{{panelItems}}" as="n" hint-placeholder-count="4">
+            <a href="{{n.href}}" class="drop-item" style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #F1F5F9; text-decoration: none; color: #1E293B; background: {{n.bg}};">
+              <span style="width: 36px; height: 36px; flex: none; border-radius: 999px; background: {{n.tint}}; color: {{n.color}}; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">{{n.badge}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 14px; font-weight: {{n.weight}}; line-height: 1.6;">{{n.title}}</span>
+                <span style="font-size: 13px; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{n.body}}</span>
+                <span style="font-size: 12px; color: #64748B;">{{n.when}}</span>
+              </span>
+              <span style="width: 8px; height: 8px; margin-top: 6px; flex: none; border-radius: 999px; background: {{n.dot}};"></span>
+            </a>
+          </sc-for>
+          <a href="{{panelAllHref}}" style="display: flex; justify-content: center; align-items: center; min-height: 48px; font-size: 14px; font-weight: 600; text-decoration: none;">{{panelAllLabel}} ←</a>
+        </div>
+      </sc-if>
+    </div>
+  </header>
+
+  <main style="padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 28px; box-sizing: border-box;">
+
+    <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 280px;">
+        <span style="font-size: 14px; color: #64748B;">الأحد، 1 نوفمبر 2026</span>
+        <h1 style="margin: 0; font-size: 30px; font-weight: 700; color: #001447;">صباح الخير، أحمد</h1>
+      </div>
+      <a href="FollowUp.dc.html" style="height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; background: #7446F0; color: #FFFFFF; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 15px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        متابعة جديدة
+      </a>
+    </header>
+
+    <!-- KPIs: ruled grid -->
+    <section aria-label="ملخص" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: #D1D5DB; border: 1px solid #D1D5DB; border-radius: 8px; overflow: hidden;">
+      <div style="background: #FFFFFF; padding: 20px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 14px; color: #64748B;">المتابَعون</span>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 600; color: #001447;">6</span>
+        <span style="font-size: 13px; color: #64748B;">4 منهم في مجموعات</span>
+      </div>
+      <div style="background: #FFFFFF; padding: 20px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 14px; color: #64748B;">بحاجة إلى تواصل</span>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 600; color: #B91C1C;">2</span>
+        <span style="font-size: 13px; color: #64748B;">لا تواصل منذ أكثر من 14 يومًا</span>
+      </div>
+      <div style="background: #FFFFFF; padding: 20px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 14px; color: #64748B;">متابعات أكتوبر</span>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 600; color: #001447;">11</span>
+        <span style="font-size: 13px; color: #64748B;">8 لقاءات · 3 أنشطة</span>
+      </div>
+      <div style="background: #FFFFFF; padding: 20px 24px; display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 14px; color: #64748B;">خطط تتحسّن</span>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 600; color: #047857;">5<span style="font-size: 20px; color: #64748B;">/9</span></span>
+        <span style="font-size: 13px; color: #64748B;">2 ثابتة · 2 تتراجع</span>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+      <!-- Mentees table -->
+      <section style="flex: 999 1 620px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; box-shadow: 0 1px 2px rgba(15,23,42,.06);">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 20px 24px; border-bottom: 1px solid #E2E8F0;">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: #001447; flex: 1 1 auto;">المتابَعون</h2>
+          <div role="group" aria-label="تصفية" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #7446F0; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500;">الكل</button>
+            <button type="button" class="btn-ghost" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px;">بحاجة لتواصل</button>
+            <button type="button" class="btn-ghost" style="height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px;">خطط تتراجع</button>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <div style="min-width: 860px;">
+            <div style="display: grid; grid-template-columns: 2fr 1.3fr 1.6fr 1.7fr 1.4fr 96px; gap: 12px; padding: 12px 24px; font-size: 13px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+              <span>العضو</span><span>المجموعة</span><span>آخر تواصل</span><span>الخطة الرئيسية</span><span>اتجاه التقدم</span><span></span>
+            </div>
+            <sc-for list="{{mentees}}" as="m" hint-placeholder-count="6">
+              <div class="row" style="display: grid; grid-template-columns: 2fr 1.3fr 1.6fr 1.7fr 1.4fr 96px; gap: 12px; align-items: center; padding: 14px 24px; border-bottom: 1px solid #F1F5F9; font-size: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                  <div style="width: 36px; height: 36px; flex: none; border-radius: 999px; background: #EFEAFE; color: #5A2FD6; display: flex; align-items: center; justify-content: center; font-weight: 600;">{{m.initial}}</div>
+                  <a href="Mentee.dc.html" style="color: #1E293B; font-weight: 600; text-decoration: none;">{{m.name}}</a>
+                </div>
+                <span style="color: #475569; font-size: 14px;">{{m.group}}</span>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: {{m.statusColor}};"></span>{{m.last}}</span>
+                  <span style="font-size: 12px; color: {{m.statusColor}}; font-weight: 600;">{{m.statusLabel}} · {{m.lastType}}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                  <span style="font-size: 14px;">{{m.plan}}</span>
+                  <span style="font-size: 12px; color: #64748B;">آخر تحديث {{m.planUpdated}}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg width="72" height="28" viewBox="0 0 96 28" role="img" aria-label="{{m.trendLabel}}"><polyline points="{{m.points}}" fill="none" stroke="{{m.trendColor}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <span style="font-size: 13px; font-weight: 600; color: {{m.trendColor}};">{{m.trendArrow}} {{m.trendLabel}}</span>
+                </div>
+                <a href="FollowUp.dc.html" style="font-size: 14px; font-weight: 600; text-decoration: none;">تواصل ←</a>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <!-- Side column -->
+      <div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+
+        <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">القادم</h2>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 48px; flex: none; text-align: center; border: 1px solid #D1D5DB; border-radius: 8px; padding: 4px 0;">
+              <div style="font-size: 11px; color: #64748B;">نوفمبر</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; color: #001447;">3</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+              <span style="font-size: 15px; font-weight: 600;">حلقة الثلاثاء — الدرس الأسبوعي</span>
+              <span style="font-size: 13px; color: #64748B;">8:00 م · جماعي · بانتظار تأكيدك</span>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" style="height: 36px; padding: 0 14px; border-radius: 4px; border: none; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600;">سأحضر</button>
+                <button type="button" class="btn-ghost" style="height: 36px; padding: 0 14px; border-radius: 4px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px;">أعتذر</button>
+              </div>
+            </div>
+          </div>
+          <div style="height: 1px; background: #E2E8F0;"></div>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 48px; flex: none; text-align: center; border: 1px solid #D1D5DB; border-radius: 8px; padding: 4px 0;">
+              <div style="font-size: 11px; color: #64748B;">نوفمبر</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; color: #001447;">4</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 15px; font-weight: 600;">لقاء متابعة مع عمر القحطاني</span>
+              <span style="font-size: 13px; color: #64748B;">5:30 م · متابعة فردية</span>
+            </div>
+          </div>
+          <div style="height: 1px; background: #E2E8F0;"></div>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 48px; flex: none; text-align: center; border: 1px solid #D1D5DB; border-radius: 8px; padding: 4px 0;">
+              <div style="font-size: 11px; color: #64748B;">نوفمبر</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; color: #001447;">7</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 15px; font-weight: 600;">رحلة كرة قدم مع سلمان وماجد</span>
+              <span style="font-size: 13px; color: #64748B;">4:00 م · نشاط · رياضة</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dual role: my mentors -->
+        <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447; flex: 1;">موجِّهي</h2>
+            <span style="font-size: 12px; color: #64748B;">أنت متابَع أيضًا</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600;">س</div>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1;">
+              <span style="font-size: 15px; font-weight: 600;">د. سعد الحربي</span>
+              <span style="font-size: 13px; color: #64748B;">آخر متابعة قبل 12 يومًا · خطتان نشطتان</span>
+            </div>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">آخر الإشعارات</h2>
+          <div style="display: flex; gap: 10px; font-size: 14px; line-height: 1.6;">
+            <span style="width: 8px; height: 8px; margin-top: 8px; flex: none; border-radius: 999px; background: #7446F0;"></span>
+            <span>عيّنك المشرف موجِّهًا لـ <strong>ماجد الزهراني</strong>.<br><span style="color: #64748B; font-size: 12px;">قبل ساعتين · داخل التطبيق + بريد</span></span>
+          </div>
+          <div style="display: flex; gap: 10px; font-size: 14px; line-height: 1.6;">
+            <span style="width: 8px; height: 8px; margin-top: 8px; flex: none; border-radius: 999px; background: #7446F0;"></span>
+            <span>تذكير: لم تتواصل مع <strong>فهد المطيري</strong> منذ 34 يومًا.<br><span style="color: #64748B; font-size: 12px;">اليوم · داخل التطبيق</span></span>
+          </div>
+          <div style="display: flex; gap: 10px; font-size: 14px; line-height: 1.6;">
+            <span style="width: 8px; height: 8px; margin-top: 8px; flex: none; border-radius: 999px; background: #CBD5E1;"></span>
+            <span>سُجِّل حضور يوسف في درس الثلاثاء.<br><span style="color: #64748B; font-size: 12px;">قبل 5 أيام</span></span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: 'notif' };
+  }
+  renderVals() {
+    const status = {
+      ok: { c: '#047857', l: 'منتظم' },
+      due: { c: '#B45309', l: 'يحتاج تواصل' },
+      late: { c: '#B91C1C', l: 'متأخر' }
+    };
+    const trend = {
+      up: { c: '#047857', l: 'يتحسّن', a: '↑' },
+      down: { c: '#B91C1C', l: 'يتراجع', a: '↓' },
+      steady: { c: '#475569', l: 'ثابت', a: '–' }
+    };
+    const pts = (vs) => vs.map((v, i) => (i * 96 / (vs.length - 1)).toFixed(1) + ',' + (26 - v * 2.4).toFixed(1)).join(' ');
+    const raw = [
+      { name: 'فهد المطيري', group: 'حلقة الثلاثاء', last: 'قبل 34 يومًا', lastType: 'متابعة', s: 'late', plan: 'المحافظة على الورد اليومي', planUpdated: 'قبل 5 أسابيع', t: 'steady', v: [5, 5, 6, 5, 5, 5] },
+      { name: 'عمر القحطاني', group: 'شباب الحي', last: 'قبل 21 يومًا', lastType: 'نشاط', s: 'late', plan: 'الانتظام في صلاة الفجر', planUpdated: 'قبل 3 أسابيع', t: 'down', v: [8, 7, 7, 6, 5, 4] },
+      { name: 'خالد العتيبي', group: 'بدون مجموعة', last: 'قبل 9 أيام', lastType: 'متابعة', s: 'due', plan: 'قراءة كتاب شهريًا', planUpdated: 'قبل 9 أيام', t: 'steady', v: [4, 5, 5, 4, 5, 5] },
+      { name: 'يوسف الشمري', group: 'حلقة الثلاثاء', last: 'قبل 3 أيام', lastType: 'متابعة', s: 'ok', plan: 'حفظ جزء عمّ', planUpdated: 'قبل 3 أيام', t: 'up', v: [2, 3, 4, 4, 6, 7] },
+      { name: 'سلمان الدوسري', group: 'شباب الحي', last: 'أمس', lastType: 'نشاط', s: 'ok', plan: 'اللياقة البدنية', planUpdated: 'أمس', t: 'up', v: [3, 4, 4, 5, 6, 8] },
+      { name: 'ماجد الزهراني', group: 'بدون مجموعة', last: 'قبل 6 أيام', lastType: 'متابعة', s: 'ok', plan: 'لم تُسند خطة بعد', planUpdated: '—', t: 'steady', v: [5, 5, 5, 5, 5, 5] }
+    ];
+    const mentees = raw.map((r) => ({
+      name: r.name, initial: r.name.charAt(0), group: r.group, last: r.last, lastType: r.lastType,
+      statusColor: status[r.s].c, statusLabel: status[r.s].l,
+      plan: r.plan, planUpdated: r.planUpdated,
+      trendColor: trend[r.t].c, trendLabel: trend[r.t].l, trendArrow: trend[r.t].a,
+      points: pts(r.v)
+    }));
+    const open = this.state.open;
+    const unread = (x) => Object.assign({}, x, { bg: x.unread ? '#FAF8FF' : '#FFFFFF', weight: x.unread ? '600' : '400', dot: x.unread ? '#7446F0' : 'transparent' });
+    const notifs = [
+      { badge: 'ع', tint: '#EFEAFE', color: '#5A2FD6', title: 'عيّنك المشرف موجِّهًا لماجد الزهراني', body: 'أصبح لديك 6 متابَعين.', when: 'قبل ساعتين', unread: true, href: 'Mentee.dc.html' },
+      { badge: 'ت', tint: '#FEF2F2', color: '#B91C1C', title: 'لم تتواصل مع فهد المطيري منذ 34 يومًا', body: 'سجّل متابعة أو نشاطًا.', when: 'اليوم', unread: true, href: 'FollowUp.dc.html' },
+      { badge: 'ج', tint: '#E0EEFA', color: '#0F4C81', title: 'أكّد حضورك: حلقة الثلاثاء', body: 'الثلاثاء 3 نوفمبر · 8:00 م', when: 'اليوم', unread: true, href: 'Group.dc.html' },
+      { badge: 'خ', tint: '#FFFBEB', color: '#92400E', title: 'تقرير خطتك «قراءة كتاب شهريًا» مستحق', body: 'يطلبه د. سعد كل أسبوعين.', when: 'أمس', unread: true, href: 'MyPlan.dc.html' },
+      { badge: 'ح', tint: '#F1F5F9', color: '#334155', title: 'سُجِّل حضور يوسف في درس الثلاثاء', body: 'حلقة الثلاثاء — درس التفسير', when: 'قبل 5 أيام', unread: false, href: 'Group.dc.html' }
+    ].map(unread);
+    const msgs = [
+      { badge: 'س', tint: '#001447', color: '#FFFFFF', title: 'د. سعد الحربي', body: 'هل يناسبك لقاؤنا الأربعاء بدل الثلاثاء؟', when: 'قبل 20 دقيقة', unread: true, href: 'Messages.dc.html' },
+      { badge: 'ي', tint: '#EFEAFE', color: '#5A2FD6', title: 'يوسف الشمري', body: 'سمّعت سورة النبأ على أبي، الحمد لله', when: 'قبل ساعة', unread: true, href: 'Messages.dc.html' },
+      { badge: 'ح', tint: '#E0EEFA', color: '#0F4C81', title: 'حلقة الثلاثاء · ناصر العمري', body: 'تذكير: الدرس القادم في المسجد الجامع', when: 'أمس', unread: false, href: 'Messages.dc.html' }
+    ].map(unread);
+    const isN = open === 'notif', isM = open === 'msg';
+    const toggle = (k) => () => this.setState({ open: open === k ? null : k });
+    return {
+      mentees,
+      notifOpen: isN, msgOpen: isM, panelOpen: isN || isM,
+      notifBtnBg: isN ? '#EFEAFE' : 'transparent', msgBtnBg: isM ? '#EFEAFE' : 'transparent',
+      toggleNotif: toggle('notif'), toggleMsg: toggle('msg'),
+      panelTitle: isM ? 'الرسائل' : 'الإشعارات',
+      panelItems: isM ? msgs : notifs,
+      panelAllHref: isM ? 'Messages.dc.html' : 'Notifications.dc.html',
+      panelAllLabel: isM ? 'كل الرسائل' : 'كل الإشعارات'
+    };
+  }
+}
+</script>
+</body>
+</html>

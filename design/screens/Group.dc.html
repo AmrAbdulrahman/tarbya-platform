@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>المجموعة وسجل الحضور</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.row:hover{background:#F8FAFC}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+.note{height:36px;width:100%;box-sizing:border-box;border:1px solid #E2E8F0;border-radius:4px;padding:0 10px;font:inherit;font-size:14px;background:#FFFFFF;color:#1E293B}
+.note:focus{outline:2px solid #7446F0;outline-offset:-1px}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1250px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <header style="height: 64px; background: #FFFFFF; border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 16px; padding: 0 32px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700;">ت</div>
+    <nav aria-label="مسار التنقل" style="display: flex; gap: 8px; font-size: 14px; color: #64748B;">
+      <a href="Main.dc.html" style="text-decoration: none;">الرئيسية</a><span>/</span><span>مجموعاتي</span><span>/</span><span style="color: #1E293B; font-weight: 600;">حلقة الثلاثاء</span>
+    </nav>
+  </header>
+
+  <main style="width: 100%; max-width: 1280px; margin: 0 auto; padding: 28px 32px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px;">
+
+    <section style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
+      <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 13px; font-weight: 600; letter-spacing: .02em; color: #64748B;">مجموعة · 14 عضوًا</span>
+        <h1 style="margin: 0; font-size: 30px; font-weight: 700; color: #001447;">حلقة الثلاثاء</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; color: #475569;">
+          <span>مدير المجموعة: <strong style="color: #1E293B;">أحمد السالم</strong></span>
+          <span>مشرفو المجموعة: <strong style="color: #1E293B;">سلمان الدوسري، ناصر العمري</strong></span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button type="button" class="btn-ghost" style="height: 44px; padding: 0 16px; border-radius: 4px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 15px;">إدارة الأدوار</button>
+        <button type="button" class="btn-ghost" style="height: 44px; padding: 0 16px; border-radius: 4px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 15px;">إضافة عضو</button>
+        <button type="button" style="height: 44px; padding: 0 18px; border-radius: 4px; border: none; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600;">+ نشاط لمرة واحدة</button>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+      <!-- Attendance log -->
+      <section style="flex: 999 1 620px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px;">
+        <div style="padding: 20px 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; border-bottom: 1px solid #E2E8F0;">
+          <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: #001447;">الدرس الأسبوعي — الثلاثاء 3 نوفمبر</h2>
+            <span style="font-size: 13px; color: #64748B;">8:00 م · المسجد · درس تفسير سورة الكهف</span>
+          </div>
+          <button type="button" class="btn-ghost" style="height: 40px; padding: 0 14px; border-radius: 4px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px;">إرسال تذكير لمن لم يرد</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #E2E8F0; border-bottom: 1px solid #E2E8F0;">
+          <div style="background: #FFFFFF; padding: 14px 20px; display: flex; flex-direction: column;"><span style="font-size: 13px; color: #64748B;">أكّدوا الحضور</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; color: #047857;">9</span></div>
+          <div style="background: #FFFFFF; padding: 14px 20px; display: flex; flex-direction: column;"><span style="font-size: 13px; color: #64748B;">اعتذروا</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; color: #B45309;">2</span></div>
+          <div style="background: #FFFFFF; padding: 14px 20px; display: flex; flex-direction: column;"><span style="font-size: 13px; color: #64748B;">لم يردّوا</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; color: #475569;">3</span></div>
+          <div style="background: #FFFFFF; padding: 14px 20px; display: flex; flex-direction: column;"><span style="font-size: 13px; color: #64748B;">حضروا فعليًا</span><span style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; color: #001447;">10<span style="font-size: 16px; color: #64748B;">/14</span></span></div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <div style="min-width: 720px;">
+            <div style="display: grid; grid-template-columns: 1.6fr 1.1fr 90px 2fr; gap: 12px; padding: 10px 24px; font-size: 13px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+              <span>العضو</span><span>تأكيد الحضور</span><span>حضر</span><span>ملاحظة</span>
+            </div>
+            <sc-for list="{{members}}" as="m" hint-placeholder-count="8">
+              <div class="row" style="display: grid; grid-template-columns: 1.6fr 1.1fr 90px 2fr; gap: 12px; align-items: center; padding: 8px 24px; border-bottom: 1px solid #F1F5F9; font-size: 15px;">
+                <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F1F5F9; color: #334155; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">{{m.initial}}</span>{{m.name}}</span>
+                <span style="justify-self: start; font-size: 12px; font-weight: 600; color: {{m.rc}}; background: {{m.rb}}; border-radius: 999px; padding: 2px 10px;">{{m.rsvp}}</span>
+                <label style="display: flex; align-items: center; min-height: 44px;"><input type="checkbox" checked="{{m.attended}}" aria-label="{{m.attLabel}}" style="width: 20px; height: 20px; accent-color: #7446F0;"></label>
+                <input class="note" type="text" value="{{m.note}}" aria-label="{{m.noteLabel}}" placeholder="—">
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding: 16px 24px; display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" style="height: 44px; padding: 0 22px; border-radius: 4px; border: none; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600;">حفظ سجل الحضور</button>
+        </div>
+      </section>
+
+      <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+
+        <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447; flex: 1;">اللقاءات الدورية</h2>
+            <button type="button" style="height: 36px; padding: 0 10px; border: none; background: none; color: #7446F0; font: inherit; font-size: 14px; font-weight: 600;">+ إضافة</button>
+          </div>
+          <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 15px; font-weight: 600;">الدرس الأسبوعي</span>
+            <span style="font-size: 13px; color: #475569;">كل ثلاثاء · 8:00 م · درس / حلقة</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 2px 8px;">تذكير قبل 24 ساعة</span>
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 2px 8px;">يتطلب تأكيد الحضور</span>
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 2px 8px;">تطبيق + بريد</span>
+            </div>
+          </div>
+          <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 15px; font-weight: 600;">لقاء رياضي</span>
+            <span style="font-size: 13px; color: #475569;">كل أسبوعين · الجمعة 5:00 م · رياضة</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 2px 8px;">تذكير قبل 3 ساعات</span>
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 2px 8px;">يتطلب تأكيد الحضور</span>
+            </div>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">اللقاءات السابقة</h2>
+          <sc-for list="{{past}}" as="p" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; font-size: 14px;"><span style="flex: 1; font-weight: 500;">{{p.title}}</span><span style="color: #64748B;">{{p.count}}</span></div>
+              <div style="height: 6px; border-radius: 999px; background: #E2E8F0; overflow: hidden;"><div style="height: 6px; width: {{p.pct}}; background: #7446F0; border-radius: 999px;"></div></div>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">أنواع الأنشطة لمرة واحدة</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">مخيّم</span>
+            <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">زيارة</span>
+            <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">دورة مكثفة</span>
+            <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">إفطار جماعي</span>
+            <button type="button" style="height: 32px; font: inherit; font-size: 14px; border: 1px dashed #A78BFA; color: #5A2FD6; background: #FFFFFF; border-radius: 999px; padding: 0 12px;">+ نوع جديد</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const r = {
+      yes: { l: 'مؤكَّد', c: '#047857', b: '#ECFDF5' },
+      no: { l: 'معتذر', c: '#92400E', b: '#FFFBEB' },
+      none: { l: 'لم يرد', c: '#475569', b: '#F1F5F9' }
+    };
+    const raw = [
+      ['يوسف الشمري', 'yes', true, ''],
+      ['فهد المطيري', 'none', false, 'لم يحضر للمرة الثالثة — إبلاغ الموجِّه'],
+      ['سلمان الدوسري', 'yes', true, 'قدّم فقرة المسابقة'],
+      ['تركي العنزي', 'no', false, 'سفر'],
+      ['بدر الحربي', 'yes', true, ''],
+      ['نواف القرني', 'none', true, 'حضر بدون تأكيد مسبق'],
+      ['ريان الشهري', 'yes', true, ''],
+      ['عبدالله الرشيد', 'no', false, 'اختبار']
+    ];
+    const members = raw.map(([name, k, att, note]) => ({
+      name, initial: name.charAt(0), rsvp: r[k].l, rc: r[k].c, rb: r[k].b,
+      attended: att, note, attLabel: 'حضر: ' + name, noteLabel: 'ملاحظة عن ' + name
+    }));
+    const past = [
+      { title: '27 أكتوبر — درس التفسير', count: '12/14', pct: '86%' },
+      { title: '24 أكتوبر — لقاء رياضي', count: '8/14', pct: '57%' },
+      { title: '20 أكتوبر — درس الفقه', count: '11/14', pct: '79%' },
+      { title: '13 أكتوبر — درس الفقه', count: '10/14', pct: '71%' }
+    ];
+    return { members, past };
+  }
+}
+</script>
+</body>
+</html>

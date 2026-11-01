@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>رحلتي</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;color:#334155;text-decoration:none;font-size:15px;font-weight:500;min-height:44px;box-sizing:border-box}
+.nav-item:hover{background:#F0F5FA;color:#7446F0}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+.plan:hover{border-color:#A78BFA;box-shadow:0 10px 15px -3px rgba(15,23,42,.08)}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1250px; display: flex; flex-wrap: wrap; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA;">
+
+  <!-- Sidebar (same three sections, رحلتي active) -->
+  <nav aria-label="القائمة الرئيسية" style="flex: 1 1 240px; max-width: 100%; background: #FFFFFF; border-left: 1px solid #D1D5DB; padding: 24px 16px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box;">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px 8px;">
+      <div style="width: 36px; height: 36px; border-radius: 10px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">ت</div>
+      <div style="display: flex; flex-direction: column;"><span style="font-size: 18px; font-weight: 700; color: #001447;">تربية</span><span style="font-size: 12px; color: #64748B;">منصة الإرشاد</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 12px; font-weight: 600; color: #64748B; padding: 0 14px 4px;">متابَعيّ</span>
+      <a class="nav-item" href="Main.dc.html">لوحة المتابَعين</a>
+      <a class="nav-item" href="Mentee.dc.html">المتابَعون</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #E2E8F0; padding-top: 16px;">
+      <span style="font-size: 12px; font-weight: 600; color: #64748B; padding: 0 14px 4px;">رحلتي</span>
+      <a class="nav-item" href="#" style="background: #EFEAFE; color: #5A2FD6;">نظرة عامة</a>
+      <a class="nav-item" href="MyPlan.dc.html">خطط تطويري <span style="margin-inline-start: auto; font-size: 11px; font-weight: 600; color: #FFFFFF; background: #B45309; border-radius: 999px; padding: 1px 8px;">تقرير مستحق</span></a>
+      <a class="nav-item" href="#">أنشطتي ومتابعاتي</a>
+      <a class="nav-item" href="Group.dc.html">مجموعاتي</a>
+    </div>
+    <div style="margin-top: auto; border-top: 1px solid #E2E8F0; padding: 16px 8px 0; display: flex; align-items: center; gap: 10px;">
+      <div style="width: 40px; height: 40px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600;">أ</div>
+      <div style="display: flex; flex-direction: column;"><span style="font-size: 14px; font-weight: 600;">أحمد السالم</span><span style="font-size: 12px; color: #64748B;">موجِّه · متابَع</span></div>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box;">
+    <header style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 14px; color: #64748B;">رحلتي كمتابَع</span>
+        <h1 style="margin: 0; font-size: 30px; font-weight: 700; color: #001447;">ما المطلوب منك هذا الأسبوع</h1>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 10px 14px;">
+        <div style="width: 40px; height: 40px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600;">س</div>
+        <div style="display: flex; flex-direction: column;"><span style="font-size: 12px; color: #64748B;">موجِّهي</span><span style="font-size: 15px; font-weight: 600;">د. سعد الحربي</span></div>
+        <a href="#" class="btn-ghost" style="height: 36px; display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid #D1D5DB; border-radius: 4px; color: #334155; text-decoration: none; font-size: 14px;">مراسلة</a>
+      </div>
+    </header>
+
+    <!-- Action items -->
+    <section aria-label="إجراءات مطلوبة" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 18px 24px; border-bottom: 1px solid #E2E8F0;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447; flex: 1;">إجراءات مطلوبة</h2>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: #FFFFFF; background: #7446F0; border-radius: 999px; padding: 2px 10px;">{{openCount}}</span>
+      </div>
+      <sc-for list="{{actions}}" as="a" hint-placeholder-count="4">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 24px; border-bottom: 1px solid #F1F5F9; opacity: {{a.opacity}};">
+          <span style="width: 36px; height: 36px; flex: none; border-radius: 999px; background: {{a.tint}}; color: {{a.color}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">{{a.badge}}</span>
+          <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 15px; font-weight: 600;">{{a.title}}</span>
+            <span style="font-size: 13px; color: #64748B;">{{a.meta}}</span>
+          </div>
+          <sc-if value="{{a.open}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; gap: 8px;">
+              <sc-if value="{{a.isLink}}" hint-placeholder-val="{{false}}">
+                <a href="MyPlan.dc.html" style="height: 40px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 4px; background: #7446F0; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 600;">{{a.primary}}</a>
+              </sc-if>
+              <sc-if value="{{a.isButton}}" hint-placeholder-val="{{true}}">
+                <button type="button" onClick="{{a.done}}" style="height: 40px; padding: 0 16px; border-radius: 4px; border: none; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;">{{a.primary}}</button>
+              </sc-if>
+              <sc-if value="{{a.hasSecondary}}" hint-placeholder-val="{{false}}">
+                <button type="button" onClick="{{a.done}}" class="btn-ghost" style="height: 40px; padding: 0 14px; border-radius: 4px; border: 1px solid #D1D5DB; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px; cursor: pointer;">{{a.secondary}}</button>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{a.closed}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 13px; font-weight: 600; color: #047857;">✓ {{a.doneLabel}}</span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+
+    <!-- My plans -->
+    <section style="display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">خطط تطويري</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+        <sc-for list="{{plans}}" as="p" hint-placeholder-count="2">
+          <a href="MyPlan.dc.html" class="plan" style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: #1E293B;">
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+              <span style="flex: 1; font-size: 16px; font-weight: 600; color: #001447;">{{p.name}}</span>
+              <span style="font-size: 12px; font-weight: 700; color: {{p.color}}; background: {{p.tint}}; border-radius: 999px; padding: 2px 10px; white-space: nowrap;">{{p.arrow}} {{p.label}}</span>
+            </div>
+            <svg viewBox="0 0 240 48" width="100%" height="48" role="img" aria-label="{{p.label}}"><polyline points="{{p.points}}" fill="none" stroke="{{p.color}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #64748B;"><span>{{p.current}}</span><span style="color: {{p.dueColor}}; font-weight: 600;">{{p.due}}</span></div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+      <!-- Upcoming -->
+      <section style="flex: 1 1 320px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">القادم</h2>
+        <sc-for list="{{upcoming}}" as="u" hint-placeholder-count="3">
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 48px; flex: none; text-align: center; border: 1px solid #D1D5DB; border-radius: 8px; padding: 4px 0;">
+              <div style="font-size: 11px; color: #64748B;">نوفمبر</div>
+              <div style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; color: #001447;">{{u.day}}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1;">
+              <span style="font-size: 15px; font-weight: 600;">{{u.title}}</span>
+              <span style="font-size: 13px; color: #64748B;">{{u.meta}}</span>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: {{u.sc}}; background: {{u.sb}}; border-radius: 999px; padding: 2px 10px; white-space: nowrap;">{{u.status}}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <!-- Feed -->
+      <section style="flex: 2 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 4px;">
+        <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 600; color: #001447;">آخر المستجدات</h2>
+        <sc-for list="{{feed}}" as="f" hint-placeholder-count="4">
+          <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F1F5F9;">
+            <span style="width: 32px; height: 32px; flex: none; border-radius: 999px; background: {{f.tint}}; color: {{f.color}}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">{{f.badge}}</span>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 14px; line-height: 1.7;">{{f.text}}</span>
+              <span style="font-size: 12px; color: #64748B;">{{f.when}}</span>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { done: {} };
+  }
+  renderVals() {
+    const d = this.state.done;
+    const mark = (id) => () => this.setState({ done: Object.assign({}, d, { [id]: true }) });
+    const defs = [
+      { id: 'report', badge: 'خ', tint: '#FFFBEB', color: '#92400E', title: 'أرسل تقرير تقدّم «قراءة كتاب شهريًا»', meta: 'مستحق منذ يومين · يطلبه د. سعد كل أسبوعين', primary: 'تحديث الخطة', link: true, doneLabel: 'أُرسل' },
+      { id: 'rsvp', badge: 'ج', tint: '#E0EEFA', color: '#0F4C81', title: 'تأكيد حضور: لقاء الموجِّهين الشهري', meta: 'الخميس 5 نوفمبر · 8:30 م', primary: 'سأحضر', secondary: 'أعتذر', doneLabel: 'تم الرد' },
+      { id: 'task', badge: 'م', tint: '#EFEAFE', color: '#5A2FD6', title: 'مهمة من موجِّهك: إعداد خطة سنوية لمتابَعيك', meta: 'من متابعة 21 أكتوبر · قبل 8 نوفمبر', primary: 'تمت', doneLabel: 'أُنجزت' },
+      { id: 'ack', badge: 'ل', tint: '#ECFDF5', color: '#047857', title: 'ملاحظة جديدة مشتركة من د. سعد', meta: '«أحسنت في تنظيم الوقت؛ نناقش القراءة في اللقاء القادم.»', primary: 'اطّلعت', doneLabel: 'مقروءة' }
+    ];
+    const actions = defs.map((a) => {
+      const closed = !!d[a.id];
+      return Object.assign({}, a, {
+        open: !closed, closed, opacity: closed ? '.6' : '1',
+        isLink: !!a.link, isButton: !a.link, hasSecondary: !!a.secondary, done: mark(a.id)
+      });
+    });
+    const tone = {
+      up: { color: '#047857', tint: '#ECFDF5', label: 'يتحسّن', arrow: '↑' },
+      down: { color: '#B91C1C', tint: '#FEF2F2', label: 'يتراجع', arrow: '↓' },
+      steady: { color: '#475569', tint: '#F1F5F9', label: 'ثابت', arrow: '–' }
+    };
+    const pts = (vs, max) => vs.map((v, i) => (4 + i * 232 / (vs.length - 1)).toFixed(1) + ',' + (44 - v / max * 40).toFixed(1)).join(' ');
+    const plans = [
+      { name: 'تنظيم الوقت', t: 'up', v: [4, 5, 5, 6, 7, 8], max: 10, current: 'التقييم الحالي 8/10', due: 'آخر تحديث قبل 4 أيام', late: false },
+      { name: 'قراءة كتاب شهريًا', t: 'down', v: [2, 2, 1, 1, 1, 0], max: 3, current: '0 كتب هذا الشهر', due: 'التقرير مستحق', late: true },
+      { name: 'حفظ سورة البقرة', t: 'steady', v: [10, 11, 11, 11, 12, 12], max: 40, current: '12 صفحة من 48', due: 'آخر تحديث قبل 9 أيام', late: false }
+    ].map((p) => Object.assign({}, tone[p.t], { name: p.name, current: p.current, due: p.due, dueColor: p.late ? '#B45309' : '#64748B', points: pts(p.v, p.max) }));
+    const st = {
+      yes: { s: 'مؤكَّد', c: '#047857', b: '#ECFDF5' },
+      wait: { s: 'بانتظار ردك', c: '#92400E', b: '#FFFBEB' },
+      lead: { s: 'أنت المنظِّم', c: '#5A2FD6', b: '#EFEAFE' }
+    };
+    const upcoming = [
+      { day: '3', title: 'حلقة الثلاثاء — الدرس الأسبوعي', meta: '8:00 م · مشرف مجموعة', k: 'yes' },
+      { day: '4', title: 'متابعة مع د. سعد الحربي', meta: '9:00 م · متابعة فردية', k: 'yes' },
+      { day: '5', title: 'لقاء الموجِّهين الشهري', meta: '8:30 م · جماعي', k: d.rsvp ? 'yes' : 'wait' },
+      { day: '7', title: 'مباراة كرة قدم مع متابَعيك', meta: '4:00 م · نشاط', k: 'lead' }
+    ].map((u) => Object.assign({}, u, { status: st[u.k].s, sc: st[u.k].c, sb: st[u.k].b }));
+    const feed = [
+      { badge: 'م', tint: '#EFEAFE', color: '#5A2FD6', text: 'سجّل د. سعد متابعة معك: تحديث خطتين ومهمة جديدة.', when: 'قبل 11 يومًا' },
+      { badge: 'خ', tint: '#ECFDF5', color: '#047857', text: 'علّق د. سعد على تقريرك في «تنظيم الوقت»: «تقدّم واضح، استمر.»', when: 'قبل 4 أيام' },
+      { badge: 'ج', tint: '#E0EEFA', color: '#0F4C81', text: 'سُجِّل حضورك في حلقة الثلاثاء — درس التفسير.', when: 'قبل 5 أيام' },
+      { badge: 'ن', tint: '#FFFBEB', color: '#92400E', text: 'شاركت في نشاط: عشاء جماعي مع الموجِّهين.', when: 'قبل أسبوعين' }
+    ];
+    return { actions, openCount: defs.filter((a) => !d[a.id]).length, plans, upcoming, feed };
+  }
+}
+</script>
+</body>
+</html>

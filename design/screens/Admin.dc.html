@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>لوحة المشرف</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.side a{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;border-radius:8px;color:#CBD5E1;text-decoration:none;font-size:15px}
+.side a:hover{background:rgba(255,255,255,.08);color:#FFFFFF}
+.fld{height:44px;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:15px;color:#1E293B;background:#FFFFFF}
+.row:hover{background:#F8FAFC}
+.opt:hover{background:#F5F2FF}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1200px; display: flex; flex-wrap: wrap; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA;">
+
+  <nav class="side" aria-label="الإدارة" style="flex: 1 1 240px; background: #001447; padding: 24px 16px; display: flex; flex-direction: column; gap: 4px; box-sizing: border-box;">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px 20px;">
+      <div style="width: 36px; height: 36px; border-radius: 10px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">ت</div>
+      <div style="display: flex; flex-direction: column;"><span style="font-size: 17px; font-weight: 700; color: #FFFFFF;">تربية</span><span style="font-size: 12px; color: #94A3B8;">لوحة المشرف</span></div>
+    </div>
+    <a href="#">المستخدمون</a>
+    <a href="#" style="background: #7446F0; color: #FFFFFF; font-weight: 600;">علاقات الإرشاد</a>
+    <a href="#">المجموعات</a>
+    <a href="#">القوائم المرجعية</a>
+    <a href="#">المشرفون <span style="margin-inline-start: auto; font-size: 11px; color: #94A3B8;">المدير العام</span></a>
+    <a href="Main.dc.html" style="margin-top: auto;">← العودة للوحتي</a>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447;">علاقات الإرشاد</h1>
+      <span style="font-size: 14px; color: #64748B;">العضو الواحد قد يكون موجِّهًا ومتابَعًا في آن واحد، بحسب موقعه في التسلسل.</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+      <!-- Assign -->
+      <section style="flex: 1 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">إسناد متابَع إلى موجِّه</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label for="mentor" style="font-size: 14px; font-weight: 600; color: #334155;">الموجِّه</label>
+          <input id="mentor" class="fld" type="text" value="أحمد السالم">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label for="mentee" style="font-size: 14px; font-weight: 600; color: #334155;">المتابَع</label>
+          <input id="mentee" class="fld" type="text" value="ما" role="combobox" aria-expanded="true" aria-controls="mentee-list" style="border-color: #7446F0; outline: 2px solid #E4DBFD;">
+          <ul id="mentee-list" role="listbox" style="list-style: none; margin: 0; padding: 6px; border: 1px solid #D1D5DB; border-radius: 8px; background: #FFFFFF; box-shadow: 0 10px 15px -3px rgba(15,23,42,.1); display: flex; flex-direction: column; gap: 2px;">
+            <li role="option" aria-selected="true" class="opt" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 6px; background: #F5F2FF;">
+              <span style="flex: 1; display: flex; flex-direction: column;"><span style="font-size: 15px;"><strong style="color: #5A2FD6;">ما</strong>جد الزهراني</span><span style="font-size: 12px; color: #64748B;">بدون موجِّه · بدون مجموعة</span></span>
+            </li>
+            <li role="option" aria-selected="false" class="opt" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 6px;">
+              <span style="flex: 1; display: flex; flex-direction: column;"><span style="font-size: 15px;"><strong style="color: #5A2FD6;">ما</strong>زن الصالح</span><span style="font-size: 12px; color: #64748B;">موجِّهه الحالي: ناصر العمري</span></span>
+            </li>
+            <li role="option" aria-disabled="true" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 6px; color: #64748B;">
+              <span style="flex: 1; display: flex; flex-direction: column;"><span style="font-size: 15px;">مالك الدخيل</span><span style="font-size: 12px; color: #92400E;">غير متاح: موجِّه لأحمد السالم في التسلسل</span></span>
+            </li>
+          </ul>
+        </div>
+        <label style="display: flex; gap: 8px; align-items: center; min-height: 44px; font-size: 14px;"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #7446F0;"> إشعار الموجِّه والمتابَع (تطبيق + بريد)</label>
+        <button type="button" style="height: 44px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600;">إسناد</button>
+      </section>
+
+      <!-- Hierarchy -->
+      <section style="flex: 2 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447; flex: 1;">التسلسل</h2>
+          <span style="font-size: 13px; color: #64748B;">اسحب عضوًا لنقله إلى موجِّه آخر</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px;">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #D1D5DB; border-radius: 8px;">
+            <span style="width: 32px; height: 32px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">م</span>
+            <span style="flex: 1; font-weight: 600;">مالك الدخيل</span><span style="font-size: 12px; color: #5A2FD6; background: #EFEAFE; border-radius: 999px; padding: 1px 8px;">موجِّه · 2</span>
+          </div>
+          <div style="margin-inline-start: 28px; border-inline-start: 2px solid #E2E8F0; padding-inline-start: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #D1D5DB; border-radius: 8px;">
+              <span style="width: 32px; height: 32px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">أ</span>
+              <span style="flex: 1; font-weight: 600;">أحمد السالم</span>
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 1px 8px;">متابَع</span>
+              <span style="font-size: 12px; color: #5A2FD6; background: #EFEAFE; border-radius: 999px; padding: 1px 8px;">موجِّه · 6</span>
+            </div>
+            <div style="margin-inline-start: 28px; border-inline-start: 2px solid #E2E8F0; padding-inline-start: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+              <span style="font-size: 14px; border: 1px solid #E2E8F0; border-radius: 999px; padding: 4px 12px;">يوسف الشمري</span>
+              <span style="font-size: 14px; border: 1px solid #E2E8F0; border-radius: 999px; padding: 4px 12px;">عمر القحطاني</span>
+              <span style="font-size: 14px; border: 1px solid #E2E8F0; border-radius: 999px; padding: 4px 12px;">خالد العتيبي</span>
+              <span style="font-size: 14px; border: 1px solid #E2E8F0; border-radius: 999px; padding: 4px 12px;">سلمان الدوسري</span>
+              <span style="font-size: 14px; border: 1px solid #E2E8F0; border-radius: 999px; padding: 4px 12px;">فهد المطيري</span>
+              <span style="font-size: 14px; border: 1px dashed #A78BFA; color: #5A2FD6; border-radius: 999px; padding: 4px 12px;">+ ماجد الزهراني</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #D1D5DB; border-radius: 8px;">
+              <span style="width: 32px; height: 32px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">ن</span>
+              <span style="flex: 1; font-weight: 600;">ناصر العمري</span>
+              <span style="font-size: 12px; color: #334155; background: #F1F5F9; border-radius: 999px; padding: 1px 8px;">متابَع</span>
+              <span style="font-size: 12px; color: #5A2FD6; background: #EFEAFE; border-radius: 999px; padding: 1px 8px;">موجِّه · 4</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Users -->
+    <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 18px 24px; border-bottom: 1px solid #E2E8F0;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447; flex: 1 1 auto;">المستخدمون</h2>
+        <label for="uq" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">بحث في المستخدمين</label>
+        <input id="uq" class="fld" type="search" placeholder="بحث بالاسم أو الجوال أو البريد…" style="flex: 0 1 300px;">
+        <button type="button" style="height: 44px; padding: 0 16px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600;">+ مستخدم</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <div style="min-width: 820px;">
+          <div style="display: grid; grid-template-columns: 1.5fr 1.8fr 1.5fr 1.2fr 1.5fr 1fr; gap: 12px; padding: 10px 24px; font-size: 13px; font-weight: 600; color: #64748B; background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+            <span>الاسم</span><span>الأدوار</span><span>المدير المباشر</span><span>الجوال</span><span>البريد</span><span>الدخول</span>
+          </div>
+          <sc-for list="{{users}}" as="u" hint-placeholder-count="5">
+            <div class="row" style="display: grid; grid-template-columns: 1.5fr 1.8fr 1.5fr 1.2fr 1.5fr 1fr; gap: 12px; align-items: center; padding: 12px 24px; border-bottom: 1px solid #F1F5F9; font-size: 15px;">
+              <span style="font-weight: 600;">{{u.name}}</span>
+              <span style="font-size: 13px; color: #475569;">{{u.roles}}</span>
+              <span style="font-size: 14px; color: {{u.mgrColor}};">{{u.mgr}}</span>
+              <span style="font-size: 14px; color: {{u.phoneColor}}; font-family: 'Space Grotesk', sans-serif;">{{u.phone}}</span>
+              <span style="font-size: 14px; color: {{u.emailColor}};">{{u.email}}</span>
+              <span style="justify-self: start; font-size: 12px; font-weight: 600; color: {{u.lc}}; background: {{u.lb}}; border-radius: 999px; padding: 2px 10px;">{{u.login}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lookups -->
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+      <div style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-size: 17px; font-weight: 600; color: #001447;">أنواع لقاءات المجموعات</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">درس / حلقة</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">لقاء رياضي</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">اجتماع تخطيط</span>
+          <button type="button" style="height: 32px; font: inherit; font-size: 14px; border: 1px dashed #A78BFA; color: #5A2FD6; background: #FFFFFF; border-radius: 999px; padding: 0 12px;">+ إضافة</button>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-size: 17px; font-weight: 600; color: #001447;">أنواع الأنشطة الفردية</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">نزهة</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">سفر</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">رياضة</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">طعام</span>
+          <button type="button" style="height: 32px; font: inherit; font-size: 14px; border: 1px dashed #A78BFA; color: #5A2FD6; background: #FFFFFF; border-radius: 999px; padding: 0 12px;">+ إضافة</button>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-size: 17px; font-weight: 600; color: #001447;">طرق تتبّع الخطط</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">مقياس 1–10</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">عدد تراكمي</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">مرات أسبوعيًا</span>
+          <span style="font-size: 14px; border: 1px solid #D1D5DB; border-radius: 999px; padding: 4px 12px;">نسبة إنجاز</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const on = { l: 'مفعّل', c: '#047857', b: '#ECFDF5' };
+    const off = { l: 'غير مفعّل', c: '#475569', b: '#F1F5F9' };
+    const raw = [
+      ['عبدالله الراشد', 'مشرف · مدير', 'أعلى مستوى', '[رقم الجوال]', '[البريد]', on],
+      ['مالك الدخيل', 'مشرف · مدير · موجِّه', 'عبدالله الراشد', '[رقم الجوال]', '[البريد]', on],
+      ['أحمد السالم', 'مدير · موجِّه · متابَع · مدير مجموعة', 'مالك الدخيل', '[رقم الجوال]', '[البريد]', on],
+      ['ناصر العمري', 'موجِّه · متابَع · مشرف مجموعة', 'أحمد السالم', '—', '[البريد]', on],
+      ['يوسف الشمري', 'متابَع · عضو مجموعة', '—', '[رقم الجوال]', '—', off],
+      ['ماجد الزهراني', 'بدون دور', '—', '—', '—', off]
+    ];
+    const users = raw.map(([name, roles, mgr, phone, email, l]) => ({
+      name, roles, mgr, mgrColor: mgr === 'أعلى مستوى' || mgr === '—' ? '#94A3B8' : '#334155', phone, email, login: l.l, lc: l.c, lb: l.b,
+      phoneColor: phone === '—' ? '#94A3B8' : '#334155',
+      emailColor: email === '—' ? '#94A3B8' : '#334155'
+    }));
+    return { users };
+  }
+}
+</script>
+</body>
+</html>

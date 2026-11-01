@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>الإشعارات</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.hdr-btn:hover{background:#F0F5FA !important;color:#7446F0 !important}
+.item:hover{background:#F8FAFC !important}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1100px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <!-- Sticky app header -->
+  <header style="position: sticky; top: 0; z-index: 20; height: 64px; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 12px; padding: 0 32px; box-sizing: border-box;">
+    <a href="Main.dc.html" aria-label="الرئيسية" style="width: 32px; height: 32px; border-radius: 8px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none;">ت</a>
+    <div style="flex: 1;"></div>
+    <a href="Messages.dc.html" class="hdr-btn" aria-label="الرسائل، 2 غير مقروءة" style="position: relative; width: 44px; height: 44px; border-radius: 8px; color: #334155; display: flex; align-items: center; justify-content: center;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+      <span style="position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 999px; background: #7446F0; color: #FFFFFF; font-size: 11px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">2</span>
+    </a>
+    <a href="#" aria-current="page" aria-label="الإشعارات" style="position: relative; width: 44px; height: 44px; border-radius: 8px; background: #EFEAFE; color: #5A2FD6; display: flex; align-items: center; justify-content: center;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>
+      <sc-if value="{{hasUnread}}" hint-placeholder-val="{{true}}">
+        <span style="position: absolute; top: 6px; left: 6px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 999px; background: #B91C1C; color: #FFFFFF; font-size: 11px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">{{unreadCount}}</span>
+      </sc-if>
+    </a>
+    <a href="Profile.dc.html" aria-label="الملف الشخصي" style="width: 36px; height: 36px; margin-inline-start: 8px; border-radius: 999px; background: #001447; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; text-decoration: none;">أ</a>
+  </header>
+
+  <main style="width: 100%; max-width: 880px; margin: 0 auto; padding: 32px 24px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447; flex: 1 1 auto;">الإشعارات</h1>
+      <button type="button" onClick="{{markAll}}" class="btn-ghost" style="height: 40px; padding: 0 14px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 14px; cursor: pointer;">تعليم الكل كمقروء</button>
+      <a href="Profile.dc.html#notif" style="height: 40px; display: inline-flex; align-items: center; padding: 0 8px; font-size: 14px; text-decoration: none;">التفضيلات</a>
+    </div>
+
+    <div role="tablist" aria-label="تصفية" style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+        <button type="button" role="tab" aria-selected="{{f.on}}" onClick="{{f.pick}}" style="height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid {{f.border}}; background: {{f.bg}}; color: {{f.fg}}; font: inherit; font-size: 14px; cursor: pointer;">{{f.label}}</button>
+      </sc-for>
+    </div>
+
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+      <section style="display: flex; flex-direction: column; gap: 8px;">
+        <h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #64748B;">{{g.day}}</h2>
+        <div style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; overflow: hidden;">
+          <sc-for list="{{g.items}}" as="n" hint-placeholder-count="3">
+            <div class="item" style="display: flex; gap: 14px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; background: {{n.bg}};">
+              <span style="width: 40px; height: 40px; flex: none; border-radius: 999px; background: {{n.tint}}; color: {{n.color}}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;">{{n.badge}}</span>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                <a href="{{n.href}}" onClick="{{n.read}}" style="font-size: 15px; font-weight: {{n.weight}}; color: #1E293B; text-decoration: none; line-height: 1.6;">{{n.title}}</a>
+                <span style="font-size: 14px; color: #475569;">{{n.body}}</span>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: #64748B;">
+                  <span>{{n.when}}</span><span>·</span><span>{{n.channel}}</span>
+                </div>
+                <sc-if value="{{n.hasAction}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; gap: 8px; margin-top: 6px;">
+                    <button type="button" onClick="{{n.read}}" style="height: 36px; padding: 0 14px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;">{{n.action}}</button>
+                    <sc-if value="{{n.hasAction2}}" hint-placeholder-val="{{false}}">
+                      <button type="button" onClick="{{n.read}}" class="btn-ghost" style="height: 36px; padding: 0 12px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 13px; cursor: pointer;">{{n.action2}}</button>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+              <span aria-label="{{n.dotLabel}}" style="width: 10px; height: 10px; margin-top: 8px; flex: none; border-radius: 999px; background: {{n.dot}};"></span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-for>
+    <sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+      <div style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 40px; text-align: center; color: #64748B; font-size: 15px;">لا إشعارات هنا.</div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'all', read: {} };
+  }
+  renderVals() {
+    const s = this.state;
+    const kinds = {
+      assign: { badge: 'ع', tint: '#EFEAFE', color: '#5A2FD6' },
+      contact: { badge: 'ت', tint: '#FEF2F2', color: '#B91C1C' },
+      group: { badge: 'ج', tint: '#E0EEFA', color: '#0F4C81' },
+      plan: { badge: 'خ', tint: '#FFFBEB', color: '#92400E' },
+      info: { badge: 'ح', tint: '#F1F5F9', color: '#334155' }
+    };
+    const all = [
+      { id: 1, day: 'اليوم', k: 'assign', cat: 'mentor', title: 'عيّنك المشرف موجِّهًا لماجد الزهراني', body: 'أصبح لديك 6 متابَعين. ابدأ بلقاء تعارف.', when: 'قبل ساعتين', channel: 'داخل التطبيق + بريد', href: 'Mentee.dc.html', action: 'جدولة لقاء' },
+      { id: 2, day: 'اليوم', k: 'contact', cat: 'mentor', title: 'لم تتواصل مع فهد المطيري منذ 34 يومًا', body: 'سجّل متابعة أو نشاطًا لتحديث «آخر تواصل».', when: 'قبل 4 ساعات', channel: 'داخل التطبيق', href: 'FollowUp.dc.html', action: 'متابعة جديدة' },
+      { id: 3, day: 'اليوم', k: 'group', cat: 'group', title: 'أكّد حضورك: حلقة الثلاثاء', body: 'الثلاثاء 3 نوفمبر · 8:00 م · المسجد', when: 'قبل 6 ساعات', channel: 'داخل التطبيق + بريد', href: 'Group.dc.html', action: 'سأحضر', action2: 'أعتذر' },
+      { id: 4, day: 'أمس', k: 'plan', cat: 'mine', title: 'تقرير خطتك «قراءة كتاب شهريًا» مستحق', body: 'يطلبه د. سعد كل أسبوعين.', when: 'أمس 9:00 م', channel: 'داخل التطبيق + بريد', href: 'MyPlan.dc.html', action: 'إرسال التقرير' },
+      { id: 5, day: 'أمس', k: 'plan', cat: 'mine', title: 'علّق د. سعد على تقريرك في «تنظيم الوقت»', body: '«تقدّم واضح، استمر.»', when: 'أمس 4:12 م', channel: 'داخل التطبيق', href: 'MyPlan.dc.html', read: true },
+      { id: 6, day: 'هذا الأسبوع', k: 'info', cat: 'group', title: 'سُجِّل حضور يوسف في درس الثلاثاء', body: 'حلقة الثلاثاء — درس التفسير', when: 'الثلاثاء 27 أكتوبر', channel: 'داخل التطبيق', href: 'Group.dc.html', read: true },
+      { id: 7, day: 'هذا الأسبوع', k: 'assign', cat: 'mentor', title: 'أرسل يوسف الشمري تقرير «حفظ جزء عمّ»', body: '22 → 24 سورة · يتحسّن', when: 'الإثنين 26 أكتوبر', channel: 'داخل التطبيق', href: 'Mentee.dc.html', read: true }
+    ];
+    const isRead = (n) => n.read || s.read[n.id];
+    const fdefs = [['all', 'الكل'], ['unread', 'غير المقروءة'], ['mentor', 'متابَعيّ'], ['mine', 'رحلتي'], ['group', 'المجموعات']];
+    const filters = fdefs.map(([id, label]) => {
+      const on = s.filter === id;
+      return { label, on, bg: on ? '#001447' : '#FFFFFF', fg: on ? '#FFFFFF' : '#334155', border: on ? '#001447' : '#D1D5DB', pick: () => this.setState({ filter: id }) };
+    });
+    const visible = all.filter((n) => s.filter === 'all' ? true : s.filter === 'unread' ? !isRead(n) : n.cat === s.filter);
+    const days = [];
+    visible.forEach((n) => { if (days.indexOf(n.day) < 0) days.push(n.day); });
+    const groups = days.map((day) => ({
+      day,
+      items: visible.filter((n) => n.day === day).map((n) => {
+        const r = isRead(n);
+        return Object.assign({}, kinds[n.k], n, {
+          bg: r ? '#FFFFFF' : '#FAF8FF', weight: r ? '400' : '600',
+          dot: r ? 'transparent' : '#7446F0', dotLabel: r ? 'مقروء' : 'غير مقروء',
+          hasAction: !!n.action && !r, hasAction2: !!n.action2,
+          read: () => this.setState({ read: Object.assign({}, s.read, { [n.id]: true }) })
+        });
+      })
+    }));
+    const unreadCount = all.filter((n) => !isRead(n)).length;
+    return {
+      filters, groups, empty: groups.length === 0,
+      unreadCount, hasUnread: unreadCount > 0,
+      markAll: () => { const m = {}; all.forEach((n) => { m[n.id] = true; }); this.setState({ read: m }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

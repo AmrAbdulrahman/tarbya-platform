@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>متابعة جديدة</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F0F5FA}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.fld{height:44px;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:15px;color:#1E293B;background:#FFFFFF}
+.fld:focus,.area:focus{outline:2px solid #7446F0;outline-offset:-1px;border-color:#7446F0}
+.area{width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:10px 12px;font:inherit;font-size:15px;line-height:1.7;color:#1E293B;background:#FFFFFF;resize:vertical}
+.lbl{font-size:14px;font-weight:600;color:#334155}
+.opt:hover{background:#F5F2FF}
+.btn-ghost:hover{border-color:#7446F0;color:#7446F0}
+</style>
+</helmet>
+<div dir="rtl" style="min-height: 1400px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; color: #1E293B; background: #F0F5FA; display: flex; flex-direction: column;">
+
+  <header style="height: 64px; background: #FFFFFF; border-bottom: 1px solid #D1D5DB; display: flex; align-items: center; gap: 16px; padding: 0 32px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: #7446F0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700;">ت</div>
+    <nav aria-label="مسار التنقل" style="display: flex; gap: 8px; font-size: 14px; color: #64748B;">
+      <a href="Main.dc.html" style="text-decoration: none;">الرئيسية</a><span>/</span><span style="color: #1E293B; font-weight: 600;">متابعة جديدة</span>
+    </nav>
+  </header>
+
+  <main style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 28px 32px 48px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+    <form style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447;">{{heading}}</h1>
+
+      <!-- Type -->
+      <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <span class="lbl">نوع الإدخال</span>
+        <div role="radiogroup" aria-label="نوع الإدخال" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid #D1D5DB; border-radius: 8px; overflow: hidden;">
+          <button type="button" role="radio" aria-checked="{{isFollowup}}" onClick="{{pickFollowup}}" style="min-height: 64px; border: none; border-left: 1px solid #D1D5DB; background: {{fBg}}; color: {{fFg}}; font: inherit; text-align: start; padding: 10px 16px; display: flex; flex-direction: column; gap: 2px; cursor: pointer;">
+            <span style="font-size: 15px; font-weight: 600;">متابعة / لقاء</span>
+            <span style="font-size: 13px; opacity: .85;">ملاحظات، تحديات، مهام، وتحديث الخطط</span>
+          </button>
+          <button type="button" role="radio" aria-checked="{{isActivity}}" onClick="{{pickActivity}}" style="min-height: 64px; border: none; background: {{aBg}}; color: {{aFg}}; font: inherit; text-align: start; padding: 10px 16px; display: flex; flex-direction: column; gap: 2px; cursor: pointer;">
+            <span style="font-size: 15px; font-weight: 600;">نشاط</span>
+            <span style="font-size: 13px; opacity: .85;">نزهة، سفر، رياضة، طعام… بدون جدول متابعة</span>
+          </button>
+        </div>
+        <sc-if value="{{isActivity}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <sc-for list="{{activityTypes}}" as="t" hint-placeholder-count="5">
+              <button type="button" aria-pressed="{{t.on}}" onClick="{{t.pick}}" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid {{t.border}}; background: {{t.bg}}; color: {{t.fg}}; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;">{{t.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+
+      <!-- Who & when -->
+      <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px; position: relative;">
+          <label class="lbl" for="who">{{whoLabel}}</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 44px; border: 1px solid #7446F0; outline: 2px solid #E4DBFD; border-radius: 4px; padding: 4px 8px; background: #FFFFFF;">
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 6px 0 10px; border-radius: 999px; background: #EFEAFE; color: #5A2FD6; font-size: 14px; font-weight: 600;">
+              يوسف الشمري
+              <button type="button" aria-label="إزالة يوسف الشمري" style="width: 24px; height: 24px; border: none; background: none; color: #5A2FD6; font-size: 16px; cursor: pointer; padding: 0;">×</button>
+            </span>
+            <input id="who" type="text" value="{{query}}" onChange="{{onQuery}}" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="who-list" placeholder="اكتب اسمًا أو رقم جوال…" style="flex: 1; min-width: 160px; height: 34px; border: none; outline: none; font: inherit; font-size: 15px; background: transparent;">
+          </div>
+          <sc-if value="{{showList}}" hint-placeholder-val="{{true}}">
+            <ul id="who-list" role="listbox" style="list-style: none; margin: 0; padding: 6px; border: 1px solid #D1D5DB; border-radius: 8px; background: #FFFFFF; box-shadow: 0 10px 15px -3px rgba(15,23,42,.1), 0 4px 6px -4px rgba(15,23,42,.1); display: flex; flex-direction: column; gap: 2px;">
+              <sc-for list="{{matches}}" as="u" hint-placeholder-count="3">
+                <li role="option" class="opt" aria-selected="false" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; min-height: 44px; box-sizing: border-box; cursor: pointer;">
+                  <span style="width: 32px; height: 32px; border-radius: 999px; background: #F1F5F9; color: #334155; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">{{u.initial}}</span>
+                  <span style="display: flex; flex-direction: column;">
+                    <span style="font-size: 15px;"><strong style="color: #5A2FD6;">{{u.hit}}</strong>{{u.rest}}</span>
+                    <span style="font-size: 12px; color: #64748B;">{{u.meta}}</span>
+                  </span>
+                </li>
+              </sc-for>
+              <sc-if value="{{noMatch}}" hint-placeholder-val="{{false}}">
+                <li style="padding: 10px; font-size: 14px; color: #64748B;">لا نتائج ضمن متابَعيك.</li>
+              </sc-if>
+            </ul>
+          </sc-if>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="d">التاريخ</label><input id="d" class="fld" type="date" value="2026-11-01"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="t">الوقت</label><input id="t" class="fld" type="time" value="19:30"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl" for="l">المكان</label><input id="l" class="fld" type="text" placeholder="مثال: المسجد، مقهى، عن بُعد"></div>
+        </div>
+      </section>
+
+      <!-- Notes by visibility -->
+      <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">الملاحظات</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label class="lbl" for="n1" style="display: inline-flex; align-items: center; gap: 6px;">ملاحظات مشتركة <span style="font-size: 12px; font-weight: 600; color: #047857; background: #ECFDF5; border-radius: 999px; padding: 1px 8px;">يراها المتابَع</span></label>
+          <textarea id="n1" class="area" rows="3" placeholder="ما الذي تريد أن يقرأه يوسف بعد اللقاء؟"></textarea>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <label class="lbl" for="n2" style="display: inline-flex; align-items: center; gap: 6px;">ملاحظات خاصة <span style="font-size: 12px; font-weight: 600; color: #92400E; background: #FFFBEB; border-radius: 999px; padding: 1px 8px;">الموجِّه والمشرفون فقط</span></label>
+          <textarea id="n2" class="area" rows="3" placeholder="ملاحظات لا تظهر للمتابَع"></textarea>
+        </div>
+      </section>
+
+      <sc-if value="{{isFollowup}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Challenges & tasks -->
+          <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">التحديات</h2>
+              <div style="display: flex; gap: 8px; align-items: center; font-size: 14px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 12px;"><span style="flex: 1;">ضغط الاختبارات النهائية</span><button type="button" aria-label="حذف التحدي" style="width: 32px; height: 32px; border: none; background: none; color: #64748B; cursor: pointer;">×</button></div>
+              <button type="button" class="btn-ghost" style="height: 40px; border: 1px dashed #CBD5E1; border-radius: 4px; background: #FFFFFF; color: #475569; font: inherit; font-size: 14px; cursor: pointer;">+ إضافة تحدٍّ</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">مهام لمرة واحدة</h2>
+              <div style="display: flex; gap: 8px; align-items: center; font-size: 14px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 12px;"><span style="flex: 1;">إعداد جدول مراجعة أسبوعي</span><span style="font-size: 12px; color: #64748B;">قبل 10 نوفمبر</span></div>
+              <button type="button" class="btn-ghost" style="height: 40px; border: 1px dashed #CBD5E1; border-radius: 4px; background: #FFFFFF; color: #475569; font: inherit; font-size: 14px; cursor: pointer;">+ إضافة مهمة</button>
+            </div>
+          </section>
+
+          <!-- Plan updates -->
+          <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #001447;">تحديث خطط التطوير</h2>
+            <sc-for list="{{planRows}}" as="p" hint-placeholder-count="3">
+              <div style="display: grid; grid-template-columns: minmax(160px, 2fr) 90px 110px minmax(120px, 1fr); gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid #F1F5F9;">
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-size: 15px; font-weight: 600;">{{p.name}}</span>
+                  <span style="font-size: 12px; color: #64748B;">{{p.tracking}}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; font-size: 12px; color: #64748B;">السابق<span style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: #334155;">{{p.prev}}</span></div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <label for="{{p.id}}" style="font-size: 12px; color: #64748B;">الجديد</label>
+                  <input id="{{p.id}}" class="fld" type="number" value="{{p.next}}" style="height: 40px; font-family: 'Space Grotesk', sans-serif;">
+                </div>
+                <span style="font-size: 13px; font-weight: 700; color: {{p.color}};">{{p.arrow}} {{p.delta}}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+      <!-- Notify -->
+      <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 18px 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+        <span class="lbl" style="flex: 1 1 200px;">إشعار المتابَع</span>
+        <label style="display: flex; gap: 8px; align-items: center; min-height: 44px; font-size: 14px;"><input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #7446F0;"> داخل التطبيق</label>
+        <label style="display: flex; gap: 8px; align-items: center; min-height: 44px; font-size: 14px; color: #64748B;"><input type="checkbox" disabled style="width: 18px; height: 18px;"> بريد إلكتروني (لا يوجد بريد لهذا العضو)</label>
+      </section>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button type="submit" style="height: 48px; padding: 0 28px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer;">حفظ</button>
+        <button type="button" class="btn-ghost" style="height: 48px; padding: 0 22px; border: 1px solid #D1D5DB; border-radius: 4px; background: #FFFFFF; color: #334155; font: inherit; font-size: 16px; cursor: pointer;">حفظ كمسودة</button>
+        <a href="Main.dc.html" style="height: 48px; display: inline-flex; align-items: center; padding: 0 12px; font-size: 15px; text-decoration: none;">إلغاء</a>
+      </div>
+    </form>
+
+    <!-- Context -->
+    <aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+      <section style="background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: 10px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: #001447;">من اللقاء السابق — 28 أكتوبر</h2>
+        <div style="font-size: 14px; line-height: 1.8; color: #475569;">تحدٍّ مفتوح: ضغط الاختبارات.<br>مهام: 1 من 3 منجزة.</div>
+        <div style="height: 1px; background: #E2E8F0;"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;"><span style="color: #64748B;">آخر تواصل</span><span style="font-weight: 600;">قبل 3 أيام</span></div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;"><span style="color: #64748B;">حضور الحلقة (آخر 4)</span><span style="font-weight: 600;">3 من 4</span></div>
+      </section>
+      <p style="margin: 0; font-size: 13px; line-height: 1.8; color: #64748B;">يظهر هذا الإدخال في سجل المتابَع وفي لوحة الموجِّه، ويُحدِّث «آخر تواصل» تلقائيًا.</p>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { kind: 'followup', act: 'sport', query: 'خا' };
+  }
+  renderVals() {
+    const s = this.state;
+    const isFollowup = s.kind === 'followup';
+    const people = [
+      { name: 'خالد العتيبي', meta: 'متابَعك · بدون مجموعة' },
+      { name: 'خالد الغامدي', meta: 'متابَعك · حلقة الثلاثاء' },
+      { name: 'خالد بن ناصر', meta: 'متابَعك · شباب الحي' },
+      { name: 'فهد المطيري', meta: 'متابَعك · حلقة الثلاثاء' },
+      { name: 'عمر القحطاني', meta: 'متابَعك · شباب الحي' }
+    ];
+    const q = (s.query || '').trim();
+    const matches = q ? people.filter((p) => p.name.indexOf(q) === 0).map((p) => ({
+      initial: p.name.charAt(0), hit: p.name.slice(0, q.length), rest: p.name.slice(q.length), meta: p.meta
+    })) : [];
+    const acts = [['outing', 'نزهة'], ['travel', 'سفر'], ['sport', 'رياضة'], ['food', 'طعام'], ['other', 'أخرى']];
+    const activityTypes = acts.map(([id, label]) => {
+      const on = s.act === id;
+      return { label, on, bg: on ? '#7446F0' : '#FFFFFF', fg: on ? '#FFFFFF' : '#334155', border: on ? '#7446F0' : '#D1D5DB', pick: () => this.setState({ act: id }) };
+    });
+    const planRows = [
+      { id: 'p1', name: 'حفظ جزء عمّ', tracking: 'عدد السور (تراكمي)', prev: 22, next: 24, color: '#047857', arrow: '↑', delta: '+2 تحسّن' },
+      { id: 'p2', name: 'صلاة الفجر جماعة', tracking: 'أيام في الأسبوع', prev: 5, next: 5, color: '#475569', arrow: '–', delta: 'ثابت' },
+      { id: 'p3', name: 'ضبط استخدام الجوال', tracking: 'تقييم ذاتي 1–10', prev: 3, next: 4, color: '#047857', arrow: '↑', delta: '+1 تحسّن' }
+    ];
+    return {
+      isFollowup, isActivity: !isFollowup,
+      heading: isFollowup ? 'متابعة جديدة' : 'نشاط جديد',
+      whoLabel: isFollowup ? 'المتابَع' : 'المشاركون (يمكن اختيار أكثر من عضو)',
+      fBg: isFollowup ? '#EFEAFE' : '#FFFFFF', fFg: isFollowup ? '#4A22B8' : '#334155',
+      aBg: !isFollowup ? '#EFEAFE' : '#FFFFFF', aFg: !isFollowup ? '#4A22B8' : '#334155',
+      pickFollowup: () => this.setState({ kind: 'followup' }),
+      pickActivity: () => this.setState({ kind: 'activity' }),
+      activityTypes,
+      query: s.query,
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      showList: q.length > 0, matches, noMatch: q.length > 0 && matches.length === 0,
+      planRows
+    };
+  }
+}
+</script>
+</body>
+</html>

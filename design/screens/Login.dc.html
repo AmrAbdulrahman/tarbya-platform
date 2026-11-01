@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>تسجيل الدخول</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#7446F0}a:hover{color:#5A2FD6}
+.dots{background-color:#001447;background-image:radial-gradient(rgba(255,255,255,.10) 1px,transparent 1px);background-size:40px 40px}
+.fld{height:48px;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;padding:0 12px;font:inherit;font-size:16px;color:#1E293B;background:#FFFFFF}
+.fld:focus{outline:2px solid #7446F0;outline-offset:-1px;border-color:#7446F0}
+.otp{width:52px;height:56px;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:4px;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;color:#001447;background:#FFFFFF}
+.otp:focus{outline:2px solid #7446F0;outline-offset:-1px}
+</style>
+</helmet>
+<div dir="{{dir}}" lang="{{lang}}" style="min-height: 900px; display: flex; flex-wrap: wrap; font-family: {{font}}; color: #1E293B; background: #FFFFFF;">
+
+  <section class="dots" style="flex: 1 1 420px; min-height: 280px; padding: 48px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; color: #FFFFFF;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: #7446F0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; font-family: 'IBM Plex Sans Arabic', sans-serif;">ت</div>
+      <span style="font-size: 22px; font-weight: 700;">{{t.brand}}</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 460px;">
+      <h1 style="margin: 0; font-size: 40px; line-height: 1.25; font-weight: 700;">{{t.hero}}</h1>
+      <p style="margin: 0; font-size: 17px; line-height: 1.8; color: rgba(255,255,255,.78);">{{t.sub}}</p>
+    </div>
+    <span style="font-size: 13px; color: rgba(255,255,255,.7);">{{t.closed}}</span>
+  </section>
+
+  <section style="flex: 1 1 480px; padding: 40px 48px; box-sizing: border-box; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: flex-end;">
+      <div role="group" aria-label="Language / اللغة" style="display: inline-flex; border: 1px solid #D1D5DB; border-radius: 999px; overflow: hidden;">
+        <button type="button" aria-pressed="{{isAr}}" onClick="{{toAr}}" style="height: 40px; padding: 0 16px; border: none; background: {{arBg}}; color: {{arFg}}; font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;">عربي</button>
+        <button type="button" aria-pressed="{{isEn}}" onClick="{{toEn}}" style="height: 40px; padding: 0 16px; border: none; background: {{enBg}}; color: {{enFg}}; font-family: Inter, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;">English</button>
+      </div>
+    </div>
+
+    <form style="margin: auto 0; width: 100%; max-width: 420px; align-self: center; display: flex; flex-direction: column; gap: 20px; padding: 32px 0;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <h2 style="margin: 0; font-size: 28px; font-weight: 700; color: #001447;">{{t.title}}</h2>
+        <span style="font-size: 15px; color: #64748B;">{{t.lead}}</span>
+      </div>
+
+      <div role="tablist" aria-label="{{t.method}}" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #F0F5FA; border-radius: 8px; padding: 4px; gap: 4px;">
+        <button type="button" role="tab" aria-selected="{{isPw}}" onClick="{{toPw}}" style="height: 40px; border: none; border-radius: 6px; background: {{pwBg}}; color: {{pwFg}}; box-shadow: {{pwSh}}; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">{{t.pw}}</button>
+        <button type="button" role="tab" aria-selected="{{isOtp}}" onClick="{{toOtp}}" style="height: 40px; border: none; border-radius: 6px; background: {{otpBg}}; color: {{otpFg}}; box-shadow: {{otpSh}}; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">{{t.otp}}</button>
+      </div>
+
+      <sc-if value="{{isPw}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="em" style="font-size: 14px; font-weight: 600; color: #334155;">{{t.email}}</label>
+            <input id="em" class="fld" type="email" autocomplete="username" dir="ltr" placeholder="name@example.com">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex;"><label for="pw" style="flex: 1; font-size: 14px; font-weight: 600; color: #334155;">{{t.password}}</label><a href="#" style="font-size: 14px; text-decoration: none;">{{t.forgot}}</a></div>
+            <input id="pw" class="fld" type="password" autocomplete="current-password">
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isOtp}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="ph" style="font-size: 14px; font-weight: 600; color: #334155;">{{t.phoneOrEmail}}</label>
+            <input id="ph" class="fld" type="text" dir="ltr" placeholder="05XXXXXXXX">
+          </div>
+          <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+            <legend style="font-size: 14px; font-weight: 600; color: #334155; padding: 0; margin-bottom: 8px;">{{t.code}}</legend>
+            <div dir="ltr" style="display: flex; gap: 8px; justify-content: space-between;">
+              <input class="otp" aria-label="1" inputmode="numeric" maxlength="1" value="4">
+              <input class="otp" aria-label="2" inputmode="numeric" maxlength="1" value="8">
+              <input class="otp" aria-label="3" inputmode="numeric" maxlength="1" value="1">
+              <input class="otp" aria-label="4" inputmode="numeric" maxlength="1">
+              <input class="otp" aria-label="5" inputmode="numeric" maxlength="1">
+              <input class="otp" aria-label="6" inputmode="numeric" maxlength="1">
+            </div>
+            <span style="font-size: 13px; color: #64748B;">{{t.resend}}</span>
+          </fieldset>
+        </div>
+      </sc-if>
+
+      <button type="submit" style="height: 48px; border: none; border-radius: 4px; background: #7446F0; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer;">{{t.submit}}</button>
+      <p style="margin: 0; font-size: 13px; line-height: 1.7; color: #64748B; text-align: center;">{{t.note}}</p>
+    </form>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: 'ar', method: 'pw' };
+  }
+  renderVals() {
+    const ar = {
+      brand: 'تربية', hero: 'رافِق من تُرشدهم، خطوةً بخطوة.',
+      sub: 'متابعات، خطط تطوير، ولقاءات المجموعات في مكان واحد — مع رؤية واضحة لاتجاه التقدّم.',
+      closed: 'منصة مغلقة · الدخول بدعوة من المشرف',
+      title: 'تسجيل الدخول', lead: 'مرحبًا بعودتك.', method: 'طريقة الدخول',
+      pw: 'كلمة المرور', otp: 'رمز لمرة واحدة', email: 'البريد الإلكتروني', password: 'كلمة المرور', forgot: 'نسيت كلمة المرور؟',
+      phoneOrEmail: 'الجوال أو البريد', code: 'أدخل الرمز المرسل', resend: 'إعادة الإرسال بعد 0:42',
+      submit: 'دخول', note: 'الدخول متاح حاليًا للمشرفين والموجِّهين فقط.'
+    };
+    const en = {
+      brand: 'Tarbya', hero: 'Walk with the people you mentor, step by step.',
+      sub: 'Follow-ups, development plans and group gatherings in one place, with a clear view of where progress is heading.',
+      closed: 'Closed platform · access by moderator invitation',
+      title: 'Sign in', lead: 'Welcome back.', method: 'Sign-in method',
+      pw: 'Password', otp: 'One-time code', email: 'Email', password: 'Password', forgot: 'Forgot password?',
+      phoneOrEmail: 'Phone or email', code: 'Enter the code we sent', resend: 'Resend in 0:42',
+      submit: 'Sign in', note: 'Sign-in is currently open to moderators and mentors only.'
+    };
+    const s = this.state;
+    const isAr = s.lang === 'ar';
+    const isPw = s.method === 'pw';
+    const seg = (on) => ({ bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#001447' : '#475569', sh: on ? '0 1px 2px rgba(15,23,42,.12)' : 'none' });
+    const pw = seg(isPw), otp = seg(!isPw);
+    return {
+      t: isAr ? ar : en, isAr, isEn: !isAr,
+      dir: isAr ? 'rtl' : 'ltr', lang: isAr ? 'ar' : 'en',
+      font: isAr ? "'IBM Plex Sans Arabic', system-ui, sans-serif" : "Inter, system-ui, sans-serif",
+      arBg: isAr ? '#001447' : '#FFFFFF', arFg: isAr ? '#FFFFFF' : '#334155',
+      enBg: !isAr ? '#001447' : '#FFFFFF', enFg: !isAr ? '#FFFFFF' : '#334155',
+      toAr: () => this.setState({ lang: 'ar' }), toEn: () => this.setState({ lang: 'en' }),
+      isPw, isOtp: !isPw,
+      pwBg: pw.bg, pwFg: pw.fg, pwSh: pw.sh, otpBg: otp.bg, otpFg: otp.fg, otpSh: otp.sh,
+      toPw: () => this.setState({ method: 'pw' }), toOtp: () => this.setState({ method: 'otp' })
+    };
+  }
+}
+</script>
+</body>
+</html>
