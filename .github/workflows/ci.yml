@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: tarbya
+          POSTGRES_PASSWORD: tarbya
+          POSTGRES_DB: tarbya
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U tarbya"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: cp .env.example .env
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: pnpm nx format:check
+      - run: pnpm nx affected -t lint typecheck test build
+
+      # The committed OpenAPI spec and generated client must match the API code.
+      - run: pnpm nx run api-client:generate
+      - run: git diff --exit-code -- apps/api/openapi.json libs/api-client/src/generated
+
+      - run: pnpm nx run db:migrate-deploy
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm nx affected -t e2e

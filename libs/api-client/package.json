@@ -1,0 +1,53 @@
+{
+  "name": "@tarbya/api-client",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "nx": {
+    "name": "api-client",
+    "tags": [
+      "scope:web"
+    ],
+    "targets": {
+      "generate": {
+        "dependsOn": [
+          {
+            "projects": [
+              "api"
+            ],
+            "target": "openapi"
+          }
+        ],
+        "command": "orval --config orval.config.ts",
+        "options": {
+          "cwd": "{projectRoot}"
+        },
+        "inputs": [
+          "{workspaceRoot}/apps/api/openapi.json",
+          "{projectRoot}/orval.config.ts",
+          "{projectRoot}/src/fetcher.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/src/generated"
+        ],
+        "cache": true
+      }
+    }
+  },
+  "devDependencies": {
+    "orval": "^8.46.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.105.1"
+  }
+}

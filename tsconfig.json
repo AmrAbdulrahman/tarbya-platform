@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./apps/api-e2e"
+    },
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./libs/shared"
+    },
+    {
+      "path": "./libs/db"
+    },
+    {
+      "path": "./libs/api-client"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/i18n"
+    }
+  ],
+  "compilerOptions": {}
+}

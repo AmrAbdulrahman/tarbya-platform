@@ -1,0 +1,10 @@
+# Add files here to ignore them from prettier formatting
+/dist
+/coverage
+/.nx/cache
+/.nx/workspace-data
+.nx/self-healing/design
+pnpm-lock.yaml
+**/src/generated
+**/routeTree.gen.ts
+apps/api/openapi.json

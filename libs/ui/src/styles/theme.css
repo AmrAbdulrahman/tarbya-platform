@@ -1,0 +1,45 @@
+/* Design tokens from design/README.md. Import after `@import "tailwindcss";`. */
+
+@theme {
+  --font-sans: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  --font-figures: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+
+  --color-primary: #7446f0;
+  --color-primary-hover: #5a2fd6;
+  --color-primary-tint: #efeafe;
+  --color-primary-strong: #4a22b8;
+  --color-primary-foreground: #ffffff;
+
+  --color-navy: #001447;
+  --color-surface: #f0f5fa;
+  --color-card: #ffffff;
+  --color-border: #d1d5db;
+  --color-divider: #e2e8f0;
+  --color-ink: #1e293b;
+  --color-ink-muted: #475569;
+  --color-ink-subtle: #64748b;
+
+  --color-trend-up: #047857;
+  --color-trend-down: #b91c1c;
+  --color-trend-steady: #475569;
+  --color-warn: #b45309;
+
+  --color-manager: #0f4c81;
+  --color-manager-tint: #e0eefa;
+
+  --radius-control: 4px;
+  --radius-card: 10px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-surface);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

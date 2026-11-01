@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+@import '@tarbya/ui/theme.css';
+
+/* Scan the UI library for class names too. */
+@source '../../../libs/ui/src';
