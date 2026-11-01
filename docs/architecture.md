@@ -2,27 +2,27 @@
 
 ## Stack
 
-| Concern | Choice |
-|---|---|
-| Monorepo | Nx workspace, pnpm |
-| Runtime | Node.js LTS |
-| Web | React SPA, TypeScript, Vite, ESLint |
-| Web UI | Tailwind CSS + shadcn/ui, tokens from `design/README.md` |
-| Routing / forms | TanStack Router, React Hook Form + Zod |
-| Server state | TanStack Query (hooks generated from OpenAPI) |
-| i18n | i18next + react-i18next; `ar` (default, RTL) and `en` (LTR) |
-| API | NestJS, REST, OpenAPI via `@nestjs/swagger` |
-| API client | Orval generates typed client + TanStack Query hooks into `libs/api-client` |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Auth | Built in Nest: argon2 passwords, email one-time codes, JWT access + rotating refresh tokens in httpOnly cookies |
-| Realtime | Server-Sent Events for notifications and messages |
-| Jobs | pg-boss (queue + cron in Postgres) |
-| Email | SMTP (Nodemailer); Mailpit locally |
-| Files | S3-compatible API: Railway Storage Buckets in production, MinIO locally |
-| Tests | Vitest (web), Jest (api), Playwright (e2e) |
-| CI | GitHub Actions with `nx affected` |
-| Hosting | Railway: `api` service, `web` static service, managed Postgres, storage bucket |
+| Concern         | Choice                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| Monorepo        | Nx workspace, pnpm                                                                                              |
+| Runtime         | Node.js LTS                                                                                                     |
+| Web             | React SPA, TypeScript, Vite, ESLint                                                                             |
+| Web UI          | Tailwind CSS + shadcn/ui, tokens from `design/README.md`                                                        |
+| Routing / forms | TanStack Router, React Hook Form + Zod                                                                          |
+| Server state    | TanStack Query (hooks generated from OpenAPI)                                                                   |
+| i18n            | i18next + react-i18next; `ar` (default, RTL) and `en` (LTR)                                                     |
+| API             | NestJS, REST, OpenAPI via `@nestjs/swagger`                                                                     |
+| API client      | Orval generates typed client + TanStack Query hooks into `libs/api-client`                                      |
+| Database        | PostgreSQL                                                                                                      |
+| ORM             | Prisma                                                                                                          |
+| Auth            | Built in Nest: argon2 passwords, email one-time codes, JWT access + rotating refresh tokens in httpOnly cookies |
+| Realtime        | Server-Sent Events for notifications and messages                                                               |
+| Jobs            | pg-boss (queue + cron in Postgres)                                                                              |
+| Email           | SMTP (Nodemailer); Mailpit locally                                                                              |
+| Files           | S3-compatible API: Railway Storage Buckets in production, SeaweedFS locally                                     |
+| Tests           | Vitest (web), Jest (api), Playwright (e2e)                                                                      |
+| CI              | GitHub Actions with `nx affected`                                                                               |
+| Hosting         | Railway: `api` service, `web` static service, managed Postgres, storage bucket                                  |
 
 ## Workspace layout
 
@@ -43,6 +43,7 @@ docs/             Requirements, user stories, architecture
 ```
 
 Nx module boundaries (enforced with `@nx/enforce-module-boundaries` tags):
+
 - `scope:web` may use `ui`, `i18n`, `api-client`, `shared`.
 - `scope:api` may use `db`, `shared`.
 - `shared` depends on nothing in the workspace.
@@ -56,6 +57,7 @@ One Nest module per domain under `apps/api/src/modules/`:
 Cross-cutting pieces in `apps/api/src/common/`: auth guard, `@CurrentUser()`, `@Policy()` decorator, Zod/class-validator pipes, problem-details error filter, request-scoped audit context.
 
 Conventions:
+
 - Controllers are thin; services own rules; Prisma access stays in services.
 - DTOs carry `@ApiProperty` so the OpenAPI spec is complete; Orval regenerates the client from `apps/api/openapi.json`, which is committed and checked in CI.
 - Every list endpoint is paginated by cursor.
@@ -65,14 +67,14 @@ Conventions:
 
 Roles are derived, so permission checks are relationship checks, not role lists:
 
-| Check | Source |
-|---|---|
-| super admin | user email equals `SUPER_ADMIN_EMAIL` (env) |
-| moderator | `User.isModerator` |
-| mentor of X | active `Mentorship` where mentor = me, mentee = X |
-| group admin / moderator / member | `GroupMembership.role` |
-| manager of X | X is in my subtree (recursive query on `User.managerId`) |
-| can see group G | member of G, or in the manager chain above G's admin |
+| Check                            | Source                                                   |
+| -------------------------------- | -------------------------------------------------------- |
+| super admin                      | user email equals `SUPER_ADMIN_EMAIL` (env)              |
+| moderator                        | `User.isModerator`                                       |
+| mentor of X                      | active `Mentorship` where mentor = me, mentee = X        |
+| group admin / moderator / member | `GroupMembership.role`                                   |
+| manager of X                     | X is in my subtree (recursive query on `User.managerId`) |
+| can see group G                  | member of G, or in the manager chain above G's admin     |
 
 Each module exposes a policy service (`can(user, action, resource)`) used by a `@Policy()` guard and by services for query scoping. Lists are always filtered in SQL, never after loading.
 
@@ -113,14 +115,14 @@ Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so R
 
 ## Jobs (pg-boss)
 
-| Job | When |
-|---|---|
-| `email.send` | Queued by the notifications service; retries with backoff |
-| `gatherings.materialise` | Daily: create occurrences for the coming weeks |
-| `gatherings.rsvp-request` / `.reminder` | Scheduled per occurrence from settings lead times |
-| `contact.overdue-scan` | Daily: notify mentors of mentees crossing due/late thresholds |
-| `plans.checkin-due` | Daily: remind mentees of due check-ins |
-| `auth.cleanup` | Hourly: expired codes and sessions |
+| Job                                     | When                                                          |
+| --------------------------------------- | ------------------------------------------------------------- |
+| `email.send`                            | Queued by the notifications service; retries with backoff     |
+| `gatherings.materialise`                | Daily: create occurrences for the coming weeks                |
+| `gatherings.rsvp-request` / `.reminder` | Scheduled per occurrence from settings lead times             |
+| `contact.overdue-scan`                  | Daily: notify mentors of mentees crossing due/late thresholds |
+| `plans.checkin-due`                     | Daily: remind mentees of due check-ins                        |
+| `auth.cleanup`                          | Hourly: expired codes and sessions                            |
 
 ## Realtime
 
@@ -136,7 +138,7 @@ Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so R
 
 ## Environments and configuration
 
-- Local: `docker compose up` for Postgres, Mailpit and MinIO; `pnpm nx run-many -t serve -p api web`.
+- Local: `docker compose up` for Postgres, Mailpit and SeaweedFS (S3); `pnpm nx run-many -t serve -p api web`.
 - Config is validated at boot with Zod: `DATABASE_URL`, `JWT_SECRET`, `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD` (first boot only), `SMTP_*`, `S3_*`, `APP_URL`, `ORG_TIMEZONE` (default `Africa/Cairo`).
 - Railway: `api` runs `prisma migrate deploy` before start; `web` is a static build served with a proxy rule `/api/* → api`, so cookies stay same-site.
 

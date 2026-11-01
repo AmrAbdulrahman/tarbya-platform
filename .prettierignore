@@ -3,7 +3,8 @@
 /coverage
 /.nx/cache
 /.nx/workspace-data
-.nx/self-healing/design
+.nx/self-healing
+/design
 pnpm-lock.yaml
 **/src/generated
 **/routeTree.gen.ts
