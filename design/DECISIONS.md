@@ -6,6 +6,8 @@ Rules settled while designing Tarbya. Where a rule was my call rather than the b
 
 - Arabic and right-to-left by default; English and left-to-right are supported.
 - Each user picks a default language in their profile.
+- One organisation time zone: `Africa/Cairo`.
+- Dates in Gregorian, Hijri or both, chosen per user.
 
 ## Roles
 
@@ -21,13 +23,15 @@ Roles come from relationships, not a single "role" field. One person can hold se
 | Group moderator | Assigned by a moderator or the group admin. A group can have several. |
 | Manager | Has at least one member reporting to them (see below). |
 
-- Someone can be a mentor and a mentee at the same time; the dashboard shows "my mentors" next to "my mentees".
+- Someone can be a mentor and a mentee at the same time; the dashboard shows their mentor next to their mentees.
+- A mentee has exactly one active mentor.
 - The sidebar has one section per role the person holds: administration, my team, my mentees, my journey.
 
 ## Sign-in
 
 - Email and password, or a one-time code.
-- At first only moderators and mentors can sign in.
+- Which roles can sign in is a global setting; at first moderators and mentors.
+- Users who can't sign in get no notifications.
 - Email and phone are both optional on a user.
 
 ## Management (manager line)
@@ -43,7 +47,7 @@ Roles come from relationships, not a single "role" field. One person can hold se
   - Each action is recorded as "manager on behalf of member" in an audit log that the member, their managers and moderators can see.
   - The member is always notified; notifying the mentee is optional.
 - A manager can't read private notes between a mentor and a mentee; those stay with the mentor and moderators. *(proposed)*
-- Moderators set each user's direct manager; the users table shows it. There is no form for setting it yet, and it must block cycles.
+- Moderators set each user's direct manager (v1); managers can also move people within their own subtree (v2). Cycles are blocked. The form isn't designed yet.
 
 ## Mentoring
 
@@ -66,7 +70,8 @@ Roles come from relationships, not a single "role" field. One person can hold se
 
 ## Groups
 
-- A mentee can belong to groups, but doesn't have to.
+- Members are the group admin, group moderators and mentees. A mentee needs an active mentor to join; groups are optional.
+- The group admin's manager chain can view the group, its gatherings and attendance, without being members or getting RSVP requests.
 - A group has one or more recurring gatherings (a lesson or study circle, usually weekly).
 - Gatherings notify every member and ask them to confirm attendance.
 - Each gathering has an attendance log with notes.
