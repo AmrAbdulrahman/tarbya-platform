@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import type { MeDto } from '@tarbya/api-client';
 import { setLanguage } from '@tarbya/i18n';
-import { cn } from '@tarbya/ui';
 import { meQuery } from '../auth/session';
 import { CodeForm } from '../components/login/code-form';
 import { LanguageToggle } from '../components/login/language-toggle';
@@ -84,52 +83,32 @@ function Login() {
             </span>
           </div>
 
-          <div
-            role="tablist"
-            aria-label={t('login.method')}
-            className="grid grid-cols-2 gap-1 rounded-lg bg-surface p-1"
-          >
-            {(['password', 'code'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                role="tab"
-                id={`tab-${m}`}
-                aria-selected={method === m}
-                aria-controls={`panel-${m}`}
-                onClick={() => setMethod(m)}
-                className={cn(
-                  'h-10 rounded-md text-[15px] font-semibold',
-                  method === m
-                    ? 'bg-card text-navy shadow-sm'
-                    : 'text-ink-muted hover:text-primary',
-                )}
-              >
-                {t(m === 'password' ? 'login.password' : 'login.code')}
-              </button>
-            ))}
-          </div>
+          {method === 'password' ? (
+            <PasswordForm
+              defaultEmail={email}
+              onEmailChange={setEmail}
+              onForgot={() => setMethod('code')}
+              onSignedIn={onSignedIn}
+            />
+          ) : (
+            <CodeForm
+              defaultEmail={email}
+              onEmailChange={setEmail}
+              onSignedIn={onSignedIn}
+            />
+          )}
 
-          <div
-            role="tabpanel"
-            id={`panel-${method}`}
-            aria-labelledby={`tab-${method}`}
+          <button
+            type="button"
+            onClick={() =>
+              setMethod(method === 'password' ? 'code' : 'password')
+            }
+            className="self-center text-[15px] font-medium text-primary hover:text-primary-hover hover:underline"
           >
-            {method === 'password' ? (
-              <PasswordForm
-                defaultEmail={email}
-                onEmailChange={setEmail}
-                onForgot={() => setMethod('code')}
-                onSignedIn={onSignedIn}
-              />
-            ) : (
-              <CodeForm
-                defaultEmail={email}
-                onEmailChange={setEmail}
-                onSignedIn={onSignedIn}
-              />
-            )}
-          </div>
+            {method === 'password'
+              ? t('login.useCode')
+              : t('login.usePassword')}
+          </button>
 
           <p className="text-center text-[13px] leading-[1.7] text-ink-subtle">
             {t('login.note')}

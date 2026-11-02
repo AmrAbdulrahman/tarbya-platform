@@ -6,8 +6,8 @@ const password = process.env['SUPER_ADMIN_PASSWORD'] as string;
 async function signInAsSuperAdmin(page: Page, path: string) {
   await page.goto(path);
   await page.getByLabel('البريد الإلكتروني').fill(email);
-  await page.getByRole('tabpanel').getByLabel('كلمة المرور').fill(password);
-  await page.getByRole('button', { name: 'دخول' }).click();
+  await page.getByLabel('كلمة المرور').fill(password);
+  await page.getByRole('button', { name: 'دخول', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
 }
 
