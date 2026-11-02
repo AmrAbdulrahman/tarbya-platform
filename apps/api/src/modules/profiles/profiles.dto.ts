@@ -17,6 +17,10 @@ export class ProfileDto {
   deactivatedAt!: string | null;
   /** The viewer manages, mentors or administers this user (never true for the user themself). */
   @ApiProperty() canSeeAdminNotes!: boolean;
+  /** The member themself, their current mentor, or an admin. */
+  @ApiProperty() canSeePlans!: boolean;
+  /** Their current mentor or an admin (BR-PLAN-2). */
+  @ApiProperty() canManagePlans!: boolean;
 }
 
 export class AdminNoteDto {

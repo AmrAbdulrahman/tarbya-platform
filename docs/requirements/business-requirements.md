@@ -121,6 +121,6 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## Open questions
 
-- Trend rule: proposed default is "average of the last 3 readings vs the 3 before, ±5% counts as steady", tunable in settings. Confirm with real plans.
-- Should ending a mentorship close the mentee's open plans, or carry them over to the next mentor?
+- Trend rule: built as "average of the last 3 readings vs the 3 before, within 5% of the plan's scale counts as steady", tunable in settings, with each plan saying whether higher or lower is better. Confirm with real plans.
+- Should ending a mentorship close the mentee's open plans, or carry them over to the next mentor? For now plans belong to the mentee and carry over untouched.
 - Do group gatherings count as "contact" for a mentor's last-contact status when the mentor attends?

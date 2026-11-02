@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Plus, X } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -22,6 +22,7 @@ import {
   mineQueryKey,
 } from '../../../components/mentor/form-parts';
 import { MenteeContext } from '../../../components/mentor/mentee-context';
+import { PlanUpdates } from '../../../components/mentor/plan-updates';
 
 /** US-4.3 · design/screens/FollowUp.dc.html */
 export const Route = createFileRoute('/_app/mentor/log')({
@@ -66,6 +67,7 @@ function FollowUpPage() {
     resolver: zodResolver(schema),
     defaultValues: blank(),
   });
+  const [planValues, setPlanValues] = useState<Record<string, string>>({});
   const challenges = useFieldArray({
     control: form.control,
     name: 'challenges',
@@ -85,10 +87,20 @@ function FollowUpPage() {
         tasks: v.tasks
           .filter((task) => task.title.trim())
           .map((task) => ({ title: task.title, dueOn: task.dueOn || null })),
+        planUpdates: Object.entries(planValues)
+          .filter(
+            ([, value]) =>
+              value.trim() !== '' && Number.isFinite(Number(value)),
+          )
+          .map(([planId, value]) => ({ planId, value: Number(value) })),
       }),
     onSuccess: async (_res, v) => {
       form.reset(blank(v.menteeId));
-      await queryClient.invalidateQueries({ queryKey: mineQueryKey });
+      setPlanValues({});
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: mineQueryKey }),
+        queryClient.invalidateQueries({ queryKey: ['plans'] }),
+      ]);
     },
   });
 
@@ -255,9 +267,12 @@ function FollowUpPage() {
             </AddButton>
           </Card>
         </div>
-        <p className="text-[13px] text-ink-subtle">
-          {t('mentoring.log.plansLater')}
-        </p>
+        <PlanUpdates
+          menteeId={menteeId}
+          values={planValues}
+          onChange={setPlanValues}
+          upcoming={upcoming}
+        />
 
         <FormError
           message={save.isError ? errorMessage(t, save.error) : undefined}

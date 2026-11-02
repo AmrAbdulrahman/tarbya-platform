@@ -31,6 +31,7 @@ services:
       AWS_SECRET_ACCESS_KEY: tarbya-secret
     ports:
       - '9000:8333' # S3 API
+      - '8888:8888' # file browser (filer UI)
     volumes:
       - seaweedfs-data:/data
 

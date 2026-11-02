@@ -52,7 +52,7 @@ export const navSections: NavSection[] = [
     title: 'nav.myJourney',
     roles: ['MENTEE'],
     items: [
-      { label: 'nav.myPlans', to: '/', icon: TrendingUp },
+      { label: 'nav.myPlans', to: '/my/plans', icon: TrendingUp },
       { label: 'nav.reportToMentor', to: '/', icon: MessageSquareText },
       { label: 'nav.myGroups', to: '/', icon: Users },
     ],

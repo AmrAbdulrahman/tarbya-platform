@@ -21,7 +21,9 @@ import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settin
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppMentorActivityRouteImport } from './routes/_app/mentor/activity'
 import { Route as AppMentorLogRouteImport } from './routes/_app/mentor/log'
+import { Route as AppMyPlansRouteImport } from './routes/_app/my/plans'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people/$id'
+import { Route as AppPlansIdRouteImport } from './routes/_app/plans/$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -82,9 +84,19 @@ const AppMentorLogRoute = AppMentorLogRouteImport.update({
   path: '/log',
   getParentRoute: () => AppMentorRoute,
 } as any)
+const AppMyPlansRoute = AppMyPlansRouteImport.update({
+  id: '/my/plans',
+  path: '/my/plans',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
   id: '/people/$id',
   path: '/people/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlansIdRoute = AppPlansIdRouteImport.update({
+  id: '/plans/$id',
+  path: '/plans/$id',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -100,7 +112,9 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AppAdminUsersRoute
   '/mentor/activity': typeof AppMentorActivityRoute
   '/mentor/log': typeof AppMentorLogRoute
+  '/my/plans': typeof AppMyPlansRoute
   '/people/$id': typeof AppPeopleIdRoute
+  '/plans/$id': typeof AppPlansIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -114,7 +128,9 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AppAdminUsersRoute
   '/mentor/activity': typeof AppMentorActivityRoute
   '/mentor/log': typeof AppMentorLogRoute
+  '/my/plans': typeof AppMyPlansRoute
   '/people/$id': typeof AppPeopleIdRoute
+  '/plans/$id': typeof AppPlansIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,7 +146,9 @@ export interface FileRoutesById {
   '/_app/admin/users': typeof AppAdminUsersRoute
   '/_app/mentor/activity': typeof AppMentorActivityRoute
   '/_app/mentor/log': typeof AppMentorLogRoute
+  '/_app/my/plans': typeof AppMyPlansRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
+  '/_app/plans/$id': typeof AppPlansIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,7 +164,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/mentor/activity'
     | '/mentor/log'
+    | '/my/plans'
     | '/people/$id'
+    | '/plans/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -160,7 +180,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/mentor/activity'
     | '/mentor/log'
+    | '/my/plans'
     | '/people/$id'
+    | '/plans/$id'
   id:
     | '__root__'
     | '/_app'
@@ -175,7 +197,9 @@ export interface FileRouteTypes {
     | '/_app/admin/users'
     | '/_app/mentor/activity'
     | '/_app/mentor/log'
+    | '/_app/my/plans'
     | '/_app/people/$id'
+    | '/_app/plans/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -269,11 +293,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMentorLogRouteImport
       parentRoute: typeof AppMentorRoute
     }
+    '/_app/my/plans': {
+      id: '/_app/my/plans'
+      path: '/my/plans'
+      fullPath: '/my/plans'
+      preLoaderRoute: typeof AppMyPlansRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/people/$id': {
       id: '/_app/people/$id'
       path: '/people/$id'
       fullPath: '/people/$id'
       preLoaderRoute: typeof AppPeopleIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/plans/$id': {
+      id: '/_app/plans/$id'
+      path: '/plans/$id'
+      fullPath: '/plans/$id'
+      preLoaderRoute: typeof AppPlansIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -316,7 +354,9 @@ interface AppRouteChildren {
   AppMentorRoute: typeof AppMentorRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppMyPlansRoute: typeof AppMyPlansRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
+  AppPlansIdRoute: typeof AppPlansIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -324,7 +364,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppMentorRoute: AppMentorRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
+  AppMyPlansRoute: AppMyPlansRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,
+  AppPlansIdRoute: AppPlansIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

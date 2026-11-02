@@ -39,7 +39,7 @@ Always run tasks through Nx with pnpm (`pnpm nx …`), not the underlying tools.
 
 ```bash
 cp .env.example .env            # first time
-docker compose up -d            # Postgres, Mailpit (http://localhost:8025), SeaweedFS (S3 on :9000)
+docker compose up -d            # Postgres, Mailpit (http://localhost:8025), SeaweedFS (S3 on :9000, file browser http://localhost:8888/buckets/)
 pnpm nx run db:migrate-deploy   # apply migrations
 pnpm nx run db:seed             # default settings + super admin user
 pnpm nx run-many -t serve -p api web   # api :3000 (/api/docs), web :4200

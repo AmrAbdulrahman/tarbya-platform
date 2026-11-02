@@ -9,6 +9,7 @@ import {
   IsDateString,
   IsIn,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -45,6 +46,26 @@ export class NewTaskDto {
   @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/)
   dueOn?: string | null;
+}
+
+/** A reading for one of the mentee's plans, recorded at the follow-up (BR-PLAN-3). */
+export class PlanUpdateDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  planId!: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(-1_000_000)
+  @Max(1_000_000)
+  value!: number;
+
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 2000 })
+  @IsOptional()
+  @Transform(trimOrNull)
+  @IsString()
+  @MaxLength(2000)
+  note?: string | null;
 }
 
 class InteractionFields {
@@ -96,6 +117,14 @@ export class CreateFollowUpDto extends InteractionFields {
   @ValidateNested({ each: true })
   @Type(() => NewTaskDto)
   tasks?: NewTaskDto[];
+
+  @ApiPropertyOptional({ type: PlanUpdateDto, isArray: true, maxItems: 20 })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => PlanUpdateDto)
+  planUpdates?: PlanUpdateDto[];
 }
 
 /** US-4.4 */

@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { NewTaskDto } from './newTaskDto.js';
+import type { PlanUpdateDto } from './planUpdateDto.js';
 
 export interface CreateFollowUpDto {
   startsAt: string;
@@ -28,4 +29,6 @@ export interface CreateFollowUpDto {
   challenges?: string[];
   /** @maxItems 20 */
   tasks?: NewTaskDto[];
+  /** @maxItems 20 */
+  planUpdates?: PlanUpdateDto[];
 }

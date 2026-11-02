@@ -77,12 +77,35 @@ export class InteractionsService {
       actorId,
       dto.menteeId,
     );
+    const startsAt = new Date(dto.startsAt);
+    const updates = dto.planUpdates ?? [];
+    if (updates.length) {
+      // Readings describe what happened; an upcoming follow-up has nothing to report yet.
+      if (startsAt > new Date()) {
+        throw new AppException(400, {
+          code: 'VALIDATION_FAILED',
+          title: 'Plan updates need a follow-up that has happened',
+          errors: { planUpdates: ['only for a follow-up in the past'] },
+        });
+      }
+      const ids = [...new Set(updates.map((u) => u.planId))];
+      const open = await this.prisma.developmentPlan.count({
+        where: { id: { in: ids }, menteeId: dto.menteeId, closedAt: null },
+      });
+      if (open !== ids.length || ids.length !== updates.length) {
+        throw new AppException(400, {
+          code: 'VALIDATION_FAILED',
+          title: "Each update must be for one of the mentee's open plans, once",
+          errors: { planUpdates: ['unknown, closed or repeated plan'] },
+        });
+      }
+    }
     const created = await this.prisma.interaction.create({
       data: {
         kind: 'FOLLOW_UP',
         mentorshipId: mentorship.id,
         createdById: actorId,
-        startsAt: new Date(dto.startsAt),
+        startsAt,
         place: dto.place ?? null,
         sharedNotes: dto.sharedNotes ?? null,
         privateNotes: dto.privateNotes ?? null,
@@ -92,6 +115,16 @@ export class InteractionsService {
           create: (dto.tasks ?? []).map((t) =>
             newTask(t, dto.menteeId, actorId),
           ),
+        },
+        readings: {
+          create: updates.map((u) => ({
+            planId: u.planId,
+            value: u.value,
+            note: u.note ?? null,
+            source: 'FOLLOW_UP' as const,
+            authorId: actorId,
+            recordedAt: startsAt,
+          })),
         },
       },
     });
