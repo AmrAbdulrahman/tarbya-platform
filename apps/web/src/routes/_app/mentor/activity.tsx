@@ -110,7 +110,11 @@ function ActivityPage() {
       }),
     onSuccess: async () => {
       form.reset(blank());
-      await queryClient.invalidateQueries({ queryKey: mineQueryKey });
+      await Promise.all(
+        [mineQueryKey, ['dashboard'], ['feed']].map((queryKey) =>
+          queryClient.invalidateQueries({ queryKey }),
+        ),
+      );
     },
   });
 

@@ -171,12 +171,13 @@ export class MentorshipsService {
       mentor: asMentee?.mentor ?? null,
       mentees: asMentor.map((m) => {
         const last = lastContacts.get(m.id) ?? null;
-        const since = last ?? m.startedAt;
+        const since = last?.at ?? m.startedAt;
         return {
           mentorshipId: m.id,
           mentee: m.mentee,
           startedAt: m.startedAt.toISOString(),
-          lastContactAt: last?.toISOString() ?? null,
+          lastContactAt: last?.at.toISOString() ?? null,
+          lastContactKind: last?.kind ?? null,
           contactStatus: contactStatus(since, now, { dueDays, lateDays }),
           daysSinceContact: daysSince(since, now),
           openTasks: tasksOf.get(m.mentee.id) ?? 0,

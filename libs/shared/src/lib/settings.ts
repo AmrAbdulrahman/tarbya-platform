@@ -9,6 +9,8 @@ export interface Settings {
   'gatherings.reminderHours': number;
   'plans.trendWindow': number;
   'plans.trendSteadyBand': number;
+  /** Days after a plan's last reading before the mentee's check-in is due. */
+  'plans.checkInDays': number;
 }
 
 export type SettingKey = keyof Settings;
@@ -21,4 +23,5 @@ export const DEFAULT_SETTINGS: Settings = {
   'gatherings.reminderHours': 3,
   'plans.trendWindow': 3,
   'plans.trendSteadyBand': 0.05,
+  'plans.checkInDays': 14,
 };

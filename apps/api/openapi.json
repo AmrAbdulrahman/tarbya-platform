@@ -1811,6 +1811,99 @@
           "plans"
         ]
       }
+    },
+    "/api/feed": {
+      "get": {
+        "operationId": "FeedController_list",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feed"
+        ]
+      }
+    },
+    "/api/dashboard/mentor": {
+      "get": {
+        "operationId": "FeedController_mentor",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentorDashboardDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feed"
+        ]
+      }
+    },
+    "/api/dashboard/journey": {
+      "get": {
+        "operationId": "FeedController_journey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JourneyDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feed"
+        ]
+      }
     }
   },
   "info": {
@@ -1915,6 +2008,11 @@
             "type": "number",
             "minimum": 0,
             "maximum": 0.5
+          },
+          "checkInDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 90
           }
         },
         "required": [
@@ -1924,7 +2022,8 @@
           "rsvpRequestHours",
           "reminderHours",
           "trendWindow",
-          "trendSteadyBand"
+          "trendSteadyBand",
+          "checkInDays"
         ]
       },
       "UpdateSettingsDto": {
@@ -1965,6 +2064,11 @@
             "type": "number",
             "minimum": 0,
             "maximum": 0.5
+          },
+          "checkInDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 90
           }
         }
       },
@@ -2564,6 +2668,13 @@
           }
         }
       },
+      "InteractionKind": {
+        "type": "string",
+        "enum": [
+          "FOLLOW_UP",
+          "ACTIVITY"
+        ]
+      },
       "ContactStatus": {
         "type": "string",
         "enum": [
@@ -2591,6 +2702,14 @@
             "format": "date-time",
             "nullable": true
           },
+          "lastContactKind": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InteractionKind"
+              }
+            ]
+          },
           "contactStatus": {
             "allOf": [
               {
@@ -2610,6 +2729,7 @@
           "mentee",
           "startedAt",
           "lastContactAt",
+          "lastContactKind",
           "contactStatus",
           "daysSinceContact",
           "openTasks"
@@ -2714,13 +2834,6 @@
         "required": [
           "mentorId",
           "menteeId"
-        ]
-      },
-      "InteractionKind": {
-        "type": "string",
-        "enum": [
-          "FOLLOW_UP",
-          "ACTIVITY"
         ]
       },
       "InteractionStatus": {
@@ -3212,6 +3325,9 @@
           },
           "canManagePlans": {
             "type": "boolean"
+          },
+          "isMentor": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -3225,7 +3341,8 @@
           "deactivatedAt",
           "canSeeAdminNotes",
           "canSeePlans",
-          "canManagePlans"
+          "canManagePlans",
+          "isMentor"
         ]
       },
       "AdminNoteDto": {
@@ -3508,6 +3625,9 @@
             "items": {
               "type": "number"
             }
+          },
+          "checkInDue": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -3524,7 +3644,8 @@
           "latestAt",
           "trend",
           "change",
-          "points"
+          "points",
+          "checkInDue"
         ]
       },
       "ReadingSource": {
@@ -3669,6 +3790,9 @@
               "type": "number"
             }
           },
+          "checkInDue": {
+            "type": "boolean"
+          },
           "mentee": {
             "$ref": "#/components/schemas/UserRefDto"
           },
@@ -3700,6 +3824,7 @@
           "trend",
           "change",
           "points",
+          "checkInDue",
           "mentee",
           "readings",
           "canManage",
@@ -3807,6 +3932,395 @@
         },
         "required": [
           "body"
+        ]
+      },
+      "FeedKind": {
+        "type": "string",
+        "enum": [
+          "FOLLOW_UP",
+          "ACTIVITY",
+          "CHECK_IN",
+          "REPLY"
+        ]
+      },
+      "PlanRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "FeedItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FeedKind"
+              }
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "interactionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "activityType": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityTypeRefDto"
+              }
+            ]
+          },
+          "planUpdates": {
+            "type": "number"
+          },
+          "challenges": {
+            "type": "number"
+          },
+          "tasks": {
+            "type": "number"
+          },
+          "participants": {
+            "type": "number"
+          },
+          "plan": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlanRefDto"
+              }
+            ]
+          },
+          "value": {
+            "type": "number",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "at",
+          "actor",
+          "interactionId",
+          "title",
+          "activityType",
+          "planUpdates",
+          "challenges",
+          "tasks",
+          "participants",
+          "plan",
+          "value",
+          "text"
+        ]
+      },
+      "FeedPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedItemDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "MentorStatsDto": {
+        "type": "object",
+        "properties": {
+          "mentees": {
+            "type": "number"
+          },
+          "needContact": {
+            "type": "number"
+          },
+          "monthFollowUps": {
+            "type": "number"
+          },
+          "monthActivities": {
+            "type": "number"
+          },
+          "openPlans": {
+            "type": "number"
+          },
+          "improving": {
+            "type": "number"
+          },
+          "steady": {
+            "type": "number"
+          },
+          "worse": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "mentees",
+          "needContact",
+          "monthFollowUps",
+          "monthActivities",
+          "openPlans",
+          "improving",
+          "steady",
+          "worse"
+        ]
+      },
+      "DashboardMenteeDto": {
+        "type": "object",
+        "properties": {
+          "mentorshipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mentee": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastContactAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastContactKind": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InteractionKind"
+              }
+            ]
+          },
+          "contactStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContactStatus"
+              }
+            ]
+          },
+          "daysSinceContact": {
+            "type": "number"
+          },
+          "openTasks": {
+            "type": "number"
+          },
+          "mainPlan": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PlanSummaryDto"
+              }
+            ]
+          },
+          "openPlans": {
+            "type": "number"
+          },
+          "worseningPlans": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "mentorshipId",
+          "mentee",
+          "startedAt",
+          "lastContactAt",
+          "lastContactKind",
+          "contactStatus",
+          "daysSinceContact",
+          "openTasks",
+          "mainPlan",
+          "openPlans",
+          "worseningPlans"
+        ]
+      },
+      "UpcomingDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InteractionKind"
+              }
+            ]
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "activityType": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityTypeRefDto"
+              }
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "place": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRefDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "activityType",
+          "startsAt",
+          "place",
+          "createdBy",
+          "participants"
+        ]
+      },
+      "MyMentorDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "lastContactAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "openPlans": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "user",
+          "lastContactAt",
+          "openPlans"
+        ]
+      },
+      "MentorDashboardDto": {
+        "type": "object",
+        "properties": {
+          "stats": {
+            "$ref": "#/components/schemas/MentorStatsDto"
+          },
+          "mentees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardMenteeDto"
+            }
+          },
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpcomingDto"
+            }
+          },
+          "mentor": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MyMentorDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "stats",
+          "mentees",
+          "upcoming",
+          "mentor"
+        ]
+      },
+      "JourneyDto": {
+        "type": "object",
+        "properties": {
+          "mentor": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskDto"
+            }
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanSummaryDto"
+            }
+          },
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpcomingDto"
+            }
+          }
+        },
+        "required": [
+          "mentor",
+          "tasks",
+          "plans",
+          "upcoming"
         ]
       }
     }

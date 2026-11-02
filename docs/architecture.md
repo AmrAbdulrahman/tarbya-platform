@@ -111,6 +111,8 @@ Prisma models, grouped. All have `id` (uuid), `createdAt`, `updatedAt`.
 
 Trend and contact status are computed in `libs/shared` (pure functions, unit-tested) from readings and last-contact dates. The dashboard query returns the raw inputs.
 
+- **Feed and dashboards** (`feed` module): `GET /feed?userId=` merges a member's done follow-ups and activities, plan check-ins and replies, newest first, with a `before` timestamp cursor; it carries counts, never notes. `GET /dashboard/mentor` (US-4.1) and `GET /dashboard/journey` (US-5.1) are built from the mentorship, plan and interaction services. A plan's check-in is due when it has had no reading for `plans.checkInDays` days. Gatherings join the feed in step 8.
+
 Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so RSVPs and attendance attach to real rows.
 
 ## Jobs (pg-boss)

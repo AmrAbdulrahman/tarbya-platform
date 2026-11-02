@@ -39,7 +39,14 @@ function PlanPage() {
   const [editing, setEditing] = useState(false);
   const setPlan = (p: PlanDetailDto) => {
     queryClient.setQueryData(queryKey, p);
-    void queryClient.invalidateQueries({ queryKey: ['plans', p.menteeId] });
+    // Check-ins and replies show on the dashboards and in the member's history.
+    for (const key of [
+      ['plans', p.menteeId],
+      ['dashboard'],
+      ['feed', p.menteeId],
+    ]) {
+      void queryClient.invalidateQueries({ queryKey: key });
+    }
   };
   const toggle = useMutation({
     mutationFn: async (closed: boolean) =>

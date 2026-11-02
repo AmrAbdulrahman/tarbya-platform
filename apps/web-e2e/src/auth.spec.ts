@@ -40,12 +40,12 @@ test('signs in, returns to the page asked for, and signs out (US-1.1, US-1.3)', 
   await page.getByLabel('كلمة المرور').fill(password);
   await page.getByRole('button', { name: 'دخول', exact: true }).click();
 
-  await expect(page).toHaveURL(/\/$/);
+  // "/" sends the super admin to the console, their strongest role's home (US-1.1).
+  await expect(page).toHaveURL(/\/admin\/users$/);
   await ensureArabic(page);
-  await expect(page.locator('h1')).toHaveText('مرحبًا بك في تربية');
-  // The super admin sees the administration section only.
+  await expect(page.locator('h1')).toHaveText('المستخدمون');
+  // Other sections depend on whom the dev account mentors, so only this one is checked.
   await expect(page.getByText('الإدارة')).toBeVisible();
-  await expect(page.getByText('متابَعيّ')).toBeHidden();
 
   await page.getByRole('button', { name: 'حسابي' }).click();
   await page

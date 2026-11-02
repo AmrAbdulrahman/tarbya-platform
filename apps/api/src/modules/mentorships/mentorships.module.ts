@@ -8,6 +8,6 @@ import { MentorshipsService } from './mentorships.service';
 @Module({
   controllers: [MentorshipsController],
   providers: [MentorshipsService, ContactService, MentoringAccess],
-  exports: [MentoringAccess, ContactService],
+  exports: [MentoringAccess, ContactService, MentorshipsService],
 })
 export class MentorshipsModule {}

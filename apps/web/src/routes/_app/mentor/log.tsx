@@ -26,6 +26,10 @@ import { PlanUpdates } from '../../../components/mentor/plan-updates';
 
 /** US-4.3 · design/screens/FollowUp.dc.html */
 export const Route = createFileRoute('/_app/mentor/log')({
+  // Opened from the dashboard or a mentee's profile with the mentee chosen.
+  validateSearch: z.object({
+    menteeId: z.string().uuid().optional().catch(undefined),
+  }),
   component: FollowUpPage,
 });
 
@@ -63,9 +67,10 @@ function FollowUpPage() {
     queryFn: async ({ signal }) =>
       (await mentorshipsControllerMine({ signal })).data as MyMentoringDto,
   });
+  const { menteeId: preset } = Route.useSearch();
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: blank(),
+    defaultValues: blank(preset),
   });
   const [planValues, setPlanValues] = useState<Record<string, string>>({});
   const challenges = useFieldArray({
@@ -100,6 +105,8 @@ function FollowUpPage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: mineQueryKey }),
         queryClient.invalidateQueries({ queryKey: ['plans'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['feed'] }),
       ]);
     },
   });

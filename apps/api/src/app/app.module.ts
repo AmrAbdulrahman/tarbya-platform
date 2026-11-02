@@ -10,6 +10,7 @@ import { ProblemDetailsFilter } from '../common/problem-details.filter';
 import { validationPipe } from '../common/validation.pipe';
 import { AuditModule } from '../modules/audit/audit.module';
 import { AuthModule } from '../modules/auth/auth.module';
+import { FeedModule } from '../modules/feed/feed.module';
 import { FilesModule } from '../modules/files/files.module';
 import { HierarchyModule } from '../modules/hierarchy/hierarchy.module';
 import { MeModule } from '../modules/me/me.module';
@@ -46,6 +47,7 @@ import { HealthController } from './health.controller';
     FilesModule,
     MeModule,
     PlansModule,
+    FeedModule,
   ],
   controllers: [HealthController],
   providers: [

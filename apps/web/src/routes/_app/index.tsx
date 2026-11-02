@@ -1,10 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@tarbya/shared';
 import type { Language } from '@tarbya/i18n';
 import { useHealthControllerCheck } from '@tarbya/api-client';
+import { meQuery } from '../../auth/session';
+import { homeFor } from '../../components/nav';
 
 export const Route = createFileRoute('/_app/')({
+  beforeLoad: async ({ context }) => {
+    const me = await context.queryClient.ensureQueryData(meQuery);
+    const home = homeFor(me.roles);
+    if (home) throw redirect({ to: home, replace: true });
+  },
+  // Shown only to someone with no role yet.
   component: Home,
 });
 

@@ -1,4 +1,4 @@
-import { formatDate } from './dates.js';
+import { formatDate, formatDayTile, formatTime } from './dates.js';
 
 // 22:30 UTC on 1 Nov 2026 is already 2 Nov in Cairo (UTC+2).
 const instant = '2026-11-01T22:30:00Z';
@@ -28,5 +28,26 @@ describe('formatDate', () => {
     expect(formatDate(instant, { locale: 'en', withTime: true })).toMatch(
       /00:30$/,
     );
+  });
+});
+
+describe('formatTime', () => {
+  it('shows the time in the organisation zone', () => {
+    expect(formatTime(instant, { locale: 'en' })).toBe('00:30');
+  });
+});
+
+describe('formatDayTile', () => {
+  it('gives the day and short month in the organisation zone', () => {
+    expect(formatDayTile(instant, { locale: 'en' })).toEqual({
+      day: '2',
+      month: 'Nov',
+    });
+  });
+
+  it('uses the Hijri calendar when chosen', () => {
+    const tile = formatDayTile(instant, { locale: 'en', calendar: 'HIJRI' });
+    expect(tile.day).toMatch(/^\d{1,2}$/);
+    expect(tile.month).not.toBe('Nov');
   });
 });
