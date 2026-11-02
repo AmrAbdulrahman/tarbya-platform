@@ -10,6 +10,7 @@ import {
 } from '@tarbya/api-client';
 import { Badge, Button, Input } from '@tarbya/ui';
 import { UserDialog } from '../../../components/admin/user-dialog';
+import { RoleChips } from '../../../components/role-chips';
 import { useDebounced } from '../../../lib/use-debounced';
 
 /** US-3.1 · design/screens/Admin.dc.html (users table) */
@@ -154,9 +155,11 @@ function UserRow({ user, onOpen }: { user: UserDto; onOpen: () => void }) {
           </button>
         </span>
       </td>
-      <td className="px-6 py-3.5 text-ink-muted">
+      <td className="px-6 py-3.5">
         {user.roles.length ? (
-          user.roles.map((r) => t(`admin.roles.${r}`)).join(' · ')
+          <span className="flex flex-wrap gap-1.5">
+            <RoleChips roles={user.roles} />
+          </span>
         ) : (
           <span className={muted}>{t('admin.roles.none')}</span>
         )}

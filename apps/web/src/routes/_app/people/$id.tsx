@@ -18,6 +18,7 @@ import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FormError } from '../../../components/login/fields';
 import { PlansSection } from '../../../components/plans/plans-section';
+import { RoleChips } from '../../../components/role-chips';
 
 /** A member's profile; step 6 grows it into the full mentee profile (US-4.2). */
 export const Route = createFileRoute('/_app/people/$id')({
@@ -58,11 +59,7 @@ function ProfilePage() {
             className="flex flex-wrap gap-1.5"
             aria-label={t('profile.roles')}
           >
-            {p.roles.map((r) => (
-              <Badge key={r} tone="primary">
-                {t(`admin.roles.${r}`)}
-              </Badge>
-            ))}
+            <RoleChips roles={p.roles} />
             {p.deactivatedAt && (
               <Badge tone="danger">{t('profile.deactivated')}</Badge>
             )}
