@@ -16,7 +16,7 @@ import {
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { PrismaService } from '@tarbya/db';
 import type { Request, Response } from 'express';
 import type { Env } from '../../config/env';
@@ -34,12 +34,10 @@ import { AuthService } from './auth.service';
 import { clearAuthCookies, REFRESH_COOKIE, setAuthCookies } from './cookies';
 import { SessionsService, type ClientMeta } from './sessions.service';
 
-// Per client IP, on top of the per-email limit for codes.
-const signInLimit = { default: { limit: 10, ttl: 60_000 } };
-
+// Sign-in routes are throttled per client IP (AUTH_SIGN_IN_LIMIT_PER_MINUTE),
+// on top of the per-email limit for codes.
 @ApiTags('auth')
 @Controller('auth')
-@UseGuards(ThrottlerGuard)
 export class AuthController {
   private readonly secureCookies: boolean;
 
@@ -56,7 +54,7 @@ export class AuthController {
 
   /** US-1.1 */
   @Public()
-  @Throttle(signInLimit)
+  @UseGuards(ThrottlerGuard)
   @Post('sign-in/password')
   @HttpCode(200)
   @ApiOkResponse({ type: MeDto })
@@ -78,7 +76,7 @@ export class AuthController {
 
   /** US-1.2: always 204, whether or not the email belongs to someone who can sign in. */
   @Public()
-  @Throttle(signInLimit)
+  @UseGuards(ThrottlerGuard)
   @Post('sign-in/code/request')
   @HttpCode(204)
   @ApiNoContentResponse()
@@ -88,7 +86,7 @@ export class AuthController {
 
   /** US-1.2 */
   @Public()
-  @Throttle(signInLimit)
+  @UseGuards(ThrottlerGuard)
   @Post('sign-in/code')
   @HttpCode(200)
   @ApiOkResponse({ type: MeDto })

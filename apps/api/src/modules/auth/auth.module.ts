@@ -21,7 +21,15 @@ import { SuperAdminBootstrap } from './super-admin.bootstrap';
       }),
     }),
     // In memory: fine for one API instance; move to a shared store if we scale out.
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60 }]),
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<Env, true>) => [
+        {
+          ttl: 60_000,
+          limit: config.get('AUTH_SIGN_IN_LIMIT_PER_MINUTE', { infer: true }),
+        },
+      ],
+    }),
   ],
   controllers: [AuthController],
   providers: [
