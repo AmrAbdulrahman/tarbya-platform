@@ -1,13 +1,23 @@
 import { Link, Outlet } from '@tanstack/react-router';
-import { Bell, MessageSquare, Search } from 'lucide-react';
+import { Bell, LogOut, MessageSquare, MonitorX, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tarbya/ui';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@tarbya/ui';
+import { useMe, useSignOut } from '../auth/session';
 import { LanguageSwitch } from './language-switch';
-import { navSections } from './nav';
+import { sectionsFor } from './nav';
 
 /** Sidebar with one section per role, plus the sticky header (design/screens/Main.dc.html). */
 export function AppShell() {
   const { t } = useTranslation();
+  const me = useMe();
 
   return (
     <div className="flex min-h-screen flex-wrap bg-surface">
@@ -24,7 +34,7 @@ export function AppShell() {
             <span className="text-xs text-ink-subtle">{t('app.tagline')}</span>
           </div>
         </div>
-        {navSections.map((section, i) => (
+        {sectionsFor(me.roles).map((section, i) => (
           <div
             key={section.title}
             className={
@@ -80,11 +90,53 @@ export function AppShell() {
           >
             <Bell />
           </Button>
+          <AccountMenu />
         </header>
         <main className="flex flex-col gap-7 px-10 pb-12 pt-8">
           <Outlet />
         </main>
       </div>
     </div>
+  );
+}
+
+function AccountMenu() {
+  const { t } = useTranslation();
+  const me = useMe();
+  const signOut = useSignOut();
+  const signOutEverywhere = useSignOut(true);
+  const initial = me.name.trim().charAt(0);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label={t('account.menu')}
+          className="grid size-10 place-items-center rounded-full bg-primary-tint font-bold text-primary-hover hover:ring-2 hover:ring-primary/30"
+        >
+          {initial}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>
+          <div className="font-semibold text-navy">{me.name}</div>
+          {me.email && (
+            <div dir="ltr" className="text-start text-xs text-ink-subtle">
+              {me.email}
+            </div>
+          )}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => signOut.mutate()}>
+          <LogOut aria-hidden />
+          {t('account.signOut')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => signOutEverywhere.mutate()}>
+          <MonitorX aria-hidden />
+          {t('account.signOutEverywhere')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

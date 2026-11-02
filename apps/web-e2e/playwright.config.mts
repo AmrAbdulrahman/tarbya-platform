@@ -1,8 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 import { resolve } from 'node:path';
+import { config } from 'dotenv';
 
 // Plain config without Nx helpers: importing nx from here crashes on Node 22's require(esm) loader.
 const workspaceRoot = resolve(import.meta.dirname, '../..');
+// Specs sign in as the super admin from .env.
+config({ path: resolve(workspaceRoot, '.env'), quiet: true });
 const isCI = !!process.env['CI'];
 const webServerAddress = isCI
   ? 'http://localhost:4300'
@@ -35,11 +38,22 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
   },
-  webServer: {
-    command: isCI ? 'pnpm exec nx run web:preview' : 'pnpm exec nx run web:dev',
-    url: webServerAddress,
-    reuseExistingServer: true,
-    cwd: workspaceRoot,
-  },
+  webServer: [
+    {
+      command: 'pnpm exec nx run api:serve',
+      url: 'http://localhost:3000/api/health',
+      reuseExistingServer: true,
+      cwd: workspaceRoot,
+      timeout: 180_000,
+    },
+    {
+      command: isCI
+        ? 'pnpm exec nx run web:preview'
+        : 'pnpm exec nx run web:dev',
+      url: webServerAddress,
+      reuseExistingServer: true,
+      cwd: workspaceRoot,
+    },
+  ],
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

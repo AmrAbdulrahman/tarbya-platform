@@ -23,6 +23,10 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U tarbya"
           --health-interval 5s --health-timeout 3s --health-retries 10
+      # Receives sign-in codes; the API e2e reads them from its HTTP API.
+      mailpit:
+        image: axllent/mailpit:v1.27
+        ports: ['1025:1025', '8025:8025']
     steps:
       - uses: actions/checkout@v5
         with:
@@ -49,4 +53,5 @@ jobs:
 
       - run: pnpm nx run db:migrate-deploy
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm nx affected -t e2e
+      # One suite at a time: both use the API on :3000.
+      - run: pnpm nx affected -t e2e --parallel=1

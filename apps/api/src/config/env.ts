@@ -15,6 +15,8 @@ export const envSchema = z.object({
 
   DATABASE_URL: z.string().startsWith('postgres'),
   JWT_SECRET: z.string().min(32),
+  /** Sign-in attempts per client IP per minute (US-1.2). Raised in dev and CI, where suites share one API. */
+  AUTH_SIGN_IN_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(10),
 
   SUPER_ADMIN_EMAIL: z.email(),
   SUPER_ADMIN_NAME: z.string().default('Super admin'),

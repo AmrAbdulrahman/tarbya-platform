@@ -21,6 +21,170 @@
           "health"
         ]
       }
+    },
+    "/api/auth/sign-in/password": {
+      "post": {
+        "operationId": "AuthController_signInWithPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordSignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_INVALID_CREDENTIALS"
+          },
+          "429": {
+            "description": "RATE_LIMITED"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-in/code/request": {
+      "post": {
+        "operationId": "AuthController_requestCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-in/code": {
+      "post": {
+        "operationId": "AuthController_signInWithCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeSignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_CODE_INVALID"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "AUTH_UNAUTHENTICATED"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-out": {
+      "post": {
+        "operationId": "AuthController_signOut",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-out/everywhere": {
+      "post": {
+        "operationId": "AuthController_signOutEverywhere",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "AuthController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_UNAUTHENTICATED"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
     }
   },
   "info": {
@@ -52,6 +216,123 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "PasswordSignInDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "name@example.com"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "Locale": {
+        "type": "string",
+        "enum": [
+          "ar",
+          "en"
+        ]
+      },
+      "CalendarPreference": {
+        "type": "string",
+        "enum": [
+          "GREGORIAN",
+          "HIJRI",
+          "BOTH"
+        ]
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "SUPER_ADMIN",
+          "MODERATOR",
+          "MANAGER",
+          "GROUP_ADMIN",
+          "GROUP_MODERATOR",
+          "MENTOR",
+          "MENTEE"
+        ]
+      },
+      "MeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "locale": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Locale"
+              }
+            ]
+          },
+          "calendar": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarPreference"
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "locale",
+          "calendar",
+          "roles"
+        ]
+      },
+      "RequestCodeDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "name@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CodeSignInDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "name@example.com"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456",
+            "pattern": "^\\d{6}$"
+          }
+        },
+        "required": [
+          "email",
+          "code"
         ]
       }
     }

@@ -30,7 +30,7 @@ async function main() {
   }
 
   // The super admin is identified by SUPER_ADMIN_EMAIL (BR-USR-3); make sure the user exists.
-  const email = process.env['SUPER_ADMIN_EMAIL'];
+  const email = process.env['SUPER_ADMIN_EMAIL']?.trim().toLowerCase();
   if (email) {
     await prisma.user.upsert({
       where: { email },

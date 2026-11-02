@@ -26,5 +26,11 @@
       "scope:api",
       "type:e2e"
     ]
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "argon2": "^0.45.1",
+    "dotenv": "^18.0.9",
+    "pg": "^8.23.1"
   }
 }
