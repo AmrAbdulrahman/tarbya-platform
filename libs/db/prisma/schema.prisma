@@ -40,9 +40,14 @@ model User {
 
   password   PasswordCredential?
   sessions   Session[]
-  mentoring  Mentorship[]        @relation("Mentor")
-  mentoredBy Mentorship[]        @relation("Mentee")
-  audited    AuditLog[]          @relation("AuditActor")
+  mentoring  Mentorship[]             @relation("Mentor")
+  mentoredBy Mentorship[]             @relation("Mentee")
+  audited    AuditLog[]               @relation("AuditActor")
+  created    Interaction[]            @relation("InteractionCreator")
+  joined     InteractionParticipant[]
+  tasks      Task[]                   @relation("TaskAssignee")
+  tasksSet   Task[]                   @relation("TaskCreator")
+  notes      Note[]                   @relation("NoteAuthor")
 
   @@index([managerId])
 }
@@ -93,9 +98,8 @@ model Session {
   @@index([userId])
 }
 
-// ── Mentoring ────────────────────────────────────────────────────────────
-// Only what sign-in needs to derive the mentor/mentee roles; the rest lands
-// with the mentorships module (build order step 4).
+// ── Mentoring (US-3.3, BR-MEN-1…4) ───────────────────────────────────────
+// Ending a mentorship sets endedAt; its follow-ups and notes stay attached.
 
 model Mentorship {
   id        String    @id @default(uuid()) @db.Uuid
@@ -108,8 +112,102 @@ model Mentorship {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  followUps Interaction[]
+  notes     Note[]
+
   @@index([mentorId])
   @@index([menteeId])
+}
+
+// ── Follow-ups and activities (US-4.3, US-4.4, BR-FU-1…5) ─────────────────
+// Upcoming or done is derived from startsAt; nobody stores it (BR-FU-3).
+
+enum InteractionKind {
+  FOLLOW_UP
+  ACTIVITY
+}
+
+model Interaction {
+  id             String          @id @default(uuid()) @db.Uuid
+  kind           InteractionKind
+  /// Follow-ups only: the mentorship they belong to.
+  mentorshipId   String?         @db.Uuid
+  mentorship     Mentorship?     @relation(fields: [mentorshipId], references: [id])
+  /// Activities only.
+  activityTypeId String?         @db.Uuid
+  activityType   ActivityType?   @relation(fields: [activityTypeId], references: [id])
+  createdById    String          @db.Uuid
+  createdBy      User            @relation("InteractionCreator", fields: [createdById], references: [id])
+  title          String?
+  startsAt       DateTime
+  /// Multi-day activities (a trip): the return date.
+  endsAt         DateTime?
+  place          String?
+  /// Seen by participants, the creator and moderators.
+  sharedNotes    String?
+  /// The creator and moderators only; dropped in the query for anyone else (BR-NOTE-1).
+  privateNotes   String?
+  challenges     String[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  participants InteractionParticipant[]
+  tasks        Task[]
+
+  @@index([mentorshipId, startsAt])
+  @@index([createdById, startsAt])
+}
+
+model InteractionParticipant {
+  interactionId String      @db.Uuid
+  interaction   Interaction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
+  userId        String      @db.Uuid
+  user          User        @relation(fields: [userId], references: [id])
+
+  @@id([interactionId, userId])
+  @@index([userId])
+}
+
+/// One-time tasks (BR-FU-4): the mentee ticks them off.
+model Task {
+  id            String       @id @default(uuid()) @db.Uuid
+  assigneeId    String       @db.Uuid
+  assignee      User         @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdById   String       @db.Uuid
+  createdBy     User         @relation("TaskCreator", fields: [createdById], references: [id])
+  interactionId String?      @db.Uuid
+  interaction   Interaction? @relation(fields: [interactionId], references: [id])
+  title         String
+  /// A calendar day in the organisation's time zone.
+  dueOn         DateTime?    @db.Date
+  doneAt        DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([assigneeId, doneAt])
+}
+
+// ── Notes (US-4.6, BR-NOTE-1) ─────────────────────────────────────────────
+
+enum NoteVisibility {
+  /// The mentee, the mentor and moderators.
+  SHARED
+  /// The mentor and moderators; never returned to the mentee.
+  PRIVATE
+}
+
+model Note {
+  id           String         @id @default(uuid()) @db.Uuid
+  mentorshipId String         @db.Uuid
+  mentorship   Mentorship     @relation(fields: [mentorshipId], references: [id])
+  authorId     String         @db.Uuid
+  author       User           @relation("NoteAuthor", fields: [authorId], references: [id])
+  visibility   NoteVisibility
+  body         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([mentorshipId, createdAt])
 }
 
 model Setting {
@@ -158,6 +256,8 @@ model ActivityType {
   active           Boolean       @default(true)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+
+  interactions Interaction[]
 }
 
 model TrackingMethod {

@@ -54,6 +54,7 @@ const badgeTones = {
   neutral: 'bg-slate-100 text-ink-muted',
   success: 'bg-emerald-50 text-trend-up',
   danger: 'bg-red-50 text-trend-down',
+  warn: 'bg-amber-50 text-warn',
   primary: 'bg-primary-tint text-primary-hover',
   manager: 'bg-manager-tint text-manager',
 } as const;
@@ -68,6 +69,18 @@ export function Badge({
       className={cn(
         'inline-flex h-6 items-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-medium',
         badgeTones[tone],
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function Textarea({ className, ...props }: ComponentProps<'textarea'>) {
+  return (
+    <textarea
+      className={cn(
+        'min-h-24 w-full rounded-control border border-border bg-card px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-subtle focus:border-primary focus:outline-2 focus:-outline-offset-1 focus:outline-primary aria-[invalid=true]:border-trend-down',
         className,
       )}
       {...props}

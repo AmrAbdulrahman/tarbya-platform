@@ -11,7 +11,10 @@ import { validationPipe } from '../common/validation.pipe';
 import { AuditModule } from '../modules/audit/audit.module';
 import { AuthModule } from '../modules/auth/auth.module';
 import { HierarchyModule } from '../modules/hierarchy/hierarchy.module';
+import { InteractionsModule } from '../modules/interactions/interactions.module';
 import { LookupsModule } from '../modules/lookups/lookups.module';
+import { MentorshipsModule } from '../modules/mentorships/mentorships.module';
+import { NotesModule } from '../modules/notes/notes.module';
 import { MailModule } from '../modules/mail/mail.module';
 import { SettingsModule } from '../modules/settings/settings.module';
 import { UsersModule } from '../modules/users/users.module';
@@ -32,6 +35,9 @@ import { HealthController } from './health.controller';
     UsersModule,
     AuthModule,
     LookupsModule,
+    MentorshipsModule,
+    InteractionsModule,
+    NotesModule,
   ],
   controllers: [HealthController],
   providers: [

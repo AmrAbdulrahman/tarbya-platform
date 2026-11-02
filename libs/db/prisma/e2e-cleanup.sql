@@ -8,7 +8,22 @@ BEGIN;
 CREATE TEMP TABLE e2e_users ON COMMIT DROP AS
   SELECT id FROM "User" WHERE email LIKE '%@tarbya.test';
 
+CREATE TEMP TABLE e2e_mentorships ON COMMIT DROP AS
+  SELECT id FROM "Mentorship"
+  WHERE "mentorId" IN (SELECT id FROM e2e_users) OR "menteeId" IN (SELECT id FROM e2e_users);
+
 UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Note"
+  WHERE "mentorshipId" IN (SELECT id FROM e2e_mentorships)
+     OR "authorId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Task"
+  WHERE "assigneeId" IN (SELECT id FROM e2e_users)
+     OR "createdById" IN (SELECT id FROM e2e_users);
+-- Participants go with their interaction (ON DELETE CASCADE).
+DELETE FROM "Interaction"
+  WHERE "createdById" IN (SELECT id FROM e2e_users)
+     OR "mentorshipId" IN (SELECT id FROM e2e_mentorships)
+     OR id IN (SELECT "interactionId" FROM "InteractionParticipant" WHERE "userId" IN (SELECT id FROM e2e_users));
 DELETE FROM "AuditLog"
   WHERE "actorId" IN (SELECT id FROM e2e_users)
      OR "entityId" IN (SELECT id::text FROM e2e_users);
@@ -16,9 +31,7 @@ DELETE FROM "Session"
   WHERE "userId" IN (SELECT id FROM e2e_users)
      OR "userAgent" LIKE '%tarbya-e2e%';
 DELETE FROM "PasswordCredential" WHERE "userId" IN (SELECT id FROM e2e_users);
-DELETE FROM "Mentorship"
-  WHERE "mentorId" IN (SELECT id FROM e2e_users)
-     OR "menteeId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Mentorship" WHERE id IN (SELECT id FROM e2e_mentorships);
 DELETE FROM "OneTimeCode" WHERE email LIKE '%@tarbya.test';
 DELETE FROM "User" WHERE id IN (SELECT id FROM e2e_users);
 

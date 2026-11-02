@@ -67,11 +67,15 @@ export async function createUser(
   return { id, email, password };
 }
 
-export async function createMentorship(mentorId: string, menteeId: string) {
+export async function createMentorship(
+  mentorId: string,
+  menteeId: string,
+  startedAt: Date = new Date(),
+) {
   const c = await db();
   await c.query(
-    `INSERT INTO "Mentorship" (id, "mentorId", "menteeId", "updatedAt") VALUES ($1, $2, $3, now())`,
-    [randomUUID(), mentorId, menteeId],
+    `INSERT INTO "Mentorship" (id, "mentorId", "menteeId", "startedAt", "updatedAt") VALUES ($1, $2, $3, $4, now())`,
+    [randomUUID(), mentorId, menteeId, startedAt],
   );
 }
 

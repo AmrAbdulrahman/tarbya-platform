@@ -34,7 +34,7 @@ export const navSections: NavSection[] = [
     roles: ['SUPER_ADMIN', 'MODERATOR'],
     items: [
       { label: 'nav.users', to: '/admin/users', icon: UserPlus },
-      { label: 'nav.mentorships', to: '/', icon: ListTree },
+      { label: 'nav.mentorships', to: '/admin/mentorships', icon: ListTree },
       { label: 'nav.groups', to: '/', icon: CircleDot },
       { label: 'nav.lookups', to: '/admin/lookups', icon: ClipboardList },
       { label: 'nav.settings', to: '/admin/settings', icon: Settings },
@@ -45,7 +45,7 @@ export const navSections: NavSection[] = [
     roles: ['MENTOR'],
     items: [
       { label: 'nav.menteeDashboard', to: '/', icon: LayoutDashboard },
-      { label: 'nav.followUps', to: '/', icon: Calendar },
+      { label: 'nav.followUps', to: '/mentor/log', icon: Calendar },
     ],
   },
   {
