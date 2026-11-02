@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@tarbya/db';
 
-/** The management tree (BR-MGR-1, BR-MGR-2): `User.managerId` read with recursive queries. */
+/**
+ * The two trees, read with recursive queries: management (`User.managerId`,
+ * BR-MGR-1/2) and mentoring (active mentorships, BR-MEN-3).
+ */
 @Injectable()
 export class HierarchyService {
   /** True when `candidateId` is `userId` or anywhere below them, i.e. making them the manager would close a loop. */
@@ -17,6 +20,24 @@ export class HierarchyService {
         SELECT u.id FROM "User" u JOIN subtree s ON u."managerId" = s.id
       )
       SELECT 1 AS found FROM subtree WHERE id = ${candidateId}::uuid LIMIT 1`;
+    return rows.length > 0;
+  }
+
+  /** True when `candidateId` mentors `userId`, directly or further up their mentoring chain. */
+  async isMentorAbove(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    candidateId: string,
+  ): Promise<boolean> {
+    const rows = await tx.$queryRaw<{ found: number }[]>`
+      WITH RECURSIVE chain AS (
+        SELECT "mentorId" AS id FROM "Mentorship"
+        WHERE "menteeId" = ${userId}::uuid AND "endedAt" IS NULL
+        UNION
+        SELECT m."mentorId" FROM "Mentorship" m
+        JOIN chain c ON m."menteeId" = c.id AND m."endedAt" IS NULL
+      )
+      SELECT 1 AS found FROM chain WHERE id = ${candidateId}::uuid LIMIT 1`;
     return rows.length > 0;
   }
 }

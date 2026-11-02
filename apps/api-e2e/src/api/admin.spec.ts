@@ -119,10 +119,11 @@ describe('admin', () => {
   describe('managers (US-3.4)', () => {
     it('sets managers, derives the manager role, and refuses loops and inactive managers', async () => {
       const { s } = await moderator();
-      const top = await createUser();
-      const mid = await createUser();
-      const leaf = await createUser();
-      const gone = await createUser({ deactivated: true });
+      // Only moderators have managers (BR-MGR-1).
+      const top = await createUser({ moderator: true });
+      const mid = await createUser({ moderator: true });
+      const leaf = await createUser({ moderator: true });
+      const gone = await createUser({ moderator: true, deactivated: true });
 
       expect(
         (await s.put(`/api/users/${mid.id}/manager`, { managerId: top.id }))
@@ -136,6 +137,7 @@ describe('admin', () => {
         name: expect.any(String),
       });
       expect((await s.get(`/api/users/${mid.id}`)).data.roles).toEqual([
+        'MODERATOR',
         'MANAGER',
       ]);
 
@@ -164,6 +166,45 @@ describe('admin', () => {
         'user.manager.set',
       ]);
     });
+  });
+
+  it('keeps the management line to moderators', async () => {
+    const { s } = await moderator();
+    const boss = await createUser({ moderator: true });
+    const plain = await createUser();
+
+    const notMod = await s.put(`/api/users/${plain.id}/manager`, {
+      managerId: boss.id,
+    });
+    expect(notMod.data.code).toBe('MANAGER_NOT_MODERATOR');
+
+    const mod = await createUser({ moderator: true });
+    const byPlain = await s.put(`/api/users/${mod.id}/manager`, {
+      managerId: plain.id,
+    });
+    expect(byPlain.data.code).toBe('MANAGER_NOT_MODERATOR');
+
+    // Demoting: refused while they manage someone; otherwise clears their own manager.
+    await s.put(`/api/users/${mod.id}/manager`, { managerId: boss.id });
+    const line = (await s.get('/api/hierarchy/management')).data as {
+      id: string;
+      managerId: string | null;
+    }[];
+    expect(line).toEqual(
+      expect.arrayContaining([
+        { id: mod.id, name: expect.any(String), managerId: boss.id },
+      ]),
+    );
+    expect(line.map((n) => n.id)).not.toContain(plain.id);
+    const admin = await signedIn(await superAdminId());
+    const busy = await admin.put(`/api/users/${boss.id}/moderator`, {
+      isModerator: false,
+    });
+    expect(busy.data.code).toBe('MODERATOR_HAS_REPORTS');
+    const demoted = await admin.put(`/api/users/${mod.id}/moderator`, {
+      isModerator: false,
+    });
+    expect(demoted.data).toMatchObject({ isModerator: false, manager: null });
   });
 
   describe('moderators (US-3.2)', () => {

@@ -18,6 +18,10 @@ interface UserPickerProps {
   excludeIds?: string[];
   invalid?: boolean;
   describedBy?: string;
+  /** Offer only moderators and the super admin (who can be managers). */
+  moderatorsOnly?: boolean;
+  /** Focus the field when it appears, e.g. after an "add" button opened it. */
+  autoFocus?: boolean;
 }
 
 /** Typeahead over name, email and phone (BR-USR-6), active users only. */
@@ -28,6 +32,8 @@ export function UserPicker({
   excludeIds = [],
   invalid,
   describedBy,
+  moderatorsOnly,
+  autoFocus,
 }: UserPickerProps) {
   const { t } = useTranslation();
   const listId = useId();
@@ -37,10 +43,14 @@ export function UserPicker({
   const q = useDebounced(text.trim(), 200);
 
   const results = useQuery({
-    queryKey: ['user-picker', q],
+    queryKey: ['user-picker', q, !!moderatorsOnly],
     queryFn: async ({ signal }) =>
-      (await usersControllerList({ q, status: 'active', limit: 8 }, { signal }))
-        .data,
+      (
+        await usersControllerList(
+          { q, status: 'active', limit: 8, moderatorsOnly },
+          { signal },
+        )
+      ).data,
     enabled: open && q.length > 0,
     staleTime: 30_000,
   });
@@ -108,6 +118,7 @@ export function UserPicker({
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
         autoComplete="off"
+        autoFocus={autoFocus}
         placeholder={t('admin.picker.placeholder')}
         className="h-11 text-[15px]"
         value={text}

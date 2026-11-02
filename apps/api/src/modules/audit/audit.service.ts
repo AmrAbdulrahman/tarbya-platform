@@ -8,12 +8,14 @@ export type AuditAction =
   | 'user.reactivate'
   | 'user.manager.set'
   | 'user.moderator.set'
-  | 'settings.update';
+  | 'settings.update'
+  | 'mentorship.start'
+  | 'mentorship.end';
 
 export interface AuditEntry {
   actorId: string;
   action: AuditAction;
-  entity: 'User' | 'Setting';
+  entity: 'User' | 'Setting' | 'Mentorship';
   entityId: string;
   /** Changed fields as { field: [before, after] }. */
   diff?: Record<string, [unknown, unknown]>;

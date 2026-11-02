@@ -11,7 +11,7 @@ async function signInAsSuperAdmin(page: Page, path: string) {
   await expect(page).toHaveURL(new RegExp(`${path}$`));
 }
 
-test('adds a user with a manager and finds them (US-3.1, US-3.4)', async ({
+test('adds a moderator with a manager and finds them (US-3.1, US-3.2, US-3.4)', async ({
   page,
 }) => {
   const tag = Date.now().toString(36);
@@ -21,6 +21,11 @@ test('adds a user with a manager and finds them (US-3.1, US-3.4)', async ({
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('الاسم').fill(`سارة ${tag}`);
   await dialog.getByLabel('البريد الإلكتروني').fill(`sara.${tag}@tarbya.test`);
+  // Only moderators have a direct manager: the field appears once the box is ticked.
+  await expect(
+    dialog.getByRole('combobox', { name: 'المدير المباشر' }),
+  ).toBeHidden();
+  await dialog.getByRole('checkbox', { name: 'مشرف' }).check();
   const manager = dialog.getByRole('combobox', { name: 'المدير المباشر' });
   await manager.fill('Super');
   await expect(
@@ -37,7 +42,9 @@ test('adds a user with a manager and finds them (US-3.1, US-3.4)', async ({
   const row = page.getByRole('row').filter({ hasText: `سارة ${tag}` });
   await expect(row).toBeVisible();
   await expect(row).toContainText('Super admin');
-  await expect(row).toContainText('غير مفعّل');
+  await expect(row).toContainText('مشرف');
+  // A moderator with an email can sign in.
+  await expect(row).toContainText('مفعّل');
 });
 
 test('the settings form refuses late days that are not after due days (US-3.6)', async ({

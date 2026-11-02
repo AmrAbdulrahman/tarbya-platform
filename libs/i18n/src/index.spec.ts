@@ -13,6 +13,21 @@ describe('i18n', () => {
     expect(keys(en).sort()).toEqual(keys(ar).sort());
   });
 
+  it('gives every Arabic plural all six forms', () => {
+    // Arabic picks zero/one/two/few/many/other; a missing form shows the raw key.
+    const forms = ['zero', 'one', 'two', 'few', 'many', 'other'];
+    const all = new Set(keys(ar));
+    const plurals = new Set(
+      [...all]
+        .filter((k) => forms.some((f) => k.endsWith(`_${f}`)))
+        .map((k) => k.replace(/_[a-z]+$/, '')),
+    );
+    const missing = [...plurals].flatMap((base) =>
+      forms.filter((f) => !all.has(`${base}_${f}`)).map((f) => `${base}_${f}`),
+    );
+    expect(missing).toEqual([]);
+  });
+
   it('defaults to Arabic and right-to-left, and flips direction on switch', async () => {
     await initI18n();
     expect(document.documentElement.lang).toBe('ar');

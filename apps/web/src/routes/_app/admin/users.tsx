@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { Plus, Search } from 'lucide-react';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Pencil, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -136,13 +136,23 @@ function UserRow({ user, onOpen }: { user: UserDto; onOpen: () => void }) {
   return (
     <tr className="border-t border-divider hover:bg-slate-50">
       <td className="px-6 py-3.5">
-        <button
-          type="button"
-          onClick={onOpen}
-          className="text-start font-semibold text-navy hover:text-primary"
-        >
-          {user.name}
-        </button>
+        <span className="flex items-center gap-1">
+          <Link
+            to="/people/$id"
+            params={{ id: user.id }}
+            className="font-semibold text-navy hover:text-primary"
+          >
+            {user.name}
+          </Link>
+          <button
+            type="button"
+            onClick={onOpen}
+            aria-label={t('admin.userForm.editTitle', { name: user.name })}
+            className="grid size-8 place-items-center rounded-lg text-ink-subtle hover:bg-surface hover:text-primary"
+          >
+            <Pencil className="size-4" aria-hidden />
+          </button>
+        </span>
       </td>
       <td className="px-6 py-3.5 text-ink-muted">
         {user.roles.length ? (

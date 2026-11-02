@@ -9,6 +9,7 @@ import type { UsersControllerListStatus } from './usersControllerListStatus.js';
 export type UsersControllerListParams = {
   q?: string;
   status?: UsersControllerListStatus;
+  moderatorsOnly?: boolean;
   cursor?: string;
   /**
    * @minimum 1

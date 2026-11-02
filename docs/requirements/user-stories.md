@@ -97,7 +97,8 @@ As the super admin, I want to make a user a moderator or remove them.
 
 As a moderator, I want to assign a mentee to a mentor with typeahead, and end a mentorship.
 
-- Assigning someone who already has an active mentor asks to replace the mentorship.
+- Assigning someone who already has an active mentor asks, in a confirmation dialog, before moving them.
+- Each person in the tree has an in-place "add mentee" typeahead.
 - Cycles in the mentoring chain are refused.
 - Both people are notified.
 - The mentoring hierarchy is shown as a tree.
@@ -105,11 +106,19 @@ As a moderator, I want to assign a mentee to a mentor with typeahead, and end a 
 
 ### US-3.4 Set a user's manager — v1
 
-As a moderator, I want to set or clear a user's direct manager with typeahead.
+As a moderator, I want to set or clear a moderator's direct manager with typeahead.
 
+- The manager field only appears for moderators, and only offers moderators and the super admin.
 - A choice that would create a cycle is refused.
-- Assigning a mentee to a mentor who has no manager shows a warning.
 - Refs: BR-MGR-1…3
+
+### US-3.7 Keep admin notes on a member — v1
+
+As someone who manages or mentors a member (or a moderator), I want to keep notes on their profile that the member never sees.
+
+- Notes show on the member's profile page, newest first, with author and date.
+- Only the author edits a note.
+- Refs: BR-NOTE-3
 
 ### US-3.5 Manage lookups — v1
 

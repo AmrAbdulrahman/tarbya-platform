@@ -22,6 +22,30 @@
         ]
       }
     },
+    "/api/hierarchy/management": {
+      "get": {
+        "operationId": "HierarchyController_management",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ManagementNodeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "hierarchy"
+        ]
+      }
+    },
     "/api/settings": {
       "get": {
         "operationId": "SettingsController_get",
@@ -96,6 +120,14 @@
                 "active",
                 "inactive"
               ]
+            }
+          },
+          {
+            "name": "moderatorsOnly",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -385,6 +417,39 @@
         },
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/people": {
+      "get": {
+        "operationId": "PeopleController_search",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "people"
         ]
       }
     },
@@ -737,6 +802,593 @@
           "lookups"
         ]
       }
+    },
+    "/api/mentorships/mine": {
+      "get": {
+        "operationId": "MentorshipsController_mine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyMentoringDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "mentorships"
+        ]
+      }
+    },
+    "/api/mentorships": {
+      "get": {
+        "operationId": "MentorshipsController_active",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MentorshipDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "mentorships"
+        ]
+      },
+      "post": {
+        "operationId": "MentorshipsController_assign",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignMentorshipDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentorshipDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "MENTEE_HAS_MENTOR, MENTORSHIP_CYCLE, USER_INACTIVE"
+          }
+        },
+        "tags": [
+          "mentorships"
+        ]
+      }
+    },
+    "/api/mentorships/{id}/end": {
+      "post": {
+        "operationId": "MentorshipsController_end",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentorshipDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "mentorships"
+        ]
+      }
+    },
+    "/api/interactions": {
+      "get": {
+        "operationId": "InteractionsController_timeline",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InteractionPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interactions"
+        ]
+      }
+    },
+    "/api/interactions/{id}": {
+      "get": {
+        "operationId": "InteractionsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InteractionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interactions"
+        ]
+      }
+    },
+    "/api/interactions/follow-ups": {
+      "post": {
+        "operationId": "InteractionsController_createFollowUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFollowUpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InteractionDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "NOT_YOUR_MENTEE"
+          }
+        },
+        "tags": [
+          "interactions"
+        ]
+      }
+    },
+    "/api/interactions/activities": {
+      "post": {
+        "operationId": "InteractionsController_createActivity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActivityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InteractionDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interactions"
+        ]
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "operationId": "TasksController_list",
+        "parameters": [
+          {
+            "name": "assigneeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "open",
+              "type": "string",
+              "enum": [
+                "open",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/api/tasks/{id}": {
+      "patch": {
+        "operationId": "TasksController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/api/notes": {
+      "get": {
+        "operationId": "NotesController_list",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "notes"
+        ]
+      },
+      "post": {
+        "operationId": "NotesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "notes"
+        ]
+      }
+    },
+    "/api/notes/{id}": {
+      "patch": {
+        "operationId": "NotesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "NOTE_WIDEN_CONFIRM"
+          }
+        },
+        "tags": [
+          "notes"
+        ]
+      }
+    },
+    "/api/people/{id}": {
+      "get": {
+        "operationId": "ProfilesController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/api/people/{id}/admin-notes": {
+      "get": {
+        "operationId": "ProfilesController_notes",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminNoteDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "post": {
+        "operationId": "ProfilesController_addNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoteBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/api/admin-notes/{id}": {
+      "patch": {
+        "operationId": "ProfilesController_editNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoteBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
     }
   },
   "info": {
@@ -768,6 +1420,28 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "ManagementNodeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "managerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "managerId"
         ]
       },
       "SignInRole": {
@@ -1038,11 +1712,6 @@
                 "$ref": "#/components/schemas/CalendarPreference"
               }
             ]
-          },
-          "managerId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
           }
         },
         "required": [
@@ -1103,6 +1772,26 @@
         },
         "required": [
           "isModerator"
+        ]
+      },
+      "PersonDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isMyMentee": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "isMyMentee"
         ]
       },
       "PasswordSignInDto": {
@@ -1447,6 +2136,681 @@
             "type": "boolean"
           }
         }
+      },
+      "ContactStatus": {
+        "type": "string",
+        "enum": [
+          "REGULAR",
+          "DUE",
+          "LATE"
+        ]
+      },
+      "MyMenteeDto": {
+        "type": "object",
+        "properties": {
+          "mentorshipId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mentee": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastContactAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "contactStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContactStatus"
+              }
+            ]
+          },
+          "daysSinceContact": {
+            "type": "number"
+          },
+          "openTasks": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "mentorshipId",
+          "mentee",
+          "startedAt",
+          "lastContactAt",
+          "contactStatus",
+          "daysSinceContact",
+          "openTasks"
+        ]
+      },
+      "MyMentoringDto": {
+        "type": "object",
+        "properties": {
+          "mentor": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "mentees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyMenteeDto"
+            }
+          }
+        },
+        "required": [
+          "mentor",
+          "mentees"
+        ]
+      },
+      "MentorRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "manager": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "manager"
+        ]
+      },
+      "MentorshipDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mentor": {
+            "$ref": "#/components/schemas/MentorRefDto"
+          },
+          "mentee": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "mentor",
+          "mentee",
+          "startedAt",
+          "endedAt"
+        ]
+      },
+      "AssignMentorshipDto": {
+        "type": "object",
+        "properties": {
+          "mentorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "replace": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "mentorId",
+          "menteeId"
+        ]
+      },
+      "InteractionKind": {
+        "type": "string",
+        "enum": [
+          "FOLLOW_UP",
+          "ACTIVITY"
+        ]
+      },
+      "InteractionStatus": {
+        "type": "string",
+        "enum": [
+          "UPCOMING",
+          "DONE"
+        ]
+      },
+      "ActivityTypeRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LookupColor"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "nameAr",
+          "nameEn",
+          "color"
+        ]
+      },
+      "TaskDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "dueOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "doneAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "assignee": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "interactionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "dueOn",
+          "doneAt",
+          "assignee",
+          "interactionId"
+        ]
+      },
+      "InteractionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InteractionKind"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InteractionStatus"
+              }
+            ]
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "activityType": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityTypeRefDto"
+              }
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "place": {
+            "type": "string",
+            "nullable": true
+          },
+          "sharedNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "privateNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "challenges": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRefDto"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "title",
+          "activityType",
+          "startsAt",
+          "endsAt",
+          "place",
+          "sharedNotes",
+          "privateNotes",
+          "challenges",
+          "createdBy",
+          "participants",
+          "tasks"
+        ]
+      },
+      "InteractionPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InteractionDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "NewTaskDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "dueOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "CreateFollowUpDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "place": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "sharedNotes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "privateNotes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "challenges": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tasks": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewTaskDto"
+            }
+          }
+        },
+        "required": [
+          "startsAt",
+          "menteeId"
+        ]
+      },
+      "CreateActivityDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "place": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "sharedNotes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "privateNotes": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 5000
+          },
+          "activityTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "participantIds": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "startsAt",
+          "activityTypeId",
+          "title",
+          "participantIds"
+        ]
+      },
+      "UpdateTaskDto": {
+        "type": "object",
+        "properties": {
+          "done": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "done"
+        ]
+      },
+      "NoteVisibility": {
+        "type": "string",
+        "enum": [
+          "SHARED",
+          "PRIVATE"
+        ]
+      },
+      "NoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NoteVisibility"
+              }
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "visibility",
+          "body",
+          "author",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateNoteDto": {
+        "type": "object",
+        "properties": {
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NoteVisibility"
+              }
+            ]
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "menteeId",
+          "visibility",
+          "body"
+        ]
+      },
+      "UpdateNoteDto": {
+        "type": "object",
+        "properties": {
+          "visibility": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NoteVisibility"
+              }
+            ]
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          },
+          "confirmWiden": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "manager": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "mentor": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "deactivatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "canSeeAdminNotes": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "roles",
+          "manager",
+          "mentor",
+          "deactivatedAt",
+          "canSeeAdminNotes"
+        ]
+      },
+      "AdminNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canEdit": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "author",
+          "createdAt",
+          "updatedAt",
+          "canEdit"
+        ]
+      },
+      "AdminNoteBodyDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "body"
+        ]
       }
     }
   }
