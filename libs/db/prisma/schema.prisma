@@ -2,8 +2,8 @@
 // docs/architecture.md ("Data model").
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   // The api bundle is CommonJS.
   moduleFormat = "cjs"
 }
@@ -38,7 +38,77 @@ model User {
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
+  password   PasswordCredential?
+  sessions   Session[]
+  mentoring  Mentorship[]        @relation("Mentor")
+  mentoredBy Mentorship[]        @relation("Mentee")
+
   @@index([managerId])
+}
+
+// ── Auth (US-1.1 … US-1.3) ────────────────────────────────────────────────
+
+model PasswordCredential {
+  userId    String   @id @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  hash      String
+  updatedAt DateTime @updatedAt
+}
+
+enum OneTimeCodePurpose {
+  SIGN_IN
+}
+
+/// Emailed codes. Stored as an HMAC, never in clear.
+model OneTimeCode {
+  id        String             @id @default(uuid()) @db.Uuid
+  email     String
+  purpose   OneTimeCodePurpose
+  codeHash  String
+  attempts  Int                @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime           @default(now())
+
+  @@index([email, purpose, createdAt])
+}
+
+/// One row per sign-in. The refresh token is "<id>.<secret>"; only the current
+/// secret's hash is kept, plus the previous one for a short grace window.
+model Session {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @db.Uuid
+  user         User      @relation(fields: [userId], references: [id])
+  tokenHash    String
+  previousHash String?
+  rotatedAt    DateTime?
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  userAgent    String?
+  ip           String?
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// ── Mentoring ────────────────────────────────────────────────────────────
+// Only what sign-in needs to derive the mentor/mentee roles; the rest lands
+// with the mentorships module (build order step 4).
+
+model Mentorship {
+  id        String    @id @default(uuid()) @db.Uuid
+  mentorId  String    @db.Uuid
+  mentor    User      @relation("Mentor", fields: [mentorId], references: [id])
+  menteeId  String    @db.Uuid
+  mentee    User      @relation("Mentee", fields: [menteeId], references: [id])
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([mentorId])
+  @@index([menteeId])
 }
 
 model Setting {

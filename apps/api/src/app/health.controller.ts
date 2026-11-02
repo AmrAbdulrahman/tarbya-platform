@@ -1,6 +1,7 @@
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '@tarbya/db';
+import { Public } from '../common/public.decorator';
 
 class HealthDto {
   @ApiProperty({ enum: ['ok'] })
@@ -8,6 +9,7 @@ class HealthDto {
 }
 
 @ApiTags('health')
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}

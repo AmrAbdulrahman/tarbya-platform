@@ -1,14 +1,14 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import cookieParser from 'cookie-parser';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { writeFileSync } from 'node:fs';
 import { AppModule } from './app/app.module';
 import { buildOpenApiDocument, setupOpenApi } from './openapi';
 import type { Env } from './config/env';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'log'],
   });
   const config = app.get<ConfigService<Env, true>>(ConfigService);
@@ -26,7 +26,10 @@ async function bootstrap() {
     return;
   }
 
-  app.use(cookieParser());
+  // Railway's proxy sets X-Forwarded-For; the throttler and sessions need the client's IP.
+  if (config.get('NODE_ENV', { infer: true }) === 'production') {
+    app.set('trust proxy', 1);
+  }
   app.enableShutdownHooks();
   setupOpenApi(app);
 

@@ -5,5 +5,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './calendarPreference.js';
+export * from './codeSignInDto.js';
 export * from './healthDto.js';
 export * from './healthDtoStatus.js';
+export * from './locale.js';
+export * from './meDto.js';
+export * from './passwordSignInDto.js';
+export * from './requestCodeDto.js';
+export * from './role.js';

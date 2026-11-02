@@ -3,3 +3,13 @@
 
 /* Scan the UI library for class names too. */
 @source '../../../libs/ui/src';
+
+/* Login hero: navy with a faint dot grid (design/screens/Login.dc.html). */
+.login-dots {
+  background-color: var(--color-navy);
+  background-image: radial-gradient(
+    rgb(255 255 255 / 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 40px 40px;
+}
