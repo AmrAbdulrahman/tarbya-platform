@@ -1,5 +1,6 @@
 export * from './auth/auth.js';
 export * from './health/health.js';
+export * from './hierarchy/hierarchy.js';
 export * from './interactions/interactions.js';
 export * from './lookups/lookups.js';
 export * from './mentorships/mentorships.js';

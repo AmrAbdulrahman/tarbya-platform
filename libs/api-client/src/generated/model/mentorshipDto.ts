@@ -4,11 +4,12 @@
  * Tarbya API
  * OpenAPI spec version: 0.1.0
  */
+import type { MentorRefDto } from './mentorRefDto.js';
 import type { UserRefDto } from './userRefDto.js';
 
 export interface MentorshipDto {
   id: string;
-  mentor: UserRefDto;
+  mentor: MentorRefDto;
   mentee: UserRefDto;
   startedAt: string;
   /** @nullable */

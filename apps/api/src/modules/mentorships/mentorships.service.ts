@@ -16,7 +16,13 @@ const mentorshipSelect = {
   id: true,
   startedAt: true,
   endedAt: true,
-  mentor: { select: { id: true, name: true } },
+  mentor: {
+    select: {
+      id: true,
+      name: true,
+      manager: { select: { id: true, name: true } },
+    },
+  },
   mentee: { select: { id: true, name: true } },
 } satisfies Prisma.MentorshipSelect;
 

@@ -186,6 +186,16 @@ describe('admin', () => {
 
     // Demoting: refused while they manage someone; otherwise clears their own manager.
     await s.put(`/api/users/${mod.id}/manager`, { managerId: boss.id });
+    const line = (await s.get('/api/hierarchy/management')).data as {
+      id: string;
+      managerId: string | null;
+    }[];
+    expect(line).toEqual(
+      expect.arrayContaining([
+        { id: mod.id, name: expect.any(String), managerId: boss.id },
+      ]),
+    );
+    expect(line.map((n) => n.id)).not.toContain(plain.id);
     const admin = await signedIn(await superAdminId());
     const busy = await admin.put(`/api/users/${boss.id}/moderator`, {
       isModerator: false,

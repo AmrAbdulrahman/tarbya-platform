@@ -129,6 +129,7 @@ describe('mentorships (US-3.3)', () => {
   it('is admin-only', async () => {
     const { asMentor, mentor, mentee } = await pair();
     expect((await asMentor.get('/api/mentorships')).status).toBe(403);
+    expect((await asMentor.get('/api/hierarchy/management')).status).toBe(403);
     expect(
       (
         await asMentor.post('/api/mentorships', {

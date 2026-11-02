@@ -22,6 +22,30 @@
         ]
       }
     },
+    "/api/hierarchy/management": {
+      "get": {
+        "operationId": "HierarchyController_management",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ManagementNodeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "hierarchy"
+        ]
+      }
+    },
     "/api/settings": {
       "get": {
         "operationId": "SettingsController_get",
@@ -1398,6 +1422,28 @@
           "status"
         ]
       },
+      "ManagementNodeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "managerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "managerId"
+        ]
+      },
       "SignInRole": {
         "type": "string",
         "enum": [
@@ -2166,6 +2212,32 @@
           "mentees"
         ]
       },
+      "MentorRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "manager": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "manager"
+        ]
+      },
       "MentorshipDto": {
         "type": "object",
         "properties": {
@@ -2174,7 +2246,7 @@
             "format": "uuid"
           },
           "mentor": {
-            "$ref": "#/components/schemas/UserRefDto"
+            "$ref": "#/components/schemas/MentorRefDto"
           },
           "mentee": {
             "$ref": "#/components/schemas/UserRefDto"

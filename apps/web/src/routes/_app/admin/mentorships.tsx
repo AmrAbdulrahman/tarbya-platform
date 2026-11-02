@@ -1,15 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Plus } from 'lucide-react';
+import { Flag, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  hierarchyControllerManagement,
   mentorshipsControllerActive,
   mentorshipsControllerEnd,
+  type ManagementNodeDto,
+  type MentorRefDto,
   type MentorshipDto,
   type UserRefDto,
 } from '@tarbya/api-client';
-import { Button } from '@tarbya/ui';
+import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { meQuery } from '../../../auth/session';
 import {
@@ -26,12 +29,6 @@ export const Route = createFileRoute('/_app/admin/mentorships')({
 
 function MentorshipsPage() {
   const { t } = useTranslation();
-  const active = useQuery({
-    queryKey: mentorshipsQueryKey,
-    queryFn: async ({ signal }) =>
-      (await mentorshipsControllerActive({ signal })).data as MentorshipDto[],
-  });
-
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -44,28 +41,151 @@ function MentorshipsPage() {
       </div>
       <div className="flex flex-col gap-6">
         <AssignCard />
-        <section className="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-card p-6">
-          <h2 className="text-lg font-bold text-navy">
-            {t('mentoring.mentorships.treeTitle')}
-          </h2>
-          {active.isPending && (
-            <p className="text-ink-subtle">{t('admin.common.loading')}</p>
-          )}
-          {active.data && active.data.length === 0 && (
-            <p className="text-ink-subtle">
-              {t('mentoring.mentorships.treeEmpty')}
-            </p>
-          )}
-          {active.data && active.data.length > 0 && (
-            <ul className="flex flex-col gap-2">
-              {buildTree(active.data).map((n) => (
-                <TreeNode key={n.user.id} node={n} />
-              ))}
-            </ul>
-          )}
-        </section>
+        <TreeSection />
       </div>
     </>
+  );
+}
+
+type View = 'mentoring' | 'management';
+
+/** The mentoring tree or the management tree: two separate lines, never mixed (BR-MGR-4). */
+function TreeSection() {
+  const { t } = useTranslation();
+  const [view, setView] = useState<View>('mentoring');
+  const active = useQuery({
+    queryKey: mentorshipsQueryKey,
+    queryFn: async ({ signal }) =>
+      (await mentorshipsControllerActive({ signal })).data as MentorshipDto[],
+  });
+  const management = useQuery({
+    queryKey: ['hierarchy', 'management'],
+    queryFn: async ({ signal }) =>
+      (await hierarchyControllerManagement({ signal }))
+        .data as ManagementNodeDto[],
+    enabled: view === 'management',
+  });
+  const current = view === 'mentoring' ? active : management;
+
+  return (
+    <section className="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-card p-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="flex-1 text-lg font-bold text-navy">
+          {t('mentoring.mentorships.treeTitle')}
+        </h2>
+        <div
+          role="tablist"
+          aria-label={t('mentoring.mentorships.treeView')}
+          className="inline-flex rounded-full border border-border p-1"
+        >
+          {(['mentoring', 'management'] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="tab"
+              aria-selected={view === v}
+              onClick={() => setView(v)}
+              className={cn(
+                'h-8 rounded-full px-4 text-sm font-semibold',
+                view !== v && 'text-ink-muted hover:text-primary',
+                view === v &&
+                  v === 'mentoring' &&
+                  'bg-primary text-primary-foreground',
+                view === v && v === 'management' && 'bg-manager text-white',
+              )}
+            >
+              {v === 'mentoring'
+                ? t('mentoring.mentorships.treeMentoring')
+                : t('mentoring.mentorships.treeManagement')}
+            </button>
+          ))}
+        </div>
+      </div>
+      {current.isPending && (
+        <p className="text-ink-subtle">{t('admin.common.loading')}</p>
+      )}
+      {view === 'mentoring' &&
+        active.data &&
+        (active.data.length === 0 ? (
+          <p className="text-ink-subtle">
+            {t('mentoring.mentorships.treeEmpty')}
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {buildTree(active.data).map((n) => (
+              <TreeNode key={n.user.id} node={n} />
+            ))}
+          </ul>
+        ))}
+      {view === 'management' &&
+        management.data &&
+        (management.data.length === 0 ? (
+          <p className="text-ink-subtle">
+            {t('mentoring.mentorships.managementEmpty')}
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {buildManagementTree(management.data).map((n) => (
+              <ManagerNode key={n.id} node={n} />
+            ))}
+          </ul>
+        ))}
+    </section>
+  );
+}
+
+interface ManagerTreeNode extends ManagementNodeDto {
+  reports: ManagerTreeNode[];
+}
+
+function buildManagementTree(nodes: ManagementNodeDto[]): ManagerTreeNode[] {
+  const byId = new Map(
+    nodes.map((n) => [n.id, { ...n, reports: [] as ManagerTreeNode[] }]),
+  );
+  const roots: ManagerTreeNode[] = [];
+  for (const n of byId.values()) {
+    const manager = n.managerId ? byId.get(n.managerId) : undefined;
+    if (manager) manager.reports.push(n);
+    else roots.push(n);
+  }
+  return roots;
+}
+
+/** The management line in the manager blue, so it never reads as mentoring. */
+function ManagerNode({ node }: { node: ManagerTreeNode }) {
+  const { t } = useTranslation();
+  return (
+    <li className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-manager/25 bg-manager-tint/40 px-3 py-2">
+        <span
+          aria-hidden
+          className="grid size-8 place-items-center rounded-full bg-manager-tint text-sm font-bold text-manager"
+        >
+          {node.name.charAt(0)}
+        </span>
+        <Link
+          to="/people/$id"
+          params={{ id: node.id }}
+          className="font-semibold text-navy hover:text-manager"
+        >
+          {node.name}
+        </Link>
+        {node.reports.length > 0 && (
+          <span className="text-[13px] text-manager">
+            {t('mentoring.mentorships.reportCount', {
+              count: node.reports.length,
+            })}
+          </span>
+        )}
+      </div>
+      {node.reports.length > 0 && (
+        <ul className="flex flex-col gap-2 border-s-2 border-manager/30 ps-5">
+          {node.reports.map((r) => (
+            <ManagerNode key={r.id} node={r} />
+          ))}
+        </ul>
+      )}
+    </li>
   );
 }
 
@@ -126,7 +246,8 @@ function AssignCard() {
 }
 
 interface Node {
-  user: UserRefDto;
+  /** Mentors carry their direct manager. */
+  user: UserRefDto & Partial<Pick<MentorRefDto, 'manager'>>;
   /** The mentorship to this node's mentor; absent for roots. */
   mentorship?: MentorshipDto;
   children: Node[];
@@ -143,7 +264,10 @@ function buildTree(mentorships: MentorshipDto[]): Node[] {
   for (const m of mentorships) {
     const child = node(m.mentee);
     child.mentorship = m;
-    node(m.mentor).children.push(child);
+    const mentor = node(m.mentor);
+    // A mentor may have been added first as someone's mentee, without their manager.
+    mentor.user = m.mentor;
+    mentor.children.push(child);
   }
   const byName = (a: Node, b: Node) => a.user.name.localeCompare(b.user.name);
   for (const n of nodes.values()) n.children.sort(byName);
@@ -188,6 +312,9 @@ function TreeNode({ node }: { node: Node }) {
               count: node.children.length,
             })}
           </span>
+        )}
+        {node.children.length > 0 && (
+          <ReportsTo manager={node.user.manager ?? null} />
         )}
         <span className="flex-1" />
         <Button
@@ -267,5 +394,30 @@ function TreeNode({ node }: { node: Node }) {
         </ul>
       )}
     </li>
+  );
+}
+
+/** On mentors: who they report to in the management line, or a flag when nobody. */
+function ReportsTo({ manager }: { manager: UserRefDto | null }) {
+  const { t } = useTranslation();
+  if (!manager) {
+    return (
+      <span className="inline-flex h-6 items-center gap-1 rounded-full bg-amber-50 px-2.5 text-[13px] font-medium text-warn">
+        <Flag className="size-3.5" aria-hidden />
+        {t('mentoring.mentorships.noManager')}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex h-6 items-center gap-1 rounded-full bg-manager-tint px-2.5 text-[13px] text-manager">
+      {t('mentoring.mentorships.reportsTo')}
+      <Link
+        to="/people/$id"
+        params={{ id: manager.id }}
+        className="font-semibold hover:underline"
+      >
+        {manager.name}
+      </Link>
+    </span>
   );
 }

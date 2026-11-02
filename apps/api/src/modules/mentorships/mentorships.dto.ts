@@ -2,9 +2,15 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { UserRefDto } from '../users/users.dto';
 
+export class MentorRefDto extends UserRefDto {
+  /** Their direct manager, if any: shown as "reports to" in the mentoring tree. */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  manager!: UserRefDto | null;
+}
+
 export class MentorshipDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
-  @ApiProperty({ type: UserRefDto }) mentor!: UserRefDto;
+  @ApiProperty({ type: MentorRefDto }) mentor!: MentorRefDto;
   @ApiProperty({ type: UserRefDto }) mentee!: UserRefDto;
   @ApiProperty({ format: 'date-time' }) startedAt!: string;
   @ApiProperty({ type: String, format: 'date-time', nullable: true }) endedAt!:
