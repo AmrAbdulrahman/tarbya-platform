@@ -3,3 +3,5 @@ export * from './components/button.js';
 export * from './components/dropdown-menu.js';
 export * from './components/input.js';
 export * from './components/direction.js';
+export * from './components/dialog.js';
+export * from './components/form-controls.js';

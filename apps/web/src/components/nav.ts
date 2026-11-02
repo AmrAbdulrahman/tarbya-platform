@@ -1,5 +1,6 @@
 import {
   ClipboardList,
+  Settings,
   Calendar,
   CircleDot,
   LayoutDashboard,
@@ -32,10 +33,11 @@ export const navSections: NavSection[] = [
     title: 'nav.admin',
     roles: ['SUPER_ADMIN', 'MODERATOR'],
     items: [
-      { label: 'nav.users', to: '/', icon: UserPlus },
+      { label: 'nav.users', to: '/admin/users', icon: UserPlus },
       { label: 'nav.mentorships', to: '/', icon: ListTree },
       { label: 'nav.groups', to: '/', icon: CircleDot },
-      { label: 'nav.lookups', to: '/', icon: ClipboardList },
+      { label: 'nav.lookups', to: '/admin/lookups', icon: ClipboardList },
+      { label: 'nav.settings', to: '/admin/settings', icon: Settings },
     ],
   },
   {

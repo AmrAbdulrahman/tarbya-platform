@@ -1,8 +1,10 @@
 import { hash } from 'argon2';
+import { sign } from 'jsonwebtoken';
 import { config } from 'dotenv';
 import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 import { Client } from 'pg';
+import { Session } from './session';
 
 config({ path: resolve(__dirname, '../../../../.env'), quiet: true });
 
@@ -91,4 +93,46 @@ export async function messageCount(email: string): Promise<number> {
     `${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`,
   );
   return ((await res.json()) as { messages_count: number }).messages_count;
+}
+
+/**
+ * A signed-in session without going through sign-in, so suites don't use up its
+ * rate limit: a Session row plus an access token signed like the API's.
+ */
+export async function signedIn(userId: string): Promise<Session> {
+  const c = await db();
+  const sessionId = randomUUID();
+  await c.query(
+    `INSERT INTO "Session" (id, "userId", "tokenHash", "expiresAt") VALUES ($1, $2, $3, now() + interval '1 day')`,
+    [sessionId, userId, randomUUID()],
+  );
+  const token = sign(
+    { sub: userId, sid: sessionId },
+    process.env['JWT_SECRET'] as string,
+    {
+      algorithm: 'HS256',
+      expiresIn: 900,
+    },
+  );
+  const session = new Session();
+  session.cookies.set('access_token', token);
+  return session;
+}
+
+/** The super admin from .env (the API creates it on boot). */
+export async function superAdminId(): Promise<string> {
+  const c = await db();
+  const { rows } = await c.query(`SELECT id FROM "User" WHERE email = $1`, [
+    (process.env['SUPER_ADMIN_EMAIL'] as string).toLowerCase(),
+  ]);
+  return rows[0].id;
+}
+
+export async function auditActions(entityId: string): Promise<string[]> {
+  const c = await db();
+  const { rows } = await c.query(
+    `SELECT action FROM "AuditLog" WHERE "entityId" = $1 ORDER BY "createdAt"`,
+    [entityId],
+  );
+  return rows.map((r: { action: string }) => r.action);
 }

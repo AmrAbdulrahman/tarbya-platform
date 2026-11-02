@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import type { Env } from '../../config/env';
+import { AccessGuard } from '../../common/access';
 import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
@@ -36,7 +37,10 @@ import { SuperAdminBootstrap } from './super-admin.bootstrap';
     AuthService,
     SessionsService,
     SuperAdminBootstrap,
+    // Order matters: who you are, then what you may do.
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: AccessGuard },
   ],
+  exports: [SessionsService],
 })
 export class AuthModule {}

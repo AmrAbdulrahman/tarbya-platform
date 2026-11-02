@@ -22,6 +22,372 @@
         ]
       }
     },
+    "/api/settings": {
+      "get": {
+        "operationId": "SettingsController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "operationId": "SettingsController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "UsersController_list",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "all",
+              "type": "string",
+              "enum": [
+                "all",
+                "active",
+                "inactive"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      },
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "USER_EMAIL_TAKEN, USER_PHONE_TAKEN, MANAGER_INACTIVE"
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "USER_EMAIL_TAKEN, USER_PHONE_TAKEN, SUPER_ADMIN_LOCKED"
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/deactivate": {
+      "post": {
+        "operationId": "UsersController_deactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "SUPER_ADMIN_LOCKED, SELF_ACTION"
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/reactivate": {
+      "post": {
+        "operationId": "UsersController_reactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/manager": {
+      "put": {
+        "operationId": "UsersController_setManager",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetManagerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "MANAGER_CYCLE, MANAGER_INACTIVE"
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{id}/moderator": {
+      "put": {
+        "operationId": "UsersController_setModerator",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetModeratorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "SUPER_ADMIN_LOCKED"
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/api/auth/sign-in/password": {
       "post": {
         "operationId": "AuthController_signInWithPassword",
@@ -185,6 +551,192 @@
           "auth"
         ]
       }
+    },
+    "/api/lookups/activity-types": {
+      "get": {
+        "operationId": "LookupsController_activityTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lookups"
+        ]
+      },
+      "post": {
+        "operationId": "LookupsController_createActivityType",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActivityTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lookups"
+        ]
+      }
+    },
+    "/api/lookups/activity-types/{id}": {
+      "patch": {
+        "operationId": "LookupsController_updateActivityType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lookups"
+        ]
+      }
+    },
+    "/api/lookups/tracking-methods": {
+      "get": {
+        "operationId": "LookupsController_trackingMethods",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingMethodDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lookups"
+        ]
+      },
+      "post": {
+        "operationId": "LookupsController_createTrackingMethod",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTrackingMethodDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingMethodDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lookups"
+        ]
+      }
+    },
+    "/api/lookups/tracking-methods/{id}": {
+      "patch": {
+        "operationId": "LookupsController_updateTrackingMethod",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTrackingMethodDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackingMethodDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "lookups"
+        ]
+      }
     }
   },
   "info": {
@@ -218,21 +770,107 @@
           "status"
         ]
       },
-      "PasswordSignInDto": {
+      "SignInRole": {
+        "type": "string",
+        "enum": [
+          "MODERATOR",
+          "MANAGER",
+          "GROUP_ADMIN",
+          "GROUP_MODERATOR",
+          "MENTOR",
+          "MENTEE"
+        ]
+      },
+      "SettingsDto": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string",
-            "example": "name@example.com"
+          "signInRoles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SignInRole"
+            }
           },
-          "password": {
-            "type": "string"
+          "contactDueDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 90
+          },
+          "contactLateDays": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 180
+          },
+          "rsvpRequestHours": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 336
+          },
+          "reminderHours": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 72
+          },
+          "trendWindow": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 10
+          },
+          "trendSteadyBand": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.5
           }
         },
         "required": [
-          "email",
-          "password"
+          "signInRoles",
+          "contactDueDays",
+          "contactLateDays",
+          "rsvpRequestHours",
+          "reminderHours",
+          "trendWindow",
+          "trendSteadyBand"
         ]
+      },
+      "UpdateSettingsDto": {
+        "type": "object",
+        "properties": {
+          "signInRoles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SignInRole"
+            }
+          },
+          "contactDueDays": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 90
+          },
+          "contactLateDays": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 180
+          },
+          "rsvpRequestHours": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 336
+          },
+          "reminderHours": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 72
+          },
+          "trendWindow": {
+            "type": "number",
+            "minimum": 2,
+            "maximum": 10
+          },
+          "trendSteadyBand": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.5
+          }
+        }
       },
       "Locale": {
         "type": "string",
@@ -259,6 +897,228 @@
           "GROUP_MODERATOR",
           "MENTOR",
           "MENTEE"
+        ]
+      },
+      "UserRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "locale": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Locale"
+              }
+            ]
+          },
+          "calendar": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarPreference"
+              }
+            ]
+          },
+          "isModerator": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "manager": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "deactivatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "canSignIn": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "locale",
+          "calendar",
+          "isModerator",
+          "roles",
+          "manager",
+          "deactivatedAt",
+          "canSignIn"
+        ]
+      },
+      "UserPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+201001234567"
+          },
+          "locale": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Locale"
+              }
+            ]
+          },
+          "calendar": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarPreference"
+              }
+            ]
+          },
+          "managerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "locale": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Locale"
+              }
+            ]
+          },
+          "calendar": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarPreference"
+              }
+            ]
+          }
+        }
+      },
+      "SetManagerDto": {
+        "type": "object",
+        "properties": {
+          "managerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "managerId"
+        ]
+      },
+      "SetModeratorDto": {
+        "type": "object",
+        "properties": {
+          "isModerator": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isModerator"
+        ]
+      },
+      "PasswordSignInDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "name@example.com"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
         ]
       },
       "MeDto": {
@@ -334,6 +1194,259 @@
           "email",
           "code"
         ]
+      },
+      "ActivityScope": {
+        "type": "string",
+        "enum": [
+          "INDIVIDUAL",
+          "GROUP_RECURRING",
+          "GROUP_ONE_OFF"
+        ]
+      },
+      "LookupColor": {
+        "type": "string",
+        "enum": [
+          "PURPLE",
+          "NAVY",
+          "GREEN",
+          "AMBER",
+          "ROSE",
+          "SLATE"
+        ]
+      },
+      "ReminderLead": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "H3",
+          "H24",
+          "H48"
+        ]
+      },
+      "ActivityTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityScope"
+              }
+            ]
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LookupColor"
+              }
+            ]
+          },
+          "requiresRsvp": {
+            "type": "boolean"
+          },
+          "tracksAttendance": {
+            "type": "boolean"
+          },
+          "showInFeed": {
+            "type": "boolean"
+          },
+          "reminder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReminderLead"
+              }
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "nameAr",
+          "nameEn",
+          "scope",
+          "color",
+          "requiresRsvp",
+          "tracksAttendance",
+          "showInFeed",
+          "reminder",
+          "active"
+        ]
+      },
+      "CreateActivityTypeDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "nameEn": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityScope"
+              }
+            ]
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LookupColor"
+              }
+            ]
+          },
+          "requiresRsvp": {
+            "type": "boolean"
+          },
+          "tracksAttendance": {
+            "type": "boolean"
+          },
+          "showInFeed": {
+            "type": "boolean"
+          },
+          "reminder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReminderLead"
+              }
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "nameAr",
+          "nameEn",
+          "scope"
+        ]
+      },
+      "UpdateActivityTypeDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "nameEn": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityScope"
+              }
+            ]
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LookupColor"
+              }
+            ]
+          },
+          "requiresRsvp": {
+            "type": "boolean"
+          },
+          "tracksAttendance": {
+            "type": "boolean"
+          },
+          "showInFeed": {
+            "type": "boolean"
+          },
+          "reminder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReminderLead"
+              }
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TrackingMethodDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "nameAr",
+          "nameEn",
+          "active"
+        ]
+      },
+      "CreateTrackingMethodDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "nameEn": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "nameAr",
+          "nameEn"
+        ]
+      },
+      "UpdateTrackingMethodDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "nameEn": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
       }
     }
   }
