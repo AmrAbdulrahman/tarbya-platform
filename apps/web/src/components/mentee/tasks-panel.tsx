@@ -10,29 +10,35 @@ import { formatDate } from '@tarbya/shared';
 import { cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
+import { mineQueryKey } from '../mentor/form-parts';
 
 /** A mentee's one-time tasks, open first (BR-FU-4). The mentee, their mentor and admins tick them. */
-export function TasksPanel({ menteeId }: { menteeId: string }) {
+export function TasksPanel({
+  menteeId,
+  openOnly = false,
+}: {
+  menteeId: string;
+  /** Hide done tasks (the follow-up screen); the profile shows all. */
+  openOnly?: boolean;
+}) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const queryKey = ['tasks', menteeId];
+  const status = openOnly ? 'open' : 'all';
+  const queryKey = ['tasks', menteeId, status];
   const tasks = useQuery({
     queryKey,
     queryFn: async ({ signal }) =>
-      (
-        await tasksControllerList(
-          { assigneeId: menteeId, status: 'all' },
-          { signal },
-        )
-      ).data as TaskDto[],
+      (await tasksControllerList({ assigneeId: menteeId, status }, { signal }))
+        .data as TaskDto[],
   });
   const toggle = useMutation({
     mutationFn: (task: TaskDto) =>
       tasksControllerUpdate(task.id, { done: !task.doneAt }),
     onSuccess: () =>
       Promise.all([
-        queryClient.invalidateQueries({ queryKey }),
+        queryClient.invalidateQueries({ queryKey: ['tasks', menteeId] }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: mineQueryKey }),
       ]),
   });
 
@@ -42,7 +48,7 @@ export function TasksPanel({ menteeId }: { menteeId: string }) {
       className="flex flex-col gap-3 rounded-card border border-border bg-card p-6"
     >
       <h2 id="tasks-title" className="text-lg font-bold text-navy">
-        {t('mentee.tasks')}
+        {openOnly ? t('mentoring.log.openTasks') : t('mentee.tasks')}
       </h2>
       {tasks.isError && (
         <p className="text-sm text-ink-subtle">

@@ -295,6 +295,12 @@ export const ar = {
       confirmEnd: 'نعم، أنهِها',
     },
     log: {
+      pickFirst: 'اختر متابَعًا لترى وضعه وتسجّل إدخالًا جديدًا.',
+      newFollowUpWith: 'تسجيل متابعة مع {{name}}',
+      newActivityWith: 'تسجيل نشاط مع {{name}}',
+      savedFollowUp: 'حُفظت المتابعة.',
+      savedActivity: 'أُضيف النشاط.',
+      progress: 'التقدّم',
       followUpTitle: 'متابعة جديدة',
       activityTitle: 'نشاط جديد',
       activityLead:
@@ -329,7 +335,6 @@ export const ar = {
       upcomingHint: 'موعده لم يأتِ بعد، فلا يُحسب تواصلًا حتى يحين.',
       doneHint: 'يُحدِّث «آخر تواصل» عند الحفظ.',
       save: 'حفظ',
-      saved: 'تم الحفظ وأُضيف إلى سجل المتابَع.',
       lastContact: 'آخر تواصل',
       neverContacted: 'لا تواصل منذ بدء المتابعة',
       daysAgo_zero: 'اليوم',
@@ -340,8 +345,6 @@ export const ar = {
       daysAgo_other: 'قبل {{count}} يوم',
       openTasks: 'مهام مفتوحة',
       status: { REGULAR: 'منتظم', DUE: 'مستحق', LATE: 'متأخر' },
-      aside:
-        'يظهر هذا الإدخال في سجل المتابَع وفي لوحة الموجِّه، ويُحدِّث «آخر تواصل» تلقائيًا.',
       activityType: 'نوع النشاط',
       typesHint: 'الأنواع يديرها المشرفون من القوائم المرجعية.',
       participants: 'المشاركون',

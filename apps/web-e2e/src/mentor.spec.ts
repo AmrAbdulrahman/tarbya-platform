@@ -15,14 +15,10 @@ async function signIn(page: Page) {
   await ensureArabic(page);
 }
 
-test('the mentor finds a mentee on the dashboard and shares a note with them (US-4.1, US-4.2, US-4.6)', async ({
-  page,
-}) => {
+/** The super admin mentors a fresh e2e member; the teardown removes both. */
+async function newMentee(page: Page) {
   const tag = Date.now().toString(36);
   const name = `يوسف ${tag}`;
-  await signIn(page);
-
-  // The super admin mentors a fresh e2e member; the teardown removes both.
   const me = await (await page.request.get('/api/auth/me')).json();
   const mentee = await (
     await page.request.post('/api/users', {
@@ -35,6 +31,14 @@ test('the mentor finds a mentee on the dashboard and shares a note with them (US
     data: { mentorId: me.id, menteeId: mentee.id },
   });
   expect(assigned.ok(), await assigned.text()).toBe(true);
+  return { id: mentee.id as string, name };
+}
+
+test('the mentor finds a mentee on the dashboard and shares a note with them (US-4.1, US-4.2, US-4.6)', async ({
+  page,
+}) => {
+  await signIn(page);
+  const { name } = await newMentee(page);
 
   await page.goto('/mentor');
   const row = page.getByRole('row').filter({ hasText: name });
@@ -58,4 +62,30 @@ test('the mentor finds a mentee on the dashboard and shares a note with them (US
   await dialog.getByRole('button', { name: 'نعم، شاركها' }).click();
   await expect(dialog).toBeHidden();
   await expect(note).toContainText(`مشتركة مع ${name}`);
+});
+
+test('picks a mentee first, then logs a follow-up from the panel (US-4.3)', async ({
+  page,
+}) => {
+  await signIn(page);
+  const { name } = await newMentee(page);
+
+  await page.goto('/mentor/log');
+  // Only the mentee picker until someone is chosen.
+  await expect(page.getByRole('region', { name: 'السجل' })).toBeHidden();
+  await page.getByLabel('المتابَع').selectOption({ label: name });
+
+  const toggle = page.getByRole('button', { name: `تسجيل متابعة مع ${name}` });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  const history = page.getByRole('region', { name: 'السجل' });
+  await expect(history).toContainText('لا شيء هنا بعد.');
+
+  await toggle.click();
+  await page.getByLabel('ملاحظات مشتركة').fill('بداية موفقة');
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+
+  // Saving closes the panel and confirms with a toast.
+  await expect(page.getByRole('status')).toContainText('حُفظت المتابعة.');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(history).toContainText('لقاء متابعة');
 });

@@ -300,6 +300,13 @@ export const en: Messages = {
       confirmEnd: 'Yes, end it',
     },
     log: {
+      pickFirst:
+        'Choose a mentee to see where things stand and log a new entry.',
+      newFollowUpWith: 'Log a follow-up with {{name}}',
+      newActivityWith: 'Log an activity with {{name}}',
+      savedFollowUp: 'Follow-up saved.',
+      savedActivity: 'Activity added.',
+      progress: 'Progress',
       followUpTitle: 'New follow-up',
       activityTitle: 'New activity',
       activityLead:
@@ -335,7 +342,6 @@ export const en: Messages = {
         "It hasn't happened yet, so it won't count as contact until it does.",
       doneHint: 'Saving updates last contact.',
       save: 'Save',
-      saved: "Saved and added to the mentee's history.",
       lastContact: 'Last contact',
       neverContacted: 'No contact since the mentorship began',
       daysAgo_zero: 'Today',
@@ -346,8 +352,6 @@ export const en: Messages = {
       daysAgo_other: '{{count}} days ago',
       openTasks: 'Open tasks',
       status: { REGULAR: 'Regular', DUE: 'Due', LATE: 'Late' },
-      aside:
-        "This entry appears in the mentee's history and on the mentor dashboard, and updates last contact automatically.",
       activityType: 'Activity type',
       typesHint: 'Moderators manage the types in lookups.',
       participants: 'Participants',

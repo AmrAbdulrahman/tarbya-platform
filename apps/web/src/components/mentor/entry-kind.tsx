@@ -3,7 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@tarbya/ui';
 
 /** Follow-up or activity: the two entry types switch between their forms (FollowUp.dc.html). */
-export function EntryKind({ current }: { current: 'follow-up' | 'activity' }) {
+export function EntryKind({
+  current,
+  menteeId,
+}: {
+  current: 'follow-up' | 'activity';
+  /** Kept when switching, so the chosen mentee stays. */
+  menteeId?: string;
+}) {
   const { t } = useTranslation();
   const tiles = [
     {
@@ -28,6 +35,7 @@ export function EntryKind({ current }: { current: 'follow-up' | 'activity' }) {
         <Link
           key={tile.id}
           to={tile.to}
+          search={{ menteeId }}
           aria-current={tile.id === current ? 'page' : undefined}
           className={cn(
             'flex flex-col gap-1 rounded-card border-2 px-4 py-3',
