@@ -1,0 +1,39 @@
+# Local development services. Start with: docker compose up -d
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: tarbya
+      POSTGRES_PASSWORD: tarbya
+      POSTGRES_DB: tarbya
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U tarbya']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI
+
+  # S3-compatible storage. MinIO images are no longer published on Docker Hub.
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.50
+    command: server -dir=/data -s3 -s3.port=8333
+    environment:
+      AWS_ACCESS_KEY_ID: tarbya
+      AWS_SECRET_ACCESS_KEY: tarbya-secret
+    ports:
+      - '9000:8333' # S3 API
+    volumes:
+      - seaweedfs-data:/data
+
+volumes:
+  postgres-data:
+  seaweedfs-data:

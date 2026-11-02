@@ -1,0 +1,30 @@
+{
+  "name": "@tarbya/api-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "api-e2e",
+    "implicitDependencies": [
+      "api"
+    ],
+    "targets": {
+      "e2e": {
+        "command": "jest --passWithNoTests",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "dependsOn": [
+          "api:build",
+          "api:serve"
+        ],
+        "options": {
+          "cwd": "apps/api-e2e"
+        }
+      }
+    },
+    "tags": [
+      "scope:api",
+      "type:e2e"
+    ]
+  }
+}

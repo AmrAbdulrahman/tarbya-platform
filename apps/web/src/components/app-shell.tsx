@@ -1,0 +1,90 @@
+import { Link, Outlet } from '@tanstack/react-router';
+import { Bell, MessageSquare, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@tarbya/ui';
+import { LanguageSwitch } from './language-switch';
+import { navSections } from './nav';
+
+/** Sidebar with one section per role, plus the sticky header (design/screens/Main.dc.html). */
+export function AppShell() {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex min-h-screen flex-wrap bg-surface">
+      <nav
+        aria-label={t('app.name')}
+        className="flex max-w-full flex-[1_1_240px] flex-col gap-6 border-e border-border bg-card px-4 py-6"
+      >
+        <div className="flex items-center gap-2.5 px-2">
+          <div className="grid size-9 place-items-center rounded-card bg-primary text-lg font-bold text-primary-foreground">
+            ت
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold text-navy">{t('app.name')}</span>
+            <span className="text-xs text-ink-subtle">{t('app.tagline')}</span>
+          </div>
+        </div>
+        {navSections.map((section, i) => (
+          <div
+            key={section.title}
+            className={
+              i
+                ? 'flex flex-col gap-1 border-t border-divider pt-4'
+                : 'flex flex-col gap-1'
+            }
+          >
+            <span className="px-3.5 pb-1 text-xs font-semibold text-ink-subtle">
+              {t(section.title)}
+            </span>
+            {section.items.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                className="flex min-h-11 items-center gap-3 rounded-lg px-3.5 text-[15px] font-medium text-ink hover:bg-surface hover:text-primary"
+                activeProps={{
+                  className: 'bg-primary-tint text-primary-hover',
+                }}
+                activeOptions={{ exact: true }}
+              >
+                <item.icon className="size-5" aria-hidden />
+                {t(item.label)}
+              </Link>
+            ))}
+          </div>
+        ))}
+      </nav>
+
+      <div className="flex min-w-0 flex-[999_1_560px] flex-col">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-10 backdrop-blur">
+          <label className="relative flex-[0_1_380px]">
+            <span className="sr-only">{t('header.search')}</span>
+            <input
+              type="search"
+              placeholder={t('header.search')}
+              className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
+            />
+            <Search
+              className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
+              aria-hidden
+            />
+          </label>
+          <div className="flex-1" />
+          <LanguageSwitch />
+          <Button variant="ghost" size="icon" aria-label={t('header.messages')}>
+            <MessageSquare />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t('header.notifications')}
+          >
+            <Bell />
+          </Button>
+        </header>
+        <main className="flex flex-col gap-7 px-10 pb-12 pt-8">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}
