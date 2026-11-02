@@ -55,4 +55,7 @@ export class MeDto {
 
   @ApiProperty({ enum: ROLES, enumName: 'Role', isArray: true })
   roles!: Role[];
+
+  @ApiProperty({ type: String, nullable: true })
+  avatarUrl!: string | null;
 }

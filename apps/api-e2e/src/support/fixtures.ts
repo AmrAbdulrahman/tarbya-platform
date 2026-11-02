@@ -79,8 +79,11 @@ export async function createMentorship(
   );
 }
 
-/** The newest sign-in code Mailpit received for this address. */
-export async function latestCode(email: string): Promise<string> {
+/** The newest code Mailpit received for this address (sign-in or contact change). */
+export async function latestCode(
+  email: string,
+  after?: string,
+): Promise<string> {
   for (let attempt = 0; attempt < 20; attempt++) {
     const res = await fetch(
       `${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}&limit=1`,
@@ -89,7 +92,7 @@ export async function latestCode(email: string): Promise<string> {
       messages: { Subject: string }[];
     };
     const match = messages[0]?.Subject.match(/\b(\d{6})\b/);
-    if (match) return match[1];
+    if (match && match[1] !== after) return match[1];
     await new Promise((r) => setTimeout(r, 250));
   }
   throw new Error(`No sign-in code arrived for ${email}`);
@@ -143,4 +146,22 @@ export async function auditActions(entityId: string): Promise<string[]> {
     [entityId],
   );
   return rows.map((r: { action: string }) => r.action);
+}
+
+/** Makes the session look older, e.g. to test "sign in again" rules. */
+export async function ageSession(userId: string, minutes: number) {
+  const c = await db();
+  await c.query(
+    `UPDATE "Session" SET "createdAt" = now() - ($2 || ' minutes')::interval WHERE "userId" = $1`,
+    [userId, String(minutes)],
+  );
+}
+
+export async function setPassword(userId: string, password: string) {
+  const c = await db();
+  await c.query(
+    `INSERT INTO "PasswordCredential" ("userId", hash, "updatedAt") VALUES ($1, $2, now())
+     ON CONFLICT ("userId") DO UPDATE SET hash = excluded.hash`,
+    [userId, await hash(password)],
+  );
 }

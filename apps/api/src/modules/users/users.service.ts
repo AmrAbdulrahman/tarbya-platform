@@ -57,7 +57,11 @@ export class UsersService {
         OR: [
           { name: { contains: query.q, mode: 'insensitive' } },
           { email: { contains: query.q, mode: 'insensitive' } },
-          { phone: { contains: query.q.replace(/[^\d+]/g, '') || query.q } },
+          // Only a query that looks like a phone number searches phones.
+          ...(/^[+\d\s()-]+$/.test(query.q) &&
+          query.q.replace(/\D/g, '').length >= 3
+            ? [{ phone: { contains: query.q.replace(/[^\d+]/g, '') } }]
+            : []),
         ],
       }),
     };

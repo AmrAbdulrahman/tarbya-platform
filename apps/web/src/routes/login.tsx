@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import type { MeDto } from '@tarbya/api-client';
+import { setLanguage } from '@tarbya/i18n';
 import { cn } from '@tarbya/ui';
 import { meQuery } from '../auth/session';
 import { CodeForm } from '../components/login/code-form';
@@ -42,8 +43,10 @@ function Login() {
   // Kept across tabs so switching method doesn't lose what was typed.
   const [email, setEmail] = useState('');
 
-  const onSignedIn = (me: MeDto) => {
+  const onSignedIn = async (me: MeDto) => {
     queryClient.setQueryData(meQuery.queryKey, me);
+    // Each member's default language (BR-ORG-2) wins over the one picked on this screen.
+    await setLanguage(me.locale);
     router.history.push(back ?? '/');
   };
 

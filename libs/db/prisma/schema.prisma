@@ -35,6 +35,8 @@ model User {
   manager       User?              @relation("Management", fields: [managerId], references: [id])
   reports       User[]             @relation("Management")
   deactivatedAt DateTime?
+  avatarFileId  String?            @unique @db.Uuid
+  avatarFile    FileObject?        @relation(fields: [avatarFileId], references: [id])
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
@@ -50,6 +52,7 @@ model User {
   notes             Note[]                   @relation("NoteAuthor")
   adminNotes        AdminNote[]              @relation("AdminNoteSubject")
   adminNotesWritten AdminNote[]              @relation("AdminNoteAuthor")
+  contactChanges    ContactChange[]
 
   @@index([managerId])
 }
@@ -302,4 +305,42 @@ model AdminNote {
   updatedAt DateTime @updatedAt
 
   @@index([subjectId, createdAt])
+}
+
+// ── Files and profile (US-2.1, US-2.2) ───────────────────────────────────
+
+/**
+ * An object in the S3 bucket (Railway Storage Buckets; SeaweedFS locally).
+ */
+model FileObject {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique
+  mime      String
+  size      Int
+  createdAt DateTime @default(now())
+
+  avatarOf User?
+}
+
+enum ContactKind {
+  EMAIL
+  PHONE
+}
+
+/**
+ * A pending email or phone change, confirmed with an emailed code (US-2.2).
+ */
+model ContactChange {
+  id        String      @id @default(uuid()) @db.Uuid
+  userId    String      @db.Uuid
+  user      User        @relation(fields: [userId], references: [id])
+  kind      ContactKind
+  value     String
+  codeHash  String
+  attempts  Int         @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime    @default(now())
+
+  @@index([userId, kind, createdAt])
 }

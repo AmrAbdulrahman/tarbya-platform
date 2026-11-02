@@ -145,6 +145,13 @@ export class SessionsService {
     });
   }
 
+  async revokeAllExcept(userId: string, keepSessionId: string): Promise<void> {
+    await this.prisma.session.updateMany({
+      where: { userId, revokedAt: null, id: { not: keepSessionId } },
+      data: { revokedAt: new Date() },
+    });
+  }
+
   /** The session a refresh token names, if it parses; used to sign out without a valid access token. */
   sessionIdOf(refreshToken: string | undefined): string | undefined {
     return parseRefreshToken(refreshToken)?.sessionId;

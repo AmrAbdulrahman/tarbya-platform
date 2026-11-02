@@ -1,5 +1,12 @@
-import { Link, Outlet } from '@tanstack/react-router';
-import { Bell, LogOut, MessageSquare, MonitorX, Search } from 'lucide-react';
+import { Link, Outlet, useNavigate } from '@tanstack/react-router';
+import {
+  Bell,
+  LogOut,
+  MessageSquare,
+  MonitorX,
+  Search,
+  UserRound,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -12,6 +19,7 @@ import {
 } from '@tarbya/ui';
 import { useMe, useSignOut } from '../auth/session';
 import { LanguageSwitch } from './language-switch';
+import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
 
 /** Sidebar with one section per role, plus the sticky header (design/screens/Main.dc.html). */
@@ -105,7 +113,7 @@ function AccountMenu() {
   const me = useMe();
   const signOut = useSignOut();
   const signOutEverywhere = useSignOut(true);
-  const initial = me.name.trim().charAt(0);
+  const navigate = useNavigate();
 
   return (
     <DropdownMenu>
@@ -113,9 +121,9 @@ function AccountMenu() {
         <button
           type="button"
           aria-label={t('account.menu')}
-          className="grid size-10 place-items-center rounded-full bg-primary-tint font-bold text-primary-hover hover:ring-2 hover:ring-primary/30"
+          className="shrink-0 rounded-full hover:ring-2 hover:ring-primary/30"
         >
-          {initial}
+          <Avatar name={me.name} url={me.avatarUrl} className="size-10" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -128,6 +136,10 @@ function AccountMenu() {
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => navigate({ to: '/profile' })}>
+          <UserRound aria-hidden />
+          {t('me.profileLink')}
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => signOut.mutate()}>
           <LogOut aria-hidden />
           {t('account.signOut')}

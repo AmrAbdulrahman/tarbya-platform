@@ -23,6 +23,7 @@ import type { Env } from '../../config/env';
 import { unauthenticated } from '../../common/app-exception';
 import { CurrentAuth, type AuthContext } from '../../common/auth-context';
 import { Public } from '../../common/public.decorator';
+import { AvatarsService } from '../files/avatars.service';
 import { RolesService } from '../users/roles.service';
 import {
   CodeSignInDto,
@@ -171,6 +172,7 @@ export class AuthController {
       locale: user.locale,
       calendar: user.calendar,
       roles,
+      avatarUrl: AvatarsService.url(user.id, user.avatarFileId),
     };
   }
 }

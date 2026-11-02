@@ -21,6 +21,15 @@ export class Session {
     );
   }
 
+  async delete(url: string) {
+    return this.track(
+      await axios.delete(url, {
+        headers: { 'X-Requested-With': 'e2e', Cookie: this.cookieHeader() },
+        validateStatus: () => true,
+      }),
+    );
+  }
+
   async put(url: string, body?: unknown) {
     return this.send('put', url, body);
   }
@@ -36,6 +45,16 @@ export class Session {
         url,
         data: body,
         headers: { 'X-Requested-With': 'e2e', Cookie: this.cookieHeader() },
+        validateStatus: () => true,
+      }),
+    );
+  }
+
+  async getBytes(url: string) {
+    return this.track(
+      await axios.get(url, {
+        headers: { Cookie: this.cookieHeader() },
+        responseType: 'arraybuffer',
         validateStatus: () => true,
       }),
     );
