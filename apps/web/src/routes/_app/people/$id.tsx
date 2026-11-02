@@ -17,6 +17,7 @@ import { Badge, Button, Textarea } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FormError } from '../../../components/login/fields';
+import { PlansSection } from '../../../components/plans/plans-section';
 
 /** A member's profile; step 6 grows it into the full mentee profile (US-4.2). */
 export const Route = createFileRoute('/_app/people/$id')({
@@ -91,6 +92,9 @@ function ProfilePage() {
         </section>
         {p.canSeeAdminNotes && <AdminNotes subjectId={p.id} />}
       </div>
+      {p.canSeePlans && (
+        <PlansSection menteeId={p.id} canManage={p.canManagePlans} />
+      )}
     </>
   );
 }

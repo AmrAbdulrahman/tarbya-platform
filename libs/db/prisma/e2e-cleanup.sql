@@ -16,6 +16,13 @@ UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_us
 DELETE FROM "AdminNote"
   WHERE "subjectId" IN (SELECT id FROM e2e_users)
      OR "authorId" IN (SELECT id FROM e2e_users);
+-- Replies go with their reading (ON DELETE CASCADE).
+DELETE FROM "PlanReading"
+  WHERE "authorId" IN (SELECT id FROM e2e_users)
+     OR "planId" IN (SELECT id FROM "DevelopmentPlan" WHERE "menteeId" IN (SELECT id FROM e2e_users) OR "createdById" IN (SELECT id FROM e2e_users));
+DELETE FROM "PlanReply" WHERE "authorId" IN (SELECT id FROM e2e_users);
+DELETE FROM "DevelopmentPlan"
+  WHERE "menteeId" IN (SELECT id FROM e2e_users) OR "createdById" IN (SELECT id FROM e2e_users);
 DELETE FROM "Note"
   WHERE "mentorshipId" IN (SELECT id FROM e2e_mentorships)
      OR "authorId" IN (SELECT id FROM e2e_users);

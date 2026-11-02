@@ -22,4 +22,6 @@ export interface ProfileDto {
   /** @nullable */
   deactivatedAt: string | null;
   canSeeAdminNotes: boolean;
+  canSeePlans: boolean;
+  canManagePlans: boolean;
 }

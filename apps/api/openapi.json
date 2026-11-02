@@ -1600,6 +1600,217 @@
           "me"
         ]
       }
+    },
+    "/api/plans": {
+      "get": {
+        "operationId": "PlansController_list",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ]
+      },
+      "post": {
+        "operationId": "PlansController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ]
+      }
+    },
+    "/api/plans/{id}": {
+      "get": {
+        "operationId": "PlansController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ]
+      },
+      "patch": {
+        "operationId": "PlansController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ]
+      }
+    },
+    "/api/plans/{id}/check-ins": {
+      "post": {
+        "operationId": "PlansController_checkIn",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ]
+      }
+    },
+    "/api/plans/readings/{readingId}/replies": {
+      "post": {
+        "operationId": "PlansController_reply",
+        "parameters": [
+          {
+            "name": "readingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanReplyBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "plans"
+        ]
+      }
     }
   },
   "info": {
@@ -2717,6 +2928,27 @@
           "title"
         ]
       },
+      "PlanUpdateDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "value": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "planId",
+          "value"
+        ]
+      },
       "CreateFollowUpDto": {
         "type": "object",
         "properties": {
@@ -2755,6 +2987,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NewTaskDto"
+            }
+          },
+          "planUpdates": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanUpdateDto"
             }
           }
         },
@@ -2967,6 +3206,12 @@
           },
           "canSeeAdminNotes": {
             "type": "boolean"
+          },
+          "canSeePlans": {
+            "type": "boolean"
+          },
+          "canManagePlans": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -2978,7 +3223,9 @@
           "manager",
           "mentor",
           "deactivatedAt",
-          "canSeeAdminNotes"
+          "canSeeAdminNotes",
+          "canSeePlans",
+          "canManagePlans"
         ]
       },
       "AdminNoteDto": {
@@ -3170,6 +3417,396 @@
         },
         "required": [
           "newPassword"
+        ]
+      },
+      "TrackingMethodRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nameAr",
+          "nameEn"
+        ]
+      },
+      "Trend": {
+        "type": "string",
+        "enum": [
+          "IMPROVING",
+          "STEADY",
+          "WORSE",
+          "NEW"
+        ]
+      },
+      "PlanSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string"
+          },
+          "trackingMethod": {
+            "$ref": "#/components/schemas/TrackingMethodRefDto"
+          },
+          "target": {
+            "type": "number"
+          },
+          "higherIsBetter": {
+            "type": "boolean"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "latest": {
+            "type": "number",
+            "nullable": true
+          },
+          "latestAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "trend": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Trend"
+              }
+            ]
+          },
+          "change": {
+            "type": "number"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "menteeId",
+          "name",
+          "goal",
+          "trackingMethod",
+          "target",
+          "higherIsBetter",
+          "endsOn",
+          "closedAt",
+          "latest",
+          "latestAt",
+          "trend",
+          "change",
+          "points"
+        ]
+      },
+      "ReadingSource": {
+        "type": "string",
+        "enum": [
+          "FOLLOW_UP",
+          "CHECK_IN"
+        ]
+      },
+      "PlanReplyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "author",
+          "createdAt"
+        ]
+      },
+      "PlanReadingDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "value": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "source": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReadingSource"
+              }
+            ]
+          },
+          "needsHelp": {
+            "type": "boolean"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanReplyDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "value",
+          "note",
+          "source",
+          "needsHelp",
+          "recordedAt",
+          "author",
+          "replies"
+        ]
+      },
+      "PlanDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string"
+          },
+          "trackingMethod": {
+            "$ref": "#/components/schemas/TrackingMethodRefDto"
+          },
+          "target": {
+            "type": "number"
+          },
+          "higherIsBetter": {
+            "type": "boolean"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "latest": {
+            "type": "number",
+            "nullable": true
+          },
+          "latestAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "trend": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Trend"
+              }
+            ]
+          },
+          "change": {
+            "type": "number"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "mentee": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "readings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanReadingDto"
+            }
+          },
+          "canManage": {
+            "type": "boolean"
+          },
+          "canCheckIn": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "menteeId",
+          "name",
+          "goal",
+          "trackingMethod",
+          "target",
+          "higherIsBetter",
+          "endsOn",
+          "closedAt",
+          "latest",
+          "latestAt",
+          "trend",
+          "change",
+          "points",
+          "mentee",
+          "readings",
+          "canManage",
+          "canCheckIn"
+        ]
+      },
+      "CreatePlanDto": {
+        "type": "object",
+        "properties": {
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "goal": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "trackingMethodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target": {
+            "type": "number"
+          },
+          "higherIsBetter": {
+            "type": "boolean",
+            "default": true
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "required": [
+          "menteeId",
+          "name",
+          "goal",
+          "trackingMethodId",
+          "target"
+        ]
+      },
+      "UpdatePlanDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "goal": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "trackingMethodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target": {
+            "type": "number"
+          },
+          "higherIsBetter": {
+            "type": "boolean",
+            "default": true
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "closed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CheckInDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          },
+          "needsHelp": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "PlanReplyBodyDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "body"
         ]
       }
     }

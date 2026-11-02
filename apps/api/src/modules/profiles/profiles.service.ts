@@ -60,6 +60,15 @@ export class ProfilesService {
       },
     });
     if (!user) throw notFound();
+    const [canSeePlans, canManagePlans] = await Promise.all([
+      this.mentoring.canView(viewerId, id),
+      this.roles
+        .isAdmin(viewerId)
+        .then(
+          async (admin) =>
+            admin || !!(await this.mentoring.currentMentorship(viewerId, id)),
+        ),
+    ]);
     return {
       id: user.id,
       name: user.name,
@@ -70,6 +79,8 @@ export class ProfilesService {
       mentor: user.mentoredBy[0]?.mentor ?? null,
       deactivatedAt: user.deactivatedAt?.toISOString() ?? null,
       canSeeAdminNotes: responsible,
+      canSeePlans,
+      canManagePlans,
     };
   }
 

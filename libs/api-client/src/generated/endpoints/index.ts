@@ -8,6 +8,7 @@ export * from './me/me.js';
 export * from './mentorships/mentorships.js';
 export * from './notes/notes.js';
 export * from './people/people.js';
+export * from './plans/plans.js';
 export * from './profiles/profiles.js';
 export * from './settings/settings.js';
 export * from './tasks/tasks.js';
