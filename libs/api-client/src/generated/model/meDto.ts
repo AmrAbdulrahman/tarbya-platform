@@ -16,4 +16,6 @@ export interface MeDto {
   locale: Locale;
   calendar: CalendarPreference;
   roles: Role[];
+  /** @nullable */
+  avatarUrl: string | null;
 }

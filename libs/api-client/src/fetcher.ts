@@ -56,7 +56,8 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const headers = new Headers(init.headers);
   for (const [name, value] of Object.entries(HEADERS)) headers.set(name, value);
-  if (init.body && !headers.has('Content-Type'))
+  // JSON bodies arrive as strings; FormData must keep the browser's multipart boundary.
+  if (typeof init.body === 'string' && !headers.has('Content-Type'))
     headers.set('Content-Type', 'application/json');
 
   const send = () => fetch(url, { ...init, headers, credentials: 'include' });

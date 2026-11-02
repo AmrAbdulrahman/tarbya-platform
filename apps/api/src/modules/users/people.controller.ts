@@ -45,30 +45,34 @@ export class PeopleController {
     @Query() query: PeopleQuery,
   ): Promise<PersonDto[]> {
     await this.access.assertMentorOrAdmin(auth.userId);
-    const rows = await this.prisma.user.findMany({
-      where: {
-        deactivatedAt: null,
-        id: { not: auth.userId },
-        ...(query.q && { name: { contains: query.q, mode: 'insensitive' } }),
-      },
-      select: {
-        id: true,
-        name: true,
-        mentoredBy: {
-          where: { mentorId: auth.userId, endedAt: null },
-          select: { id: true },
-        },
-      },
-      orderBy: { name: 'asc' },
-      take: 50,
-    });
-    return rows
-      .map((r) => ({
-        id: r.id,
-        name: r.name,
-        isMyMentee: r.mentoredBy.length > 0,
-      }))
-      .sort((a, b) => Number(b.isMyMentee) - Number(a.isMyMentee))
-      .slice(0, 10);
+    const where = {
+      deactivatedAt: null,
+      id: { not: auth.userId },
+      ...(query.q && {
+        name: { contains: query.q, mode: 'insensitive' as const },
+      }),
+    };
+    const mine = {
+      mentoredBy: { some: { mentorId: auth.userId, endedAt: null } },
+    };
+    // Mentees first, then everyone else, so a mentee is never cut off by the limit.
+    const [mentees, others] = await Promise.all([
+      this.prisma.user.findMany({
+        where: { ...where, ...mine },
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+        take: 10,
+      }),
+      this.prisma.user.findMany({
+        where: { ...where, NOT: mine },
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+        take: 10,
+      }),
+    ]);
+    return [
+      ...mentees.map((u) => ({ ...u, isMyMentee: true })),
+      ...others.map((u) => ({ ...u, isMyMentee: false })),
+    ].slice(0, 10);
   }
 }

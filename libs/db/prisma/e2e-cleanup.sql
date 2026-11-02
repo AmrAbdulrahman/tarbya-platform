@@ -35,8 +35,13 @@ DELETE FROM "Session"
      OR "userAgent" LIKE '%tarbya-e2e%';
 DELETE FROM "PasswordCredential" WHERE "userId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Mentorship" WHERE id IN (SELECT id FROM e2e_mentorships);
+DELETE FROM "ContactChange" WHERE "userId" IN (SELECT id FROM e2e_users);
+CREATE TEMP TABLE e2e_files ON COMMIT DROP AS
+  SELECT "avatarFileId" AS id FROM "User" WHERE id IN (SELECT id FROM e2e_users) AND "avatarFileId" IS NOT NULL;
 DELETE FROM "OneTimeCode" WHERE email LIKE '%@tarbya.test';
 DELETE FROM "User" WHERE id IN (SELECT id FROM e2e_users);
+-- The objects stay in the bucket; local test files are small and harmless.
+DELETE FROM "FileObject" WHERE id IN (SELECT id FROM e2e_files);
 
 DELETE FROM "ActivityType" WHERE "nameEn" LIKE 'e2e %';
 DELETE FROM "TrackingMethod" WHERE "nameEn" LIKE 'e2e %';

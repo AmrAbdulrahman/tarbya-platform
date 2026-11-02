@@ -51,6 +51,13 @@ jobs:
       - run: pnpm nx run api-client:generate
       - run: git diff --exit-code -- apps/api/openapi.json libs/api-client/src/generated
 
+      # S3 for profile pictures; the same SeaweedFS as docker-compose.yml.
+      - name: Start SeaweedFS
+        run: |
+          docker run -d -p 9000:8333 -e AWS_ACCESS_KEY_ID=tarbya -e AWS_SECRET_ACCESS_KEY=tarbya-secret \
+            chrislusf/seaweedfs:4.50 server -dir=/data -s3 -s3.port=8333
+          for i in $(seq 1 30); do curl -s -o /dev/null localhost:9000 && break; sleep 2; done
+
       - run: pnpm nx run db:migrate-deploy
       - run: pnpm exec playwright install --with-deps chromium
       # One suite at a time: both use the API on :3000.
