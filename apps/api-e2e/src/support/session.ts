@@ -21,6 +21,26 @@ export class Session {
     );
   }
 
+  async put(url: string, body?: unknown) {
+    return this.send('put', url, body);
+  }
+
+  async patch(url: string, body?: unknown) {
+    return this.send('patch', url, body);
+  }
+
+  private async send(method: 'put' | 'patch', url: string, body: unknown) {
+    return this.track(
+      await axios.request({
+        method,
+        url,
+        data: body,
+        headers: { 'X-Requested-With': 'e2e', Cookie: this.cookieHeader() },
+        validateStatus: () => true,
+      }),
+    );
+  }
+
   async get(url: string) {
     return this.track(
       await axios.get(url, {

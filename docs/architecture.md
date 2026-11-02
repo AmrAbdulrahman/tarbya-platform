@@ -76,7 +76,7 @@ Roles are derived, so permission checks are relationship checks, not role lists:
 | manager of X                     | X is in my subtree (recursive query on `User.managerId`) |
 | can see group G                  | member of G, or in the manager chain above G's admin     |
 
-Each module exposes a policy service (`can(user, action, resource)`) used by a `@Policy()` guard and by services for query scoping. Lists are always filtered in SQL, never after loading.
+Each module exposes a policy service (`can(user, action, resource)`) used by a `@Policy()` guard and by services for query scoping. Lists are always filtered in SQL, never after loading. Administration routes use `@Requires('admin' | 'superAdmin')` (`apps/api/src/common/access.ts`), checked by a global guard after authentication.
 
 Private notes are excluded at the query level for anyone who isn't the mentor or a moderator.
 
@@ -100,12 +100,12 @@ Private notes are excluded at the query level for anyone who isn't the mentor or
 Prisma models, grouped. All have `id` (uuid), `createdAt`, `updatedAt`.
 
 - **People:** `User` (name, email?, phone?, avatarFileId?, locale, calendar, isModerator, managerId?, deactivatedAt?), `PasswordCredential`, `OneTimeCode`, `Session`, `ContactChange`.
-- **Settings & lookups:** `Setting` (key, json value), `ActivityType` (nameAr, nameEn, color, scope individual/group, groupId?, flags, active), `GatheringType`, `TrackingMethod`.
+- **Settings & lookups:** `Setting` (key, json value; keys and defaults in `libs/shared/src/lib/settings.ts`), `ActivityType` (nameAr, nameEn, scope INDIVIDUAL | GROUP_RECURRING | GROUP_ONE_OFF, color, requiresRsvp, tracksAttendance, showInFeed, reminder, active; group-specific types get a `groupId` with groups), `TrackingMethod`. Gathering types are the `GROUP_RECURRING` activity types, as in `design/screens/ActivityTypes.dc.html`; there is no separate `GatheringType`.
 - **Mentoring:** `Mentorship` (mentorId, menteeId, startedAt, endedAt?; partial unique index on menteeId where endedAt is null).
 - **Interactions:** `Interaction` (kind FOLLOW_UP | ACTIVITY, activityTypeId?, mentorshipId?, createdById, startsAt, place?, notes, challenges), `InteractionParticipant`, `Task` (menteeId, interactionId?, title, dueAt?, doneAt?).
 - **Plans:** `DevelopmentPlan` (mentorshipId, name, goal, trackingMethodId, target, endsAt?, closedAt?), `PlanReading` (planId, value, note, source FOLLOW_UP | CHECK_IN, interactionId?, authorId, recordedAt), `PlanReply`.
 - **Notes:** `Note` (mentorshipId, authorId, visibility SHARED | PRIVATE, body).
-- **Groups:** `Group`, `GroupMembership` (role ADMIN | MODERATOR | MEMBER; one ADMIN per group), `GatheringSeries` (groupId, gatheringTypeId, weekday, time, place, startsOn, endsOn?), `Gathering` (occurrence; seriesId? for one-time activities, startsAt, cancelledAt?), `Rsvp`, `Attendance` (present, note).
+- **Groups:** `Group`, `GroupMembership` (role ADMIN | MODERATOR | MEMBER; one ADMIN per group), `GatheringSeries` (groupId, activityTypeId, weekday, time, place, startsOn, endsOn?), `Gathering` (occurrence; seriesId? for one-time activities, startsAt, cancelledAt?), `Rsvp`, `Attendance` (present, note).
 - **Inbox:** `Notification` (userId, type, payload json, readAt?), `NotificationPreference` (userId, type, inApp, email), `Conversation` (kind DIRECT | GROUP | TEAM, groupId?), `ConversationMember` (lastReadAt), `Message`.
 - **Other:** `FileObject` (key, mime, size), `AuditLog` (actorId, onBehalfOfId?, action, entity, entityId, diff json).
 

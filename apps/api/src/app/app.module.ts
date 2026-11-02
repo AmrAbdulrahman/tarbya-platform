@@ -8,7 +8,10 @@ import { validateEnv } from '../config/env';
 import { CsrfMiddleware } from '../common/csrf.middleware';
 import { ProblemDetailsFilter } from '../common/problem-details.filter';
 import { validationPipe } from '../common/validation.pipe';
+import { AuditModule } from '../modules/audit/audit.module';
 import { AuthModule } from '../modules/auth/auth.module';
+import { HierarchyModule } from '../modules/hierarchy/hierarchy.module';
+import { LookupsModule } from '../modules/lookups/lookups.module';
 import { MailModule } from '../modules/mail/mail.module';
 import { SettingsModule } from '../modules/settings/settings.module';
 import { UsersModule } from '../modules/users/users.module';
@@ -23,9 +26,12 @@ import { HealthController } from './health.controller';
     }),
     DbModule,
     MailModule,
+    AuditModule,
+    HierarchyModule,
     SettingsModule,
     UsersModule,
     AuthModule,
+    LookupsModule,
   ],
   controllers: [HealthController],
   providers: [

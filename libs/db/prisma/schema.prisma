@@ -42,6 +42,7 @@ model User {
   sessions   Session[]
   mentoring  Mentorship[]        @relation("Mentor")
   mentoredBy Mentorship[]        @relation("Mentee")
+  audited    AuditLog[]          @relation("AuditActor")
 
   @@index([managerId])
 }
@@ -115,4 +116,73 @@ model Setting {
   key       String   @id
   value     Json
   updatedAt DateTime @updatedAt
+}
+
+// ── Lookups (US-3.5, BR-ADM-2) ──────────────────────────────────────────
+// Never hard-deleted: switch `active` off instead.
+
+/// Where an activity type can be used. Group gathering types are the GROUP_RECURRING ones.
+enum ActivityScope {
+  INDIVIDUAL
+  GROUP_RECURRING
+  GROUP_ONE_OFF
+}
+
+/// The design's lookup palette (design/screens/ActivityTypes.dc.html).
+enum LookupColor {
+  PURPLE
+  NAVY
+  GREEN
+  AMBER
+  ROSE
+  SLATE
+}
+
+enum ReminderLead {
+  NONE
+  H3
+  H24
+  H48
+}
+
+model ActivityType {
+  id               String        @id @default(uuid()) @db.Uuid
+  nameAr           String
+  nameEn           String
+  scope            ActivityScope
+  color            LookupColor   @default(PURPLE)
+  requiresRsvp     Boolean       @default(false)
+  tracksAttendance Boolean       @default(false)
+  showInFeed       Boolean       @default(true)
+  reminder         ReminderLead  @default(NONE)
+  active           Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model TrackingMethod {
+  id        String   @id @default(uuid()) @db.Uuid
+  nameAr    String
+  nameEn    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Audit (BR-ADM-4, BR-MGR-8) ──────────────────────────────────────────
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  actorId      String?  @db.Uuid
+  actor        User?    @relation("AuditActor", fields: [actorId], references: [id])
+  /// v2: the member a manager acted for.
+  onBehalfOfId String?  @db.Uuid
+  action       String
+  entity       String
+  entityId     String
+  diff         Json?
+  createdAt    DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId])
 }

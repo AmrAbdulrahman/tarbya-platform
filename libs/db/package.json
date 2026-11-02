@@ -71,6 +71,12 @@
         "dependsOn": [
           "prisma-generate"
         ]
+      },
+      "e2e-cleanup": {
+        "command": "prisma db execute --file prisma/e2e-cleanup.sql",
+        "options": {
+          "cwd": "{projectRoot}"
+        }
       }
     }
   },
@@ -78,6 +84,7 @@
     "@nestjs/common": "^11.2.8",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "@tarbya/shared": "workspace:*",
     "pg": "^8.23.1"
   }
 }

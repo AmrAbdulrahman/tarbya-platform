@@ -5,12 +5,33 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './activityScope.js';
+export * from './activityTypeDto.js';
 export * from './calendarPreference.js';
 export * from './codeSignInDto.js';
+export * from './createActivityTypeDto.js';
+export * from './createTrackingMethodDto.js';
+export * from './createUserDto.js';
 export * from './healthDto.js';
 export * from './healthDtoStatus.js';
 export * from './locale.js';
+export * from './lookupColor.js';
 export * from './meDto.js';
 export * from './passwordSignInDto.js';
+export * from './reminderLead.js';
 export * from './requestCodeDto.js';
 export * from './role.js';
+export * from './setManagerDto.js';
+export * from './setModeratorDto.js';
+export * from './settingsDto.js';
+export * from './signInRole.js';
+export * from './trackingMethodDto.js';
+export * from './updateActivityTypeDto.js';
+export * from './updateSettingsDto.js';
+export * from './updateTrackingMethodDto.js';
+export * from './updateUserDto.js';
+export * from './userDto.js';
+export * from './userPageDto.js';
+export * from './userRefDto.js';
+export * from './usersControllerListParams.js';
+export * from './usersControllerListStatus.js';
