@@ -112,12 +112,13 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## 11. Administration and lookups
 
-| ID       | Requirement                                                                                                                                                                         | Release |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| BR-ADM-1 | The super admin and moderators manage users, mentorships, groups and managers.                                                                                                      | v1      |
-| BR-ADM-2 | They manage lookups: group gathering types, activity types, plan tracking methods. Lookups have Arabic and English names, can be deactivated, and are never hard-deleted once used. | v1      |
-| BR-ADM-3 | They manage system settings (BR-ORG-5, BR-AUTH-2).                                                                                                                                  | v1      |
-| BR-ADM-4 | Sensitive changes (roles, mentorships, managers, deactivation, settings) are written to an audit log.                                                                               | v1      |
+| ID       | Requirement                                                                                                                                                                                                                                                                                                    | Release |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| BR-ADM-1 | The super admin and moderators manage users, mentorships, groups and managers.                                                                                                                                                                                                                                 | v1      |
+| BR-ADM-2 | They manage lookups: group gathering types, activity types, plan tracking methods. Lookups have Arabic and English names, can be deactivated, and are never hard-deleted once used.                                                                                                                            | v1      |
+| BR-ADM-3 | They manage system settings (BR-ORG-5, BR-AUTH-2).                                                                                                                                                                                                                                                             | v1      |
+| BR-ADM-4 | Sensitive changes (roles, mentorships, managers, deactivation, settings) are written to an audit log.                                                                                                                                                                                                          | v1      |
+| BR-ADM-5 | The super admin can view the app as any other active user (impersonation), with a banner that says so and a way back. Starting and stopping are audited, changes made meanwhile are recorded as the super admin's on behalf of that user, and the user's password, email, phone and sessions can't be changed. | v1      |
 
 ## Open questions
 

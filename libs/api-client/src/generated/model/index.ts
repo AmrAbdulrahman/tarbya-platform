@@ -32,6 +32,7 @@ export * from './feedKind.js';
 export * from './feedPageDto.js';
 export * from './healthDto.js';
 export * from './healthDtoStatus.js';
+export * from './impersonateDto.js';
 export * from './interactionDto.js';
 export * from './interactionKind.js';
 export * from './interactionPageDto.js';

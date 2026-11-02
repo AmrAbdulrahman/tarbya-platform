@@ -63,6 +63,7 @@ pnpm nx run-many -t serve -p api web   # api :3000 (/api/docs), web :4200
 - `apps/web-e2e/playwright.config.mts` must not import from `nx`/`@nx/*`: it crashes Node 22's ESM loader.
 - `apps/api/openapi.json` and `libs/api-client/src/generated` are committed; CI fails if they're stale.
 - Every non-GET request needs an `X-Requested-With` header (CSRF); the generated client sends it. Routes need a session unless marked `@Public()`.
+- While the super admin impersonates someone, `auth.userId` is that user and `auth.impersonatorId` is the super admin. Routes that change sign-in details take `@NotWhileImpersonating()`.
 - Admin-only routes take `@Requires('admin')` (super admin or moderator) or `@Requires('superAdmin')`. Sensitive changes go through `AuditService.record(…, tx)` inside the same transaction.
 - The e2e suites write to the database in `.env` (your dev database) and clean up after themselves with `libs/db/prisma/e2e-cleanup.sql`. Test data must use `@tarbya.test` emails and `e2e `-prefixed lookup names, or it won't be removed. `pnpm nx run db:e2e-cleanup` runs the cleanup by hand.
 - API errors are problem details with a stable `code` from `libs/shared/src/lib/errors.ts`; add a matching `errors.<code>` string in both locales.

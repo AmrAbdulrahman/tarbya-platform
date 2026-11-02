@@ -41,7 +41,8 @@ model User {
   updatedAt     DateTime           @updatedAt
 
   password          PasswordCredential?
-  sessions          Session[]
+  sessions          Session[]                @relation("SessionOwner")
+  impersonatedIn    Session[]                @relation("SessionImpersonated")
   mentoring         Mentorship[]             @relation("Mentor")
   mentoredBy        Mentorship[]             @relation("Mentee")
   audited           AuditLog[]               @relation("AuditActor")
@@ -91,18 +92,21 @@ model OneTimeCode {
 /// One row per sign-in. The refresh token is "<id>.<secret>"; only the current
 /// secret's hash is kept, plus the previous one for a short grace window.
 model Session {
-  id           String    @id @default(uuid()) @db.Uuid
-  userId       String    @db.Uuid
-  user         User      @relation(fields: [userId], references: [id])
-  tokenHash    String
-  previousHash String?
-  rotatedAt    DateTime?
-  expiresAt    DateTime
-  revokedAt    DateTime?
-  userAgent    String?
-  ip           String?
-  createdAt    DateTime  @default(now())
-  lastUsedAt   DateTime  @default(now())
+  id                 String    @id @default(uuid()) @db.Uuid
+  userId             String    @db.Uuid
+  user               User      @relation("SessionOwner", fields: [userId], references: [id])
+  /// The super admin is viewing the app as this user; tokens carry them as `sub` and the owner as `act`.
+  impersonatedUserId String?   @db.Uuid
+  impersonatedUser   User?     @relation("SessionImpersonated", fields: [impersonatedUserId], references: [id])
+  tokenHash          String
+  previousHash       String?
+  rotatedAt          DateTime?
+  expiresAt          DateTime
+  revokedAt          DateTime?
+  userAgent          String?
+  ip                 String?
+  createdAt          DateTime  @default(now())
+  lastUsedAt         DateTime  @default(now())
 
   @@index([userId])
 }

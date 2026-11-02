@@ -8,6 +8,7 @@ import { validateEnv } from '../config/env';
 import { CsrfMiddleware } from '../common/csrf.middleware';
 import { ProblemDetailsFilter } from '../common/problem-details.filter';
 import { validationPipe } from '../common/validation.pipe';
+import { RequestContextMiddleware } from '../common/request-context';
 import { AuditModule } from '../modules/audit/audit.module';
 import { AuthModule } from '../modules/auth/auth.module';
 import { FeedModule } from '../modules/feed/feed.module';
@@ -57,6 +58,8 @@ import { HealthController } from './health.controller';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(cookieParser(), CsrfMiddleware).forRoutes('*path');
+    consumer
+      .apply(RequestContextMiddleware, cookieParser(), CsrfMiddleware)
+      .forRoutes('*path');
   }
 }

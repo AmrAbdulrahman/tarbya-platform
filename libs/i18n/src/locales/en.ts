@@ -87,6 +87,8 @@ export const en: Messages = {
     USER_INACTIVE: 'Everyone involved must be an active member.',
     NOT_YOUR_MENTEE: "This member isn't your mentee.",
     ACTIVITY_TYPE_INVALID: 'Pick an active one-to-one activity type.',
+    IMPERSONATION_RESTRICTED:
+      'Not available while viewing as another user. Exit impersonation first.',
     NOTE_WIDEN_CONFIRM:
       'Sharing a private note shows it to the mentee. Confirm to continue.',
     MANAGER_NOT_MODERATOR:
@@ -626,6 +628,16 @@ export const en: Messages = {
     widen: 'Yes, share it',
     tasks: 'One-time tasks',
     noTasks: 'No tasks yet.',
+  },
+  impersonation: {
+    action: 'View as a user',
+    title: 'View the app as a user',
+    hint: "You'll see the app as they do until you go back to your account. Changes you make are recorded as yours, on their behalf.",
+    user: 'User',
+    mode: 'Viewing as another user',
+    banner: 'You are viewing the app as {{name}}.',
+    signedInAs: 'Signed in as {{name}}.',
+    exit: 'Back to my account',
   },
   account: {
     menu: 'My account',

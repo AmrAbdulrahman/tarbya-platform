@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService, type Prisma } from '@tarbya/db';
+import { requestContext } from '../../common/request-context';
 
 export type AuditAction =
   | 'user.create'
@@ -10,7 +11,9 @@ export type AuditAction =
   | 'user.moderator.set'
   | 'settings.update'
   | 'mentorship.start'
-  | 'mentorship.end';
+  | 'mentorship.end'
+  | 'user.impersonate.start'
+  | 'user.impersonate.stop';
 
 export interface AuditEntry {
   actorId: string;
@@ -28,10 +31,17 @@ type Tx = Pick<PrismaService, 'auditLog'> | Prisma.TransactionClient;
 export class AuditService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * While the super admin impersonates someone, their changes are recorded as
+   * theirs, on behalf of the impersonated user.
+   */
   async record(entry: AuditEntry, tx: Tx = this.prisma): Promise<void> {
+    const by = requestContext.getStore()?.impersonatorId;
+    const onBehalf = by && by !== entry.actorId;
     await tx.auditLog.create({
       data: {
         ...entry,
+        ...(onBehalf && { actorId: by, onBehalfOfId: entry.actorId }),
         diff: (entry.diff ?? undefined) as Prisma.InputJsonValue,
       },
     });

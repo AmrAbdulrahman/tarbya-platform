@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRefDto } from '../users/users.dto';
 import { ROLES, type Role } from '@tarbya/shared';
 import {
   IsEmail,
@@ -6,6 +7,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  IsUUID,
 } from 'class-validator';
 
 export class PasswordSignInDto {
@@ -58,4 +60,12 @@ export class MeDto {
 
   @ApiProperty({ type: String, nullable: true })
   avatarUrl!: string | null;
+
+  /** The super admin, while they view the app as this user. */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
+}
+
+export class ImpersonateDto {
+  @ApiProperty({ format: 'uuid' }) @IsUUID() userId!: string;
 }

@@ -617,6 +617,62 @@
         ]
       }
     },
+    "/api/auth/impersonation": {
+      "post": {
+        "operationId": "AuthController_impersonate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpersonateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "409": {
+            "description": "SELF_ACTION, SUPER_ADMIN_LOCKED, USER_INACTIVE"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      },
+      "delete": {
+        "operationId": "AuthController_stopImpersonating",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/lookups/activity-types": {
       "get": {
         "operationId": "LookupsController_activityTypes",
@@ -2373,6 +2429,15 @@
           "avatarUrl": {
             "type": "string",
             "nullable": true
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
           }
         },
         "required": [
@@ -2382,7 +2447,8 @@
           "locale",
           "calendar",
           "roles",
-          "avatarUrl"
+          "avatarUrl",
+          "impersonator"
         ]
       },
       "RequestCodeDto": {
@@ -2413,6 +2479,18 @@
         "required": [
           "email",
           "code"
+        ]
+      },
+      "ImpersonateDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "userId"
         ]
       },
       "ActivityScope": {

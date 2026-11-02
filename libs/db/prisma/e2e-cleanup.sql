@@ -36,9 +36,11 @@ DELETE FROM "Interaction"
      OR id IN (SELECT "interactionId" FROM "InteractionParticipant" WHERE "userId" IN (SELECT id FROM e2e_users));
 DELETE FROM "AuditLog"
   WHERE "actorId" IN (SELECT id FROM e2e_users)
+     OR "onBehalfOfId" IN (SELECT id FROM e2e_users)
      OR "entityId" IN (SELECT id::text FROM e2e_users);
 DELETE FROM "Session"
   WHERE "userId" IN (SELECT id FROM e2e_users)
+     OR "impersonatedUserId" IN (SELECT id FROM e2e_users)
      OR "userAgent" LIKE '%tarbya-e2e%';
 DELETE FROM "PasswordCredential" WHERE "userId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Mentorship" WHERE id IN (SELECT id FROM e2e_mentorships);
