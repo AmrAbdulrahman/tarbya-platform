@@ -236,7 +236,7 @@ describe('admin', () => {
       const { s } = await moderator();
       const created = await s.post('/api/lookups/activity-types', {
         nameAr: 'زيارة',
-        nameEn: 'Visit',
+        nameEn: 'e2e Visit',
         scope: 'GROUP_ONE_OFF',
         requiresRsvp: true,
         reminder: 'H24',
@@ -263,7 +263,7 @@ describe('admin', () => {
 
       const method = await s.post('/api/lookups/tracking-methods', {
         nameAr: 'دقائق',
-        nameEn: 'Minutes',
+        nameEn: 'e2e Minutes',
       });
       expect(method.data.active).toBe(true);
     });

@@ -14,6 +14,7 @@ const baseURL = process.env['BASE_URL'] || webServerAddress;
 
 export default defineConfig({
   testDir: './src',
+  globalTeardown: './src/global-teardown.ts',
   outputDir: resolve(
     workspaceRoot,
     'dist/.playwright/apps/web-e2e/test-output',
@@ -55,5 +56,14 @@ export default defineConfig({
       cwd: workspaceRoot,
     },
   ],
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Marks the sessions these specs open so e2e-cleanup.sql can remove them.
+        userAgent: `${devices['Desktop Chrome'].userAgent} tarbya-e2e`,
+      },
+    },
+  ],
 });

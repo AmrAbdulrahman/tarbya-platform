@@ -71,6 +71,12 @@
         "dependsOn": [
           "prisma-generate"
         ]
+      },
+      "e2e-cleanup": {
+        "command": "prisma db execute --file prisma/e2e-cleanup.sql",
+        "options": {
+          "cwd": "{projectRoot}"
+        }
       }
     }
   },

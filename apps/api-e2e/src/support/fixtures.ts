@@ -32,7 +32,10 @@ export interface TestUser {
   password: string;
 }
 
-/** A fresh user with a unique email, so reruns don't trip per-email limits. */
+/**
+ * A fresh user with a unique email, so reruns don't trip per-email limits.
+ * Every e2e email ends in @tarbya.test so the teardown can remove them.
+ */
 export async function createUser(
   opts: {
     moderator?: boolean;
@@ -103,7 +106,8 @@ export async function signedIn(userId: string): Promise<Session> {
   const c = await db();
   const sessionId = randomUUID();
   await c.query(
-    `INSERT INTO "Session" (id, "userId", "tokenHash", "expiresAt") VALUES ($1, $2, $3, now() + interval '1 day')`,
+    // The user agent marks it for e2e-cleanup.sql (the super admin's sessions outlive the test users).
+    `INSERT INTO "Session" (id, "userId", "tokenHash", "expiresAt", "userAgent") VALUES ($1, $2, $3, now() + interval '1 day', 'tarbya-e2e')`,
     [sessionId, userId, randomUUID()],
   );
   const token = sign(
