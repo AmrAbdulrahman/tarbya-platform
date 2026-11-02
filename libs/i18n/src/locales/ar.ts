@@ -258,7 +258,7 @@ export const ar = {
       treeEmpty: 'لا توجد علاقات إرشاد بعد.',
       menteeCount_one: 'موجِّه · متابَع واحد',
       menteeCount_other: 'موجِّه · {{count}} متابَعين',
-      end: 'إنهاء',
+      end: 'إنهاء المتابعة',
       endAsk: 'إنهاء متابعة {{mentor}} لـ {{mentee}}؟ يبقى السجل محفوظًا.',
       addMentee: 'إضافة متابَع',
       addMenteeTo: 'إضافة متابَع إلى {{name}}',
@@ -266,7 +266,7 @@ export const ar = {
       moveAsk:
         'يتابع {{current}} العضو {{mentee}} حاليًا. نقله إلى {{mentor}}؟ تبقى المتابعات والملاحظات السابقة محفوظة.',
       move: 'نقل',
-      confirmEnd: 'تأكيد الإنهاء',
+      confirmEnd: 'نعم، أنهِها',
     },
     log: {
       followUpTitle: 'متابعة جديدة',

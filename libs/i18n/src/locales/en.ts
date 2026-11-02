@@ -264,7 +264,7 @@ export const en: Messages = {
       treeEmpty: 'No mentorships yet.',
       menteeCount_one: 'Mentor · 1 mentee',
       menteeCount_other: 'Mentor · {{count}} mentees',
-      end: 'End',
+      end: 'End mentorship',
       endAsk: 'End {{mentor}} mentoring {{mentee}}? The history is kept.',
       addMentee: 'Add mentee',
       addMenteeTo: 'Add a mentee to {{name}}',
@@ -272,7 +272,7 @@ export const en: Messages = {
       moveAsk:
         '{{current}} mentors {{mentee}} now. Move them to {{mentor}}? Past follow-ups and notes stay with the old mentorship.',
       move: 'Move',
-      confirmEnd: 'End mentorship',
+      confirmEnd: 'Yes, end it',
     },
     log: {
       followUpTitle: 'New follow-up',
