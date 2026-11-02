@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { ensureArabic } from './support';
+import { ensureArabic, usePasswordForm } from './support';
 
 const email = process.env['SUPER_ADMIN_EMAIL'] as string;
 const password = process.env['SUPER_ADMIN_PASSWORD'] as string;
@@ -7,6 +7,7 @@ const headers = { 'X-Requested-With': 'XMLHttpRequest' };
 
 async function signIn(page: Page) {
   await page.goto('/login');
+  await usePasswordForm(page);
   await page.getByLabel('البريد الإلكتروني').fill(email);
   await page.getByLabel('كلمة المرور').fill(password);
   await page.getByRole('button', { name: 'دخول', exact: true }).click();

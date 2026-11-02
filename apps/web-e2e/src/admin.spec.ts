@@ -1,11 +1,12 @@
 import { test, expect, type Page } from '@playwright/test';
-import { ensureArabic } from './support';
+import { ensureArabic, usePasswordForm } from './support';
 
 const email = process.env['SUPER_ADMIN_EMAIL'] as string;
 const password = process.env['SUPER_ADMIN_PASSWORD'] as string;
 
 async function signInAsSuperAdmin(page: Page, path: string) {
   await page.goto(path);
+  await usePasswordForm(page);
   await page.getByLabel('البريد الإلكتروني').fill(email);
   await page.getByLabel('كلمة المرور').fill(password);
   await page.getByRole('button', { name: 'دخول', exact: true }).click();
