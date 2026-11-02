@@ -13,11 +13,13 @@ import {
   type UserRefDto,
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
-import { formatDate } from '@tarbya/shared';
+import { formatDate, hasAnyRole } from '@tarbya/shared';
 import { Badge, Button, Textarea } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FormError } from '../../../components/login/fields';
+import { actedBy } from '../../../components/acted-by';
+import { ChangeLog } from '../../../components/admin/change-log';
 import { FeedList } from '../../../components/feed/feed-list';
 import { NotesPanel } from '../../../components/mentee/notes-panel';
 import { TasksPanel } from '../../../components/mentee/tasks-panel';
@@ -31,6 +33,7 @@ export const Route = createFileRoute('/_app/people/$id')({
 
 function ProfilePage() {
   const { t } = useTranslation();
+  const me = useMe();
   const { id } = Route.useParams();
   const profile = useQuery({
     queryKey: ['profile', id],
@@ -48,6 +51,7 @@ function ProfilePage() {
     );
   }
   const p = profile.data;
+  const isAdmin = hasAnyRole(me.roles, ['SUPER_ADMIN', 'MODERATOR']);
   return (
     <>
       <div className="flex flex-wrap items-center gap-4">
@@ -121,6 +125,7 @@ function ProfilePage() {
           </div>
         </>
       )}
+      {isAdmin && <ChangeLog userId={p.id} />}
     </>
   );
 }
@@ -247,7 +252,10 @@ function NoteItem({
     <li className="flex flex-col gap-2 py-3">
       <div className="flex items-center gap-2 text-[13px] text-ink-subtle">
         <span className="flex-1">
-          {t('profile.noteBy', { name: note.author.name, date })}
+          {t('profile.noteBy', {
+            name: actedBy(t, note.author, note.impersonator),
+            date,
+          })}
           {note.updatedAt !== note.createdAt && ` · ${t('profile.edited')}`}
         </span>
         {note.canEdit && !editing && (

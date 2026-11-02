@@ -10,5 +10,7 @@ export interface PlanReplyDto {
   id: string;
   body: string;
   author: UserRefDto;
+  /** @nullable */
+  impersonator: UserRefDto | null;
   createdAt: string;
 }

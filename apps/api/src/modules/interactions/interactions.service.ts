@@ -3,6 +3,7 @@ import { PrismaService, type Prisma } from '@tarbya/db';
 import { interactionStatus } from '@tarbya/shared';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
+import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
 import { RolesService } from '../users/roles.service';
 import type {
@@ -38,6 +39,7 @@ const interactionSelect = {
   challenges: true,
   createdById: true,
   createdBy: ref,
+  impersonator: ref,
   activityType: {
     select: { id: true, nameAr: true, nameEn: true, color: true },
   },
@@ -105,6 +107,7 @@ export class InteractionsService {
         kind: 'FOLLOW_UP',
         mentorshipId: mentorship.id,
         createdById: actorId,
+        ...impersonation(),
         startsAt,
         place: dto.place ?? null,
         sharedNotes: dto.sharedNotes ?? null,
@@ -124,6 +127,7 @@ export class InteractionsService {
             source: 'FOLLOW_UP' as const,
             authorId: actorId,
             recordedAt: startsAt,
+            ...impersonation(),
           })),
         },
       },
@@ -168,6 +172,7 @@ export class InteractionsService {
         kind: 'ACTIVITY',
         activityTypeId: type.id,
         createdById: actorId,
+        ...impersonation(),
         title: dto.title,
         startsAt: new Date(dto.startsAt),
         endsAt: dto.endsAt ? new Date(dto.endsAt) : null,
@@ -252,6 +257,7 @@ export class InteractionsService {
       privateNotes: notes.get(r.id) ?? null,
       challenges: r.challenges,
       createdBy: r.createdBy,
+      impersonator: r.impersonator,
       participants: r.participants.map((p) => p.user),
       tasks: r.tasks.map(toTaskDto),
     }));
@@ -264,5 +270,6 @@ function newTask(t: NewTaskDto, assigneeId: string, createdById: string) {
     dueOn: t.dueOn ? new Date(`${t.dueOn}T00:00:00Z`) : null,
     assigneeId,
     createdById,
+    ...impersonation(),
   };
 }

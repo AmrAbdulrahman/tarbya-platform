@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService, type Prisma } from '@tarbya/db';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
+import { impersonation } from '../../common/request-context';
 import { HierarchyService } from '../hierarchy/hierarchy.service';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
 import { roleFacts, RolesService } from '../users/roles.service';
@@ -14,6 +15,7 @@ const noteSelect = {
   updatedAt: true,
   authorId: true,
   author: { select: { id: true, name: true } },
+  impersonator: { select: { id: true, name: true } },
 } satisfies Prisma.AdminNoteSelect;
 
 const notFound = () =>
@@ -100,7 +102,7 @@ export class ProfilesService {
     if (!(await this.prisma.user.count({ where: { id: subjectId } })))
       throw notFound();
     const row = await this.prisma.adminNote.create({
-      data: { subjectId, authorId: viewerId, body },
+      data: { subjectId, authorId: viewerId, body, ...impersonation() },
       select: noteSelect,
     });
     return toDto(row, viewerId);
@@ -137,6 +139,7 @@ function toDto(
     id: n.id,
     body: n.body,
     author: n.author,
+    impersonator: n.impersonator,
     createdAt: n.createdAt.toISOString(),
     updatedAt: n.updatedAt.toISOString(),
     canEdit: n.authorId === viewerId,

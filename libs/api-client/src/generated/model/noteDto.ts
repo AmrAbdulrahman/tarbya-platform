@@ -12,6 +12,8 @@ export interface NoteDto {
   visibility: NoteVisibility;
   body: string;
   author: UserRefDto;
+  /** @nullable */
+  impersonator: UserRefDto | null;
   createdAt: string;
   updatedAt: string;
 }

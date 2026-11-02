@@ -10,6 +10,8 @@ export interface AdminNoteDto {
   id: string;
   body: string;
   author: UserRefDto;
+  /** @nullable */
+  impersonator: UserRefDto | null;
   createdAt: string;
   updatedAt: string;
   canEdit: boolean;

@@ -19,6 +19,7 @@ import { formatDate } from '@tarbya/shared';
 import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
+import { actedBy } from '../acted-by';
 import { formatNumber } from '../plans/plan-card';
 
 const kinds: Record<FeedKind, { icon: LucideIcon; className: string }> = {
@@ -116,7 +117,10 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
       body = item.text;
       break;
     case 'REPLY':
-      title = t('feed.reply', { name: item.actor.name, plan: item.plan?.name });
+      title = t('feed.reply', {
+        name: actedBy(t, item.actor, item.impersonator),
+        plan: item.plan?.name,
+      });
       body = item.text;
       break;
   }
@@ -156,9 +160,15 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
             calendar: me.calendar,
             withTime: true,
           })}
-          {item.kind !== 'REPLY' && item.actor.id !== me.id && (
-            <> · {t('feed.by', { name: item.actor.name })}</>
-          )}
+          {item.kind !== 'REPLY' &&
+            (item.actor.id !== me.id || item.impersonator) && (
+              <>
+                {' · '}
+                {t('feed.by', {
+                  name: actedBy(t, item.actor, item.impersonator),
+                })}
+              </>
+            )}
         </span>
         {body && (
           <p className="text-sm leading-relaxed text-ink-muted">{body}</p>

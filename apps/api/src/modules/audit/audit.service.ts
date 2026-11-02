@@ -1,19 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService, type Prisma } from '@tarbya/db';
+import type { ChangeDto, ChangePageDto } from './audit.dto';
 import { requestContext } from '../../common/request-context';
 
-export type AuditAction =
-  | 'user.create'
-  | 'user.update'
-  | 'user.deactivate'
-  | 'user.reactivate'
-  | 'user.manager.set'
-  | 'user.moderator.set'
-  | 'settings.update'
-  | 'mentorship.start'
-  | 'mentorship.end'
-  | 'user.impersonate.start'
-  | 'user.impersonate.stop';
+export const AUDIT_ACTIONS = [
+  'user.create',
+  'user.update',
+  'user.deactivate',
+  'user.reactivate',
+  'user.manager.set',
+  'user.moderator.set',
+  'settings.update',
+  'mentorship.start',
+  'mentorship.end',
+  'user.impersonate.start',
+  'user.impersonate.stop',
+] as const;
+
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 export interface AuditEntry {
   actorId: string;
@@ -45,6 +49,64 @@ export class AuditService {
         diff: (entry.diff ?? undefined) as Prisma.InputJsonValue,
       },
     });
+  }
+}
+
+const ref = { select: { id: true, name: true } } as const;
+
+/** A member's change log for admins: changes to them and to their mentorships. */
+@Injectable()
+export class ChangeLogService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async forUser(
+    userId: string,
+    before?: string,
+    limit = 20,
+  ): Promise<ChangePageDto> {
+    const mentorships = await this.prisma.mentorship.findMany({
+      where: { OR: [{ mentorId: userId }, { menteeId: userId }] },
+      select: { id: true },
+    });
+    const rows = await this.prisma.auditLog.findMany({
+      where: {
+        OR: [
+          { entity: 'User', entityId: userId },
+          {
+            entity: 'Mentorship',
+            entityId: { in: mentorships.map((m) => m.id) },
+          },
+        ],
+        ...(before && { createdAt: { lt: new Date(before) } }),
+      },
+      select: {
+        id: true,
+        action: true,
+        entity: true,
+        diff: true,
+        createdAt: true,
+        actor: ref,
+        onBehalfOf: ref,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit + 1,
+    });
+    const page = rows.slice(0, limit);
+    const items: ChangeDto[] = page.map((r) => ({
+      id: r.id,
+      action: r.action as AuditAction,
+      actor: r.actor,
+      onBehalfOf: r.onBehalfOf,
+      fields: r.diff && typeof r.diff === 'object' ? Object.keys(r.diff) : [],
+      createdAt: r.createdAt.toISOString(),
+    }));
+    return {
+      items,
+      nextCursor:
+        rows.length > limit
+          ? page[page.length - 1].createdAt.toISOString()
+          : null,
+    };
   }
 }
 

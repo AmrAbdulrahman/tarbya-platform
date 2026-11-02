@@ -29,6 +29,8 @@ export interface InteractionDto {
   privateNotes: string | null;
   challenges: string[];
   createdBy: UserRefDto;
+  /** @nullable */
+  impersonator: UserRefDto | null;
   participants: UserRefDto[];
   tasks: TaskDto[];
 }

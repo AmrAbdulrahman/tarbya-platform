@@ -22,6 +22,7 @@ import {
 } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
+import { actedBy } from '../acted-by';
 import { FormError } from '../login/fields';
 
 /**
@@ -189,7 +190,7 @@ function NoteItem({
         </Badge>
         <span className="flex-1 text-[13px] text-ink-subtle">
           {t('profile.noteBy', {
-            name: note.author.name,
+            name: actedBy(t, note.author, note.impersonator),
             date: formatDate(note.createdAt, {
               locale: i18n.language as Language,
               calendar: me.calendar,

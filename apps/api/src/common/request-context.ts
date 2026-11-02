@@ -15,3 +15,8 @@ export class RequestContextMiddleware implements NestMiddleware {
     requestContext.run({}, next);
   }
 }
+
+/** Spread into a record's data so it remembers the super admin behind it (BR-ADM-5). */
+export function impersonation(): { impersonatorId: string | null } {
+  return { impersonatorId: requestContext.getStore()?.impersonatorId ?? null };
+}

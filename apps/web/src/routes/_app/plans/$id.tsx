@@ -20,6 +20,7 @@ import { FormError } from '../../../components/login/fields';
 import { formatNumber } from '../../../components/plans/plan-card';
 import { PlanDialog } from '../../../components/plans/plan-dialog';
 import { Sparkline, TrendBadge } from '../../../components/plans/trend';
+import { actedBy } from '../../../components/acted-by';
 
 /** A plan with its readings: US-5.2 (check in), US-4.7 (reply) · design/screens/MyPlan.dc.html */
 export const Route = createFileRoute('/_app/plans/$id')({
@@ -298,7 +299,7 @@ function Reading({
           {reading.source === 'CHECK_IN'
             ? t('plans.checkIn')
             : t('plans.fromFollowUp')}{' '}
-          · {reading.author.name}
+          · {actedBy(t, reading.author, reading.impersonator)}
         </span>
         {reading.needsHelp && (
           <Badge tone="warn">
@@ -316,7 +317,7 @@ function Reading({
           className="ms-6 rounded-lg border-s-4 border-primary/40 bg-primary-tint/40 px-3 py-2"
         >
           <p className="text-[13px] text-ink-subtle">
-            {r.author.name} · {date(r.createdAt)}
+            {actedBy(t, r.author, r.impersonator)} · {date(r.createdAt)}
           </p>
           <p className="whitespace-pre-line text-[15px]">{r.body}</p>
         </div>

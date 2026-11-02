@@ -1,6 +1,7 @@
 import {
   auditActions,
   closeDb,
+  createMentorship,
   createUser,
   signedIn,
   superAdminId,
@@ -120,5 +121,77 @@ describe('impersonation (super admin only)', () => {
         .code,
     ).toBe('USER_INACTIVE');
     expect((await admin.delete('/api/auth/impersonation')).status).toBe(403);
+  });
+
+  it('marks what the super admin writes while impersonating as on behalf of the user', async () => {
+    const mentor = await createUser();
+    const mentee = await createUser();
+    await createMentorship(mentor.id, mentee.id);
+    await admin.post('/api/auth/impersonation', { userId: mentor.id });
+    const followUp = await admin.post('/api/interactions/follow-ups', {
+      menteeId: mentee.id,
+      startsAt: new Date(Date.now() - 60_000).toISOString(),
+    });
+    expect(followUp.data).toMatchObject({
+      createdBy: { id: mentor.id },
+      impersonator: { id: adminId },
+    });
+    await admin.post('/api/notes', {
+      menteeId: mentee.id,
+      visibility: 'PRIVATE',
+      body: 'Written by the super admin',
+    });
+    await admin.delete('/api/auth/impersonation');
+
+    // The mentor's own view of the same records shows who really wrote them.
+    const asMentor = await signedIn(mentor.id);
+    const feed = await asMentor.get(`/api/feed?userId=${mentee.id}`);
+    expect(feed.data.items[0]).toMatchObject({
+      kind: 'FOLLOW_UP',
+      actor: { id: mentor.id },
+      impersonator: { id: adminId },
+    });
+    const notes = await asMentor.get(`/api/notes?menteeId=${mentee.id}`);
+    expect(notes.data[0]).toMatchObject({
+      author: { id: mentor.id },
+      impersonator: { id: adminId },
+    });
+    // Written normally, nothing is marked.
+    await asMentor.post('/api/notes', {
+      menteeId: mentee.id,
+      visibility: 'PRIVATE',
+      body: 'Written by the mentor',
+    });
+    const after = await asMentor.get(`/api/notes?menteeId=${mentee.id}`);
+    expect(after.data[0].impersonator).toBeNull();
+  });
+
+  it("shows admins a member's change log, with impersonation spelled out", async () => {
+    const moderator = await createUser({ moderator: true });
+    const target = await createUser();
+    await admin.post('/api/auth/impersonation', { userId: moderator.id });
+    await admin.patch(`/api/users/${target.id}`, { name: 'Renamed' });
+    await admin.delete('/api/auth/impersonation');
+
+    const log = await admin.get(`/api/audit?userId=${target.id}`);
+    expect(log.status).toBe(200);
+    expect(log.data.items).toEqual([
+      expect.objectContaining({
+        action: 'user.update',
+        actor: expect.objectContaining({ id: adminId }),
+        onBehalfOf: expect.objectContaining({ id: moderator.id }),
+        fields: ['name'],
+      }),
+    ]);
+    const modLog = await admin.get(`/api/audit?userId=${moderator.id}`);
+    expect(modLog.data.items.map((i: { action: string }) => i.action)).toEqual([
+      'user.impersonate.stop',
+      'user.impersonate.start',
+    ]);
+
+    const plain = await signedIn(target.id);
+    expect((await plain.get(`/api/audit?userId=${target.id}`)).status).toBe(
+      403,
+    );
   });
 });

@@ -17,5 +17,7 @@ export interface PlanReadingDto {
   needsHelp: boolean;
   recordedAt: string;
   author: UserRefDto;
+  /** @nullable */
+  impersonator: UserRefDto | null;
   replies: PlanReplyDto[];
 }

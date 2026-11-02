@@ -15,6 +15,8 @@ export interface FeedItemDto {
   at: string;
   actor: UserRefDto;
   /** @nullable */
+  impersonator: UserRefDto | null;
+  /** @nullable */
   interactionId: string | null;
   /** @nullable */
   title: string | null;

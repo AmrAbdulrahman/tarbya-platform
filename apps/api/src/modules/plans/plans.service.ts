@@ -3,6 +3,7 @@ import { PrismaService, type Prisma } from '@tarbya/db';
 import { daysSince, planTrend } from '@tarbya/shared';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
+import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
 import { SettingsService } from '../settings/settings.service';
 import { RolesService } from '../users/roles.service';
@@ -99,8 +100,15 @@ export class PlansService {
             needsHelp: true,
             recordedAt: true,
             author: ref,
+            impersonator: ref,
             replies: {
-              select: { id: true, body: true, createdAt: true, author: ref },
+              select: {
+                id: true,
+                body: true,
+                createdAt: true,
+                author: ref,
+                impersonator: ref,
+              },
               orderBy: { createdAt: 'asc' },
             },
           },
@@ -120,6 +128,7 @@ export class PlansService {
         needsHelp: r.needsHelp,
         recordedAt: r.recordedAt.toISOString(),
         author: r.author,
+        impersonator: r.impersonator,
         replies: r.replies.map((x) => ({
           ...x,
           createdAt: x.createdAt.toISOString(),
@@ -142,6 +151,7 @@ export class PlansService {
       data: {
         menteeId: dto.menteeId,
         createdById: actorId,
+        ...impersonation(),
         name: dto.name,
         goal: dto.goal,
         trackingMethodId: dto.trackingMethodId,
@@ -215,6 +225,7 @@ export class PlansService {
         needsHelp: dto.needsHelp ?? false,
         source: 'CHECK_IN',
         authorId: actorId,
+        ...impersonation(),
       },
     });
     return this.get(actorId, planId);
@@ -233,7 +244,7 @@ export class PlansService {
     if (!reading) throw notFound();
     await this.assertCanManage(actorId, reading.plan.menteeId);
     await this.prisma.planReply.create({
-      data: { readingId, authorId: actorId, body },
+      data: { readingId, authorId: actorId, body, ...impersonation() },
     });
     return this.get(actorId, reading.planId);
   }
