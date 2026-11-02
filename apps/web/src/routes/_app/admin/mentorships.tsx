@@ -42,9 +42,9 @@ function MentorshipsPage() {
           {t('mentoring.mentorships.lead')}
         </p>
       </div>
-      <div className="flex flex-wrap items-start gap-6">
+      <div className="flex flex-col gap-6">
         <AssignCard />
-        <section className="flex min-w-0 flex-[2_1_480px] flex-col gap-4 rounded-card border border-border bg-card p-6">
+        <section className="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-card p-6">
           <h2 className="text-lg font-bold text-navy">
             {t('mentoring.mentorships.treeTitle')}
           </h2>
@@ -77,32 +77,34 @@ function AssignCard() {
   const assign = useAssignMentee(() => setMentee(null));
 
   return (
-    <section className="flex flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-6">
+    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-6">
       <h2 className="text-lg font-bold text-navy">
         {t('mentoring.mentorships.assignTitle')}
       </h2>
-      <Field id="ms-mentor" label={t('mentoring.mentorships.mentor')}>
-        <UserPicker
-          id="ms-mentor"
-          value={mentor}
-          onChange={(u) => {
-            setMentor(u);
-            assign.reset();
-          }}
-          excludeIds={mentee ? [mentee.id] : []}
-        />
-      </Field>
-      <Field id="ms-mentee" label={t('mentoring.mentorships.mentee')}>
-        <UserPicker
-          id="ms-mentee"
-          value={mentee}
-          onChange={(u) => {
-            setMentee(u);
-            assign.reset();
-          }}
-          excludeIds={mentor ? [mentor.id] : []}
-        />
-      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field id="ms-mentor" label={t('mentoring.mentorships.mentor')}>
+          <UserPicker
+            id="ms-mentor"
+            value={mentor}
+            onChange={(u) => {
+              setMentor(u);
+              assign.reset();
+            }}
+            excludeIds={mentee ? [mentee.id] : []}
+          />
+        </Field>
+        <Field id="ms-mentee" label={t('mentoring.mentorships.mentee')}>
+          <UserPicker
+            id="ms-mentee"
+            value={mentee}
+            onChange={(u) => {
+              setMentee(u);
+              assign.reset();
+            }}
+            excludeIds={mentor ? [mentor.id] : []}
+          />
+        </Field>
+      </div>
       <FormError
         message={assign.error ? errorMessage(t, assign.error) : undefined}
       />
