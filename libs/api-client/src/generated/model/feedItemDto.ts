@@ -23,7 +23,7 @@ export interface FeedItemDto {
   /** @nullable */
   activityType: ActivityTypeRefDto | null;
   planUpdates: number;
-  challenges: number;
+  challenges: string[];
   tasks: number;
   participants: number;
   /** @nullable */

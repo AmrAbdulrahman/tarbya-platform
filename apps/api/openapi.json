@@ -4266,7 +4266,10 @@
             "type": "number"
           },
           "challenges": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "tasks": {
             "type": "number"

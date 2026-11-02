@@ -43,7 +43,8 @@ export class FeedItemDto {
   @ApiProperty({ type: ActivityTypeRefDto, nullable: true })
   activityType!: ActivityTypeRefDto | null;
   @ApiProperty() planUpdates!: number;
-  @ApiProperty() challenges!: number;
+  /** The follow-up's challenges, as written. */
+  @ApiProperty({ type: String, isArray: true }) challenges!: string[];
   @ApiProperty() tasks!: number;
   @ApiProperty() participants!: number;
 

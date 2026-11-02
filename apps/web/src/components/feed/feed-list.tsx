@@ -5,6 +5,7 @@ import {
   MessageSquareReply,
   Sparkles,
   TrendingUp,
+  TriangleAlert,
   type LucideIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -96,9 +97,9 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
   switch (item.kind) {
     case 'FOLLOW_UP':
       title = t('feed.followUp');
+      // The challenges are listed below, one by one.
       body = [
         t('feed.planUpdates', { count: item.planUpdates }),
-        t('feed.challenges', { count: item.challenges }),
         t('feed.tasks', { count: item.tasks }),
       ].join(' · ');
       break;
@@ -172,6 +173,24 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
         </span>
         {body && (
           <p className="text-sm leading-relaxed text-ink-muted">{body}</p>
+        )}
+        {item.challenges.length > 0 && (
+          <div className="flex flex-col gap-1.5 pt-1">
+            <span className="text-[13px] font-semibold text-ink-muted">
+              {t('mentoring.log.challenges')}
+            </span>
+            <ul className="flex flex-wrap gap-1.5">
+              {item.challenges.map((challenge, i) => (
+                <li
+                  key={i}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[13px] font-medium text-warn"
+                >
+                  <TriangleAlert className="size-3.5 shrink-0" aria-hidden />
+                  {challenge}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </li>
