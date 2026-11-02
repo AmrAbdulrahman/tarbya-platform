@@ -28,10 +28,11 @@ export function AppShell() {
   const me = useMe();
 
   return (
-    <div className="flex min-h-screen flex-wrap bg-surface">
+    <div className="flex min-h-screen flex-col bg-surface md:flex-row">
       <nav
         aria-label={t('app.name')}
-        className="flex max-w-full flex-[1_1_240px] flex-col gap-6 border-e border-border bg-card px-4 py-6"
+        // From md up the sidebar stays put and scrolls on its own; below that it stacks above the page.
+        className="flex flex-col gap-6 border-e border-border bg-card px-4 py-6 md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto"
       >
         <div className="flex items-center gap-2.5 px-2">
           <div className="grid size-9 place-items-center rounded-card bg-primary text-lg font-bold text-primary-foreground">
@@ -72,7 +73,7 @@ export function AppShell() {
         ))}
       </nav>
 
-      <div className="flex min-w-0 flex-[999_1_560px] flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-10 backdrop-blur">
           <label className="relative flex-[0_1_380px]">
             <span className="sr-only">{t('header.search')}</span>
