@@ -53,4 +53,5 @@ jobs:
 
       - run: pnpm nx run db:migrate-deploy
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm nx affected -t e2e
+      # One suite at a time: both use the API on :3000.
+      - run: pnpm nx affected -t e2e --parallel=1
