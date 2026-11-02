@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { ensureArabic } from './support';
 
 const email = process.env['SUPER_ADMIN_EMAIL'] as string;
 const password = process.env['SUPER_ADMIN_PASSWORD'] as string;
@@ -40,6 +41,7 @@ test('signs in, returns to the page asked for, and signs out (US-1.1, US-1.3)', 
   await page.getByRole('button', { name: 'دخول', exact: true }).click();
 
   await expect(page).toHaveURL(/\/$/);
+  await ensureArabic(page);
   await expect(page.locator('h1')).toHaveText('مرحبًا بك في تربية');
   // The super admin sees the administration section only.
   await expect(page.getByText('الإدارة')).toBeVisible();

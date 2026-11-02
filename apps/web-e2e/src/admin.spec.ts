@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { ensureArabic } from './support';
 
 const email = process.env['SUPER_ADMIN_EMAIL'] as string;
 const password = process.env['SUPER_ADMIN_PASSWORD'] as string;
@@ -9,6 +10,7 @@ async function signInAsSuperAdmin(page: Page, path: string) {
   await page.getByLabel('كلمة المرور').fill(password);
   await page.getByRole('button', { name: 'دخول', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
+  await ensureArabic(page);
 }
 
 test('adds a moderator with a manager and finds them (US-3.1, US-3.2, US-3.4)', async ({
@@ -27,12 +29,15 @@ test('adds a moderator with a manager and finds them (US-3.1, US-3.2, US-3.4)', 
   ).toBeHidden();
   await dialog.getByRole('checkbox', { name: 'مشرف' }).check();
   const manager = dialog.getByRole('combobox', { name: 'المدير المباشر' });
-  await manager.fill('Super');
-  await expect(
-    dialog.getByRole('option', { name: /Super admin/ }),
-  ).toBeVisible();
+  // By email: the super admin's display name is whatever the dev account set.
+  await manager.fill(email);
+  const option = dialog.getByRole('option', { name: new RegExp(email) });
+  await expect(option).toBeVisible();
+  const managerName = (
+    (await option.locator('span').first().textContent()) ?? ''
+  ).trim();
   await manager.press('Enter');
-  await expect(dialog.getByText('Super admin', { exact: true })).toBeVisible();
+  await expect(dialog.getByText(managerName, { exact: true })).toBeVisible();
   await dialog.getByRole('button', { name: 'حفظ' }).click();
   await expect(dialog).toBeHidden();
 
@@ -41,7 +46,7 @@ test('adds a moderator with a manager and finds them (US-3.1, US-3.2, US-3.4)', 
     .fill(`sara.${tag}`);
   const row = page.getByRole('row').filter({ hasText: `سارة ${tag}` });
   await expect(row).toBeVisible();
-  await expect(row).toContainText('Super admin');
+  await expect(row).toContainText(managerName);
   await expect(row).toContainText('مشرف');
   // A moderator with an email can sign in.
   await expect(row).toContainText('مفعّل');
