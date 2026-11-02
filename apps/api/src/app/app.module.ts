@@ -15,6 +15,7 @@ import { InteractionsModule } from '../modules/interactions/interactions.module'
 import { LookupsModule } from '../modules/lookups/lookups.module';
 import { MentorshipsModule } from '../modules/mentorships/mentorships.module';
 import { NotesModule } from '../modules/notes/notes.module';
+import { ProfilesModule } from '../modules/profiles/profiles.module';
 import { MailModule } from '../modules/mail/mail.module';
 import { SettingsModule } from '../modules/settings/settings.module';
 import { UsersModule } from '../modules/users/users.module';
@@ -38,6 +39,7 @@ import { HealthController } from './health.controller';
     MentorshipsModule,
     InteractionsModule,
     NotesModule,
+    ProfilesModule,
   ],
   controllers: [HealthController],
   providers: [

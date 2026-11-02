@@ -25,7 +25,6 @@ import type {
 
 import type {
   AssignMentorshipDto,
-  AssignResultDto,
   MentorshipDto,
   MyMentoringDto
 } from '../../model';
@@ -269,7 +268,7 @@ export function useMentorshipsControllerActive<TData = Awaited<ReturnType<typeof
 
 
 export type mentorshipsControllerAssignResponse200 = {
-  data: AssignResultDto
+  data: MentorshipDto
   status: 200
 }
 

@@ -19,6 +19,4 @@ export interface CreateUserDto {
   phone?: string | null;
   locale?: Locale;
   calendar?: CalendarPreference;
-  /** @nullable */
-  managerId?: string | null;
 }

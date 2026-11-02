@@ -12,7 +12,6 @@ import { Requires } from '../../common/access';
 import { CurrentAuth, type AuthContext } from '../../common/auth-context';
 import {
   AssignMentorshipDto,
-  AssignResultDto,
   MentorshipDto,
   MyMentoringDto,
 } from './mentorships.dto';
@@ -41,14 +40,14 @@ export class MentorshipsController {
   @Post()
   @Requires('admin')
   @HttpCode(200)
-  @ApiOkResponse({ type: AssignResultDto })
+  @ApiOkResponse({ type: MentorshipDto })
   @ApiConflictResponse({
     description: 'MENTEE_HAS_MENTOR, MENTORSHIP_CYCLE, USER_INACTIVE',
   })
   assign(
     @CurrentAuth() auth: AuthContext,
     @Body() body: AssignMentorshipDto,
-  ): Promise<AssignResultDto> {
+  ): Promise<MentorshipDto> {
     return this.mentorships.assign(auth.userId, body);
   }
 

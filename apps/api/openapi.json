@@ -99,6 +99,14 @@
             }
           },
           {
+            "name": "moderatorsOnly",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "cursor",
             "required": false,
             "in": "query",
@@ -834,7 +842,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AssignResultDto"
+                  "$ref": "#/components/schemas/MentorshipDto"
                 }
               }
             }
@@ -1216,6 +1224,147 @@
           "notes"
         ]
       }
+    },
+    "/api/people/{id}": {
+      "get": {
+        "operationId": "ProfilesController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/api/people/{id}/admin-notes": {
+      "get": {
+        "operationId": "ProfilesController_notes",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminNoteDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "post": {
+        "operationId": "ProfilesController_addNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoteBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/api/admin-notes/{id}": {
+      "patch": {
+        "operationId": "ProfilesController_editNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminNoteBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
     }
   },
   "info": {
@@ -1517,11 +1666,6 @@
                 "$ref": "#/components/schemas/CalendarPreference"
               }
             ]
-          },
-          "managerId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
           }
         },
         "required": [
@@ -2073,30 +2217,6 @@
           "menteeId"
         ]
       },
-      "MentorshipWarning": {
-        "type": "string",
-        "enum": [
-          "MENTOR_HAS_NO_MANAGER"
-        ]
-      },
-      "AssignResultDto": {
-        "type": "object",
-        "properties": {
-          "mentorship": {
-            "$ref": "#/components/schemas/MentorshipDto"
-          },
-          "warnings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MentorshipWarning"
-            }
-          }
-        },
-        "required": [
-          "mentorship",
-          "warnings"
-        ]
-      },
       "InteractionKind": {
         "type": "string",
         "enum": [
@@ -2509,6 +2629,116 @@
             "type": "boolean"
           }
         }
+      },
+      "ProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "manager": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "mentor": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "deactivatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "canSeeAdminNotes": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "roles",
+          "manager",
+          "mentor",
+          "deactivatedAt",
+          "canSeeAdminNotes"
+        ]
+      },
+      "AdminNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canEdit": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "author",
+          "createdAt",
+          "updatedAt",
+          "canEdit"
+        ]
+      },
+      "AdminNoteBodyDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "body"
+        ]
       }
     }
   }

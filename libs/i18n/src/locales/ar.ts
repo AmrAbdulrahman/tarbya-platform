@@ -86,6 +86,9 @@ export const ar = {
     ACTIVITY_TYPE_INVALID: 'اختر نوع نشاط فردي مفعّلًا.',
     NOTE_WIDEN_CONFIRM:
       'مشاركة ملاحظة خاصة تجعلها مرئية للمتابَع. أكِّد للمتابعة.',
+    MANAGER_NOT_MODERATOR:
+      'المدير المباشر يُحدَّد للمشرفين فقط، ويجب أن يكون المدير مشرفًا.',
+    MODERATOR_HAS_REPORTS: 'انقل من يديرهم هذا المشرف أولًا.',
     VALIDATION_FAILED: 'تحقّق من الحقول وحاول مجددًا.',
     FORBIDDEN: 'ليست لديك صلاحية لهذا الإجراء.',
     NOT_FOUND: 'لم نجد ما تبحث عنه.',
@@ -251,13 +254,18 @@ export const ar = {
       replaceAsk:
         'يتابعه حاليًا {{name}}. إنهاء تلك العلاقة وإسناده إلى الموجِّه الجديد؟',
       replace: 'إنهاء وإسناد',
-      noManagerWarning: 'تنبيه: هذا الموجِّه ليس له مدير مباشر بعد.',
       treeTitle: 'التسلسل',
       treeEmpty: 'لا توجد علاقات إرشاد بعد.',
       menteeCount_one: 'موجِّه · متابَع واحد',
       menteeCount_other: 'موجِّه · {{count}} متابَعين',
       end: 'إنهاء',
       endAsk: 'إنهاء متابعة {{mentor}} لـ {{mentee}}؟ يبقى السجل محفوظًا.',
+      addMentee: 'إضافة متابَع',
+      addMenteeTo: 'إضافة متابَع إلى {{name}}',
+      moveTitle: 'نقل المتابَع',
+      moveAsk:
+        'يتابع {{current}} العضو {{mentee}} حاليًا. نقله إلى {{mentor}}؟ تبقى المتابعات والملاحظات السابقة محفوظة.',
+      move: 'نقل',
       confirmEnd: 'تأكيد الإنهاء',
     },
     log: {
@@ -326,6 +334,25 @@ export const ar = {
       privateNote: 'ملاحظة خاصة',
       back: 'رجوع',
     },
+  },
+  profile: {
+    roles: 'الأدوار',
+    contact: 'التواصل',
+    email: 'البريد',
+    phone: 'الجوال',
+    manager: 'المدير المباشر',
+    mentor: 'الموجِّه',
+    none: '—',
+    deactivated: 'موقوف',
+    adminNotes: 'ملاحظات الإدارة',
+    adminNotesHint:
+      'يراها من يدير هذا العضو أو يوجِّهه والمشرفون فقط، ولا يراها العضو نفسه.',
+    addNote: 'إضافة ملاحظة',
+    notePlaceholder: 'اكتب ملاحظة…',
+    noNotes: 'لا توجد ملاحظات بعد.',
+    edit: 'تعديل',
+    edited: 'عُدِّلت',
+    noteBy: '{{name}} · {{date}}',
   },
   account: {
     menu: 'حسابي',

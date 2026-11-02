@@ -82,6 +82,7 @@ function UserForm({ user, onDone }: { user?: UserDto; onDone: () => void }) {
   const queryClient = useQueryClient();
   const isSuperAdmin = me.roles.includes('SUPER_ADMIN');
   const targetIsSuperAdmin = !!user?.roles.includes('SUPER_ADMIN');
+  const canSetModerator = isSuperAdmin && !targetIsSuperAdmin;
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
@@ -90,12 +91,14 @@ function UserForm({ user, onDone }: { user?: UserDto; onDone: () => void }) {
       email: user?.email ?? '',
       phone: user?.phone ?? '',
       locale: user?.locale ?? 'ar',
-      calendar: user?.calendar ?? 'GREGORIAN',
+      calendar: user?.calendar ?? 'BOTH',
       manager: user?.manager ?? null,
       isModerator: user?.isModerator ?? false,
     },
   });
   const { errors, dirtyFields } = form.formState;
+  // Only moderators sit in the management line, so the manager field follows the checkbox.
+  const isModerator = form.watch('isModerator');
 
   const refresh = () =>
     Promise.all([
@@ -107,46 +110,35 @@ function UserForm({ user, onDone }: { user?: UserDto; onDone: () => void }) {
   const save = useMutation({
     mutationFn: async (v: Values) => {
       const contact = { email: v.email || null, phone: v.phone || null };
+      const fields = {
+        name: v.name,
+        ...contact,
+        locale: v.locale,
+        calendar: v.calendar,
+      };
       let id = user?.id;
       if (!id) {
-        id = (
-          (
-            await usersControllerCreate({
-              name: v.name,
-              ...contact,
-              locale: v.locale,
-              calendar: v.calendar,
-              managerId: v.manager?.id ?? null,
-            })
-          ).data as UserDto
-        ).id;
-      } else {
-        if (
-          dirtyFields.name ||
-          dirtyFields.email ||
-          dirtyFields.phone ||
-          dirtyFields.locale ||
-          dirtyFields.calendar
-        ) {
-          await usersControllerUpdate(id, {
-            name: v.name,
-            ...contact,
-            locale: v.locale,
-            calendar: v.calendar,
-          });
-        }
-        if ((v.manager?.id ?? null) !== (user?.manager?.id ?? null)) {
-          await usersControllerSetManager(id, {
-            managerId: v.manager?.id ?? null,
-          });
-        }
+        id = ((await usersControllerCreate(fields)).data as UserDto).id;
+      } else if (
+        dirtyFields.name ||
+        dirtyFields.email ||
+        dirtyFields.phone ||
+        dirtyFields.locale ||
+        dirtyFields.calendar
+      ) {
+        await usersControllerUpdate(id, fields);
+      }
+      // Moderator status before the manager: only moderators can have one (BR-MGR-1).
+      if (canSetModerator && v.isModerator !== (user?.isModerator ?? false)) {
+        await usersControllerSetModerator(id, { isModerator: v.isModerator });
       }
       if (
-        isSuperAdmin &&
-        !targetIsSuperAdmin &&
-        v.isModerator !== (user?.isModerator ?? false)
+        v.isModerator &&
+        (v.manager?.id ?? null) !== (user?.manager?.id ?? null)
       ) {
-        await usersControllerSetModerator(id, { isModerator: v.isModerator });
+        await usersControllerSetManager(id, {
+          managerId: v.manager?.id ?? null,
+        });
       }
     },
     onSuccess: async () => {
@@ -262,30 +254,33 @@ function UserForm({ user, onDone }: { user?: UserDto; onDone: () => void }) {
           </Select>
         </Field>
       </div>
-      <Field
-        id="u-manager"
-        label={t('admin.userForm.manager')}
-        error={fieldError('manager')}
-      >
-        <Controller
-          control={form.control}
-          name="manager"
-          render={({ field }) => (
-            <UserPicker
-              id="u-manager"
-              value={field.value}
-              onChange={field.onChange}
-              excludeIds={user ? [user.id] : []}
-              invalid={!!errors.manager}
-              describedBy="u-manager-hint"
-            />
-          )}
-        />
-        <span id="u-manager-hint" className="text-[13px] text-ink-subtle">
-          {t('admin.userForm.managerHint')}
-        </span>
-      </Field>
-      {isSuperAdmin && !targetIsSuperAdmin && (
+      {isModerator && (
+        <Field
+          id="u-manager"
+          label={t('admin.userForm.manager')}
+          error={fieldError('manager')}
+        >
+          <Controller
+            control={form.control}
+            name="manager"
+            render={({ field }) => (
+              <UserPicker
+                id="u-manager"
+                value={field.value}
+                onChange={field.onChange}
+                excludeIds={user ? [user.id] : []}
+                invalid={!!errors.manager}
+                moderatorsOnly
+                describedBy="u-manager-hint"
+              />
+            )}
+          />
+          <span id="u-manager-hint" className="text-[13px] text-ink-subtle">
+            {t('admin.userForm.managerHint')}
+          </span>
+        </Field>
+      )}
+      {canSetModerator && (
         <Checkbox
           id="u-moderator"
           label={t('admin.userForm.moderator')}

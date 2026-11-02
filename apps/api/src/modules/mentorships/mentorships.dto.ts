@@ -19,21 +19,6 @@ export class AssignMentorshipDto {
   @ApiPropertyOptional() @IsOptional() @IsBoolean() replace?: boolean;
 }
 
-export const MENTORSHIP_WARNINGS = ['MENTOR_HAS_NO_MANAGER'] as const;
-export type MentorshipWarning = (typeof MENTORSHIP_WARNINGS)[number];
-
-export class AssignResultDto {
-  @ApiProperty({ type: MentorshipDto }) mentorship!: MentorshipDto;
-
-  /** Not errors: the assignment went through (BR-MGR-1 asks for a warning only). */
-  @ApiProperty({
-    enum: MENTORSHIP_WARNINGS,
-    enumName: 'MentorshipWarning',
-    isArray: true,
-  })
-  warnings!: MentorshipWarning[];
-}
-
 const CONTACT = ['REGULAR', 'DUE', 'LATE'] as const;
 
 export class MyMenteeDto {

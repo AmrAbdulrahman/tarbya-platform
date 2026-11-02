@@ -1,33 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ApiError,
   mentorshipsControllerActive,
-  mentorshipsControllerAssign,
   mentorshipsControllerEnd,
-  type AssignResultDto,
   type MentorshipDto,
   type UserRefDto,
 } from '@tarbya/api-client';
 import { Button } from '@tarbya/ui';
-import { UserPicker } from '../../../components/admin/user-picker';
-import { Field, FormError } from '../../../components/login/fields';
 import { errorMessage } from '../../../auth/error-message';
 import { meQuery } from '../../../auth/session';
+import {
+  mentorshipsQueryKey,
+  useAssignMentee,
+} from '../../../components/admin/use-assign-mentee';
+import { UserPicker } from '../../../components/admin/user-picker';
+import { Field, FormError } from '../../../components/login/fields';
 
 /** US-3.3 · design/screens/Admin.dc.html (assign panel and mentoring tree) */
 export const Route = createFileRoute('/_app/admin/mentorships')({
   component: MentorshipsPage,
 });
 
-const queryKey = ['mentorships'];
-
 function MentorshipsPage() {
   const { t } = useTranslation();
   const active = useQuery({
-    queryKey,
+    queryKey: mentorshipsQueryKey,
     queryFn: async ({ signal }) =>
       (await mentorshipsControllerActive({ signal })).data as MentorshipDto[],
   });
@@ -57,7 +57,11 @@ function MentorshipsPage() {
             </p>
           )}
           {active.data && active.data.length > 0 && (
-            <MentoringTree mentorships={active.data} />
+            <ul className="flex flex-col gap-2">
+              {buildTree(active.data).map((n) => (
+                <TreeNode key={n.user.id} node={n} />
+              ))}
+            </ul>
           )}
         </section>
       </div>
@@ -65,39 +69,12 @@ function MentorshipsPage() {
   );
 }
 
+/** For a mentor who isn't in the tree yet. */
 function AssignCard() {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const [mentor, setMentor] = useState<UserRefDto | null>(null);
   const [mentee, setMentee] = useState<UserRefDto | null>(null);
-  const [result, setResult] = useState<AssignResultDto>();
-
-  const assign = useMutation({
-    mutationFn: async (replace: boolean) =>
-      (
-        await mentorshipsControllerAssign({
-          mentorId: mentor?.id ?? '',
-          menteeId: mentee?.id ?? '',
-          replace,
-        })
-      ).data as AssignResultDto,
-    onSuccess: async (data) => {
-      setResult(data);
-      setMentee(null);
-      // The admin may have just become a mentor (or stopped being one): roles drive the sidebar.
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey }),
-        queryClient.invalidateQueries({ queryKey: meQuery.queryKey }),
-      ]);
-    },
-  });
-
-  // The API names the current mentor when the mentee already has one.
-  const current =
-    assign.error instanceof ApiError &&
-    assign.error.code === 'MENTEE_HAS_MENTOR'
-      ? assign.error.body?.detail
-      : undefined;
+  const assign = useAssignMentee(() => setMentee(null));
 
   return (
     <section className="flex flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-6">
@@ -111,7 +88,6 @@ function AssignCard() {
           onChange={(u) => {
             setMentor(u);
             assign.reset();
-            setResult(undefined);
           }}
           excludeIds={mentee ? [mentee.id] : []}
         />
@@ -123,55 +99,26 @@ function AssignCard() {
           onChange={(u) => {
             setMentee(u);
             assign.reset();
-            setResult(undefined);
           }}
           excludeIds={mentor ? [mentor.id] : []}
         />
       </Field>
-
-      {current ? (
-        <div
-          role="alert"
-          className="flex flex-col gap-3 rounded-control border border-warn/30 bg-amber-50 p-3 text-sm text-ink"
-        >
-          {t('mentoring.mentorships.replaceAsk', { name: current })}
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => assign.mutate(true)}
-              disabled={assign.isPending}
-            >
-              {t('mentoring.mentorships.replace')}
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => assign.reset()}>
-              {t('admin.common.cancel')}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <FormError
-          message={assign.isError ? errorMessage(t, assign.error) : undefined}
-        />
-      )}
-      {result && (
-        <div role="status" className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-trend-up">
-            {t('mentoring.mentorships.assigned')}
-          </span>
-          {result.warnings.includes('MENTOR_HAS_NO_MANAGER') && (
-            <span className="text-warn">
-              {t('mentoring.mentorships.noManagerWarning')}
-            </span>
-          )}
-        </div>
+      <FormError
+        message={assign.error ? errorMessage(t, assign.error) : undefined}
+      />
+      {assign.isSuccess && (
+        <p role="status" className="text-sm font-medium text-trend-up">
+          {t('mentoring.mentorships.assigned')}
+        </p>
       )}
       <Button
-        onClick={() => assign.mutate(false)}
-        disabled={!mentor || !mentee || assign.isPending || !!current}
+        onClick={() => mentor && mentee && assign.assign(mentor, mentee)}
+        disabled={!mentor || !mentee || assign.isPending}
         className="self-start"
       >
         {t('mentoring.mentorships.assign')}
       </Button>
+      {assign.confirmDialog}
     </section>
   );
 }
@@ -201,28 +148,21 @@ function buildTree(mentorships: MentorshipDto[]): Node[] {
   return [...nodes.values()].filter((n) => !n.mentorship).sort(byName);
 }
 
-function MentoringTree({ mentorships }: { mentorships: MentorshipDto[] }) {
-  return (
-    <ul className="flex flex-col gap-2">
-      {buildTree(mentorships).map((n) => (
-        <TreeNode key={n.user.id} node={n} />
-      ))}
-    </ul>
-  );
-}
-
 function TreeNode({ node }: { node: Node }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const assign = useAssignMentee(() => setAdding(false));
   const end = useMutation({
     mutationFn: () => mentorshipsControllerEnd(node.mentorship?.id ?? ''),
     onSuccess: () =>
       Promise.all([
-        queryClient.invalidateQueries({ queryKey }),
+        queryClient.invalidateQueries({ queryKey: mentorshipsQueryKey }),
         queryClient.invalidateQueries({ queryKey: meQuery.queryKey }),
       ]),
   });
+  const pickerId = `add-mentee-${node.user.id}`;
 
   return (
     <li className="flex flex-col gap-2">
@@ -233,7 +173,13 @@ function TreeNode({ node }: { node: Node }) {
         >
           {node.user.name.charAt(0)}
         </span>
-        <span className="font-semibold text-navy">{node.user.name}</span>
+        <Link
+          to="/people/$id"
+          params={{ id: node.user.id }}
+          className="font-semibold text-navy hover:text-primary"
+        >
+          {node.user.name}
+        </Link>
         {node.children.length > 0 && (
           <span className="text-[13px] text-ink-subtle">
             {t('mentoring.mentorships.menteeCount', {
@@ -242,6 +188,22 @@ function TreeNode({ node }: { node: Node }) {
           </span>
         )}
         <span className="flex-1" />
+        <Button
+          size="sm"
+          variant="ghost"
+          aria-expanded={adding}
+          aria-controls={adding ? pickerId : undefined}
+          aria-label={t('mentoring.mentorships.addMenteeTo', {
+            name: node.user.name,
+          })}
+          onClick={() => {
+            setAdding((v) => !v);
+            assign.reset();
+          }}
+        >
+          <Plus aria-hidden />
+          {t('mentoring.mentorships.addMentee')}
+        </Button>
         {node.mentorship &&
           (confirming ? (
             <span className="flex flex-wrap items-center gap-2 text-sm text-ink-muted">
@@ -276,6 +238,25 @@ function TreeNode({ node }: { node: Node }) {
             </Button>
           ))}
       </div>
+      {adding && (
+        <div className="flex flex-col gap-2 ps-5">
+          <label htmlFor={pickerId} className="sr-only">
+            {t('mentoring.mentorships.addMenteeTo', { name: node.user.name })}
+          </label>
+          <UserPicker
+            id={pickerId}
+            value={null}
+            // Picking is the action: assign straight away, or ask first if they have a mentor.
+            onChange={(mentee) => mentee && assign.assign(node.user, mentee)}
+            excludeIds={[node.user.id, ...node.children.map((c) => c.user.id)]}
+            autoFocus
+          />
+          <FormError
+            message={assign.error ? errorMessage(t, assign.error) : undefined}
+          />
+        </div>
+      )}
+      {assign.confirmDialog}
       {node.children.length > 0 && (
         <ul className="flex flex-col gap-2 border-s-2 border-divider ps-5">
           {node.children.map((c) => (

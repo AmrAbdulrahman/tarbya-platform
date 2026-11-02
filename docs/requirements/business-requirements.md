@@ -6,13 +6,13 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## 1. Organisation and locale
 
-| ID       | Requirement                                                                                                                                          | Release |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| BR-ORG-1 | One organisation per installation. No tenant id anywhere.                                                                                            | v1      |
-| BR-ORG-2 | Arabic and right-to-left by default; English and left-to-right supported. Each user picks a default language.                                        | v1      |
-| BR-ORG-3 | One organisation time zone, `Africa/Cairo`. Times are stored in UTC and shown in the organisation zone. Recurring gatherings repeat in that zone.    | v1      |
-| BR-ORG-4 | Dates can be shown in the Gregorian calendar, the Hijri (Umm al-Qura) calendar, or both. Each user picks one in their profile; default is Gregorian. | v1      |
-| BR-ORG-5 | Thresholds (contact "due" and "late" days, reminder timing, trend sensitivity) are system settings that moderators can edit.                         | v1      |
+| ID       | Requirement                                                                                                                                       | Release |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| BR-ORG-1 | One organisation per installation. No tenant id anywhere.                                                                                         | v1      |
+| BR-ORG-2 | Arabic and right-to-left by default; English and left-to-right supported. Each user picks a default language.                                     | v1      |
+| BR-ORG-3 | One organisation time zone, `Africa/Cairo`. Times are stored in UTC and shown in the organisation zone. Recurring gatherings repeat in that zone. | v1      |
+| BR-ORG-4 | Dates can be shown in the Gregorian calendar, the Hijri (Umm al-Qura) calendar, or both. Each user picks one in their profile; default is both.   | v1      |
+| BR-ORG-5 | Thresholds (contact "due" and "late" days, reminder timing, trend sensitivity) are system settings that moderators can edit.                      | v1      |
 
 ## 2. Users and roles
 
@@ -65,10 +65,11 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## 7. Notes
 
-| ID        | Requirement                                                                                                                   | Release |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------- | ------- |
-| BR-NOTE-1 | Notes on a mentee are either **shared** (mentee, mentor and moderators see them) or **private** (mentor and moderators only). | v1      |
-| BR-NOTE-2 | Managers never see private notes, including in acting-on-behalf.                                                              | v2      |
+| ID        | Requirement                                                                                                                                                                                          | Release |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| BR-NOTE-1 | Notes on a mentee are either **shared** (mentee, mentor and moderators see them) or **private** (mentor and moderators only).                                                                        | v1      |
+| BR-NOTE-2 | Managers never see private notes, including in acting-on-behalf.                                                                                                                                     | v2      |
+| BR-NOTE-3 | Admin notes on a user are read and written by everyone above them in the management chain, their current mentor, and moderators or the super admin; never by the user. Only the author edits a note. | v1      |
 
 ## 8. Groups
 
@@ -87,16 +88,16 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## 9. Management hierarchy
 
-| ID       | Requirement                                                                                                                                                                                             | Release                        |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| BR-MGR-1 | Each user can have one direct manager. Top-level users have none. Every mentor should have a manager (warning, not a hard block, so top-level managers can mentor).                                     | v1                             |
-| BR-MGR-2 | The hierarchy is recursive and must never contain a cycle.                                                                                                                                              | v1                             |
-| BR-MGR-3 | Moderators and the super admin set any user's manager. A manager can move members within their own subtree.                                                                                             | v1 (moderators), v2 (managers) |
-| BR-MGR-4 | Management is separate from mentorship: being someone's manager doesn't make you their mentor or give mentoring rights.                                                                                 | v1                             |
-| BR-MGR-5 | A manager sees their whole subtree at every level below them, and never anyone above.                                                                                                                   | v2                             |
-| BR-MGR-6 | A team dashboard shows stats for direct reports or for all levels, and can narrow to one member's sub-team.                                                                                             | v2                             |
-| BR-MGR-7 | A manager can act on behalf of anyone in their subtree: log a follow-up, send a reminder, answer an RSVP, reply to a plan report.                                                                       | v2                             |
-| BR-MGR-8 | Acting on behalf is always visible (persistent banner), recorded as "manager on behalf of member" in an audit log visible to the member, their managers and moderators, and always notifies the member. | v2                             |
+| ID       | Requirement                                                                                                                                                                                                                                                              | Release                        |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| BR-MGR-1 | Only moderators sit in the management line: each moderator can have one direct manager, who is a moderator or the super admin. Top-level moderators have none. A moderator who still manages others can't stop being a moderator; one who stops loses their own manager. | v1                             |
+| BR-MGR-2 | The hierarchy is recursive and must never contain a cycle.                                                                                                                                                                                                               | v1                             |
+| BR-MGR-3 | Moderators and the super admin set any user's manager. A manager can move members within their own subtree.                                                                                                                                                              | v1 (moderators), v2 (managers) |
+| BR-MGR-4 | Management is separate from mentorship: being someone's manager doesn't make you their mentor or give mentoring rights.                                                                                                                                                  | v1                             |
+| BR-MGR-5 | A manager sees their whole subtree at every level below them, and never anyone above.                                                                                                                                                                                    | v2                             |
+| BR-MGR-6 | A team dashboard shows stats for direct reports or for all levels, and can narrow to one member's sub-team.                                                                                                                                                              | v2                             |
+| BR-MGR-7 | A manager can act on behalf of anyone in their subtree: log a follow-up, send a reminder, answer an RSVP, reply to a plan report.                                                                                                                                        | v2                             |
+| BR-MGR-8 | Acting on behalf is always visible (persistent banner), recorded as "manager on behalf of member" in an audit log visible to the member, their managers and moderators, and always notifies the member.                                                                  | v2                             |
 
 ## 10. Notifications and messages
 

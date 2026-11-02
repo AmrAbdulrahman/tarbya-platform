@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService, type Prisma } from '@tarbya/db';
 import { canSignIn, type Role } from '@tarbya/shared';
 import { AppException } from '../../common/app-exception';
+import type { Env } from '../../config/env';
 import { AuditService, diffOf } from '../audit/audit.service';
 import { HierarchyService } from '../hierarchy/hierarchy.service';
 import { SessionsService } from '../auth/sessions.service';
@@ -42,6 +44,7 @@ export class UsersService {
     private readonly audit: AuditService,
     private readonly hierarchy: HierarchyService,
     private readonly sessions: SessionsService,
+    private readonly config: ConfigService<Env, true>,
   ) {}
 
   async list(query: ListUsersQuery): Promise<UserPageDto> {
@@ -49,6 +52,7 @@ export class UsersService {
     const where: Prisma.UserWhereInput = {
       ...(query.status === 'active' && { deactivatedAt: null }),
       ...(query.status === 'inactive' && { deactivatedAt: { not: null } }),
+      ...(query.moderatorsOnly && { AND: [{ OR: this.canManageWhere() }] }),
       ...(query.q && {
         OR: [
           { name: { contains: query.q, mode: 'insensitive' } },
@@ -86,7 +90,6 @@ export class UsersService {
     const phone = dto.phone ? normalizePhone(dto.phone) : null;
     const id = await this.prisma.$transaction(async (tx) => {
       await this.assertContactsFree(tx, { email, phone });
-      if (dto.managerId) await this.assertCanManage(tx, dto.managerId);
       const user = await tx.user.create({
         data: {
           name: dto.name,
@@ -94,7 +97,6 @@ export class UsersService {
           phone,
           locale: dto.locale,
           calendar: dto.calendar,
-          managerId: dto.managerId ?? null,
         },
       });
       await this.audit.record(
@@ -107,7 +109,6 @@ export class UsersService {
             name: user.name,
             email,
             phone,
-            managerId: user.managerId,
           }),
         },
         tx,
@@ -209,6 +210,12 @@ export class UsersService {
       if (!user) throw notFound();
       if (user.managerId === managerId) return;
       if (managerId) {
+        if (!user.isModerator) {
+          throw new AppException(409, {
+            code: 'MANAGER_NOT_MODERATOR',
+            title: 'Only moderators have a direct manager',
+          });
+        }
         await this.assertCanManage(tx, managerId);
         if (await this.hierarchy.isInSubtree(tx, id, managerId)) {
           throw new AppException(409, {
@@ -243,14 +250,27 @@ export class UsersService {
       if (!user) throw notFound();
       if (this.roles.isSuperAdmin(user.email)) throw superAdminLocked();
       if (user.isModerator === isModerator) return;
-      await tx.user.update({ where: { id }, data: { isModerator } });
+      if (!isModerator && (await tx.user.count({ where: { managerId: id } }))) {
+        throw new AppException(409, {
+          code: 'MODERATOR_HAS_REPORTS',
+          title: 'Move the people they manage first',
+        });
+      }
+      // Only moderators have managers, so a former moderator leaves the management line.
+      const managerId = isModerator ? user.managerId : null;
+      await tx.user.update({ where: { id }, data: { isModerator, managerId } });
       await this.audit.record(
         {
           actorId,
           action: 'user.moderator.set',
           entity: 'User',
           entityId: id,
-          diff: { isModerator: [user.isModerator, isModerator] },
+          diff: {
+            isModerator: [user.isModerator, isModerator],
+            ...(managerId !== user.managerId && {
+              managerId: [user.managerId, managerId],
+            }),
+          },
         },
         tx,
       );
@@ -296,6 +316,7 @@ export class UsersService {
     }
   }
 
+  /** Managers are active moderators or the super admin (BR-MGR-1). */
   private async assertCanManage(
     tx: Prisma.TransactionClient,
     managerId: string,
@@ -307,6 +328,24 @@ export class UsersService {
         title: 'The manager must be an active user',
       });
     }
+    if (!manager.isModerator && !this.roles.isSuperAdmin(manager.email)) {
+      throw new AppException(409, {
+        code: 'MANAGER_NOT_MODERATOR',
+        title: 'The manager must be a moderator',
+      });
+    }
+  }
+
+  private canManageWhere(): Prisma.UserWhereInput[] {
+    return [
+      { isModerator: true },
+      {
+        email: {
+          equals: this.config.get('SUPER_ADMIN_EMAIL', { infer: true }),
+          mode: 'insensitive',
+        },
+      },
+    ];
   }
 }
 

@@ -29,7 +29,7 @@ model User {
   email         String?            @unique
   phone         String?            @unique
   locale        Locale             @default(ar)
-  calendar      CalendarPreference @default(GREGORIAN)
+  calendar      CalendarPreference @default(BOTH)
   isModerator   Boolean            @default(false)
   managerId     String?            @db.Uuid
   manager       User?              @relation("Management", fields: [managerId], references: [id])
@@ -38,16 +38,18 @@ model User {
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
-  password   PasswordCredential?
-  sessions   Session[]
-  mentoring  Mentorship[]             @relation("Mentor")
-  mentoredBy Mentorship[]             @relation("Mentee")
-  audited    AuditLog[]               @relation("AuditActor")
-  created    Interaction[]            @relation("InteractionCreator")
-  joined     InteractionParticipant[]
-  tasks      Task[]                   @relation("TaskAssignee")
-  tasksSet   Task[]                   @relation("TaskCreator")
-  notes      Note[]                   @relation("NoteAuthor")
+  password          PasswordCredential?
+  sessions          Session[]
+  mentoring         Mentorship[]             @relation("Mentor")
+  mentoredBy        Mentorship[]             @relation("Mentee")
+  audited           AuditLog[]               @relation("AuditActor")
+  created           Interaction[]            @relation("InteractionCreator")
+  joined            InteractionParticipant[]
+  tasks             Task[]                   @relation("TaskAssignee")
+  tasksSet          Task[]                   @relation("TaskCreator")
+  notes             Note[]                   @relation("NoteAuthor")
+  adminNotes        AdminNote[]              @relation("AdminNoteSubject")
+  adminNotesWritten AdminNote[]              @relation("AdminNoteAuthor")
 
   @@index([managerId])
 }
@@ -285,4 +287,19 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@index([actorId])
+}
+
+/// Notes about a user for the people responsible for them: everyone above them in
+/// the management chain, their current mentor, and moderators. Never shown to the user.
+model AdminNote {
+  id        String   @id @default(uuid()) @db.Uuid
+  subjectId String   @db.Uuid
+  subject   User     @relation("AdminNoteSubject", fields: [subjectId], references: [id])
+  authorId  String   @db.Uuid
+  author    User     @relation("AdminNoteAuthor", fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId, createdAt])
 }

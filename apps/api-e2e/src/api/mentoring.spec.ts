@@ -64,9 +64,7 @@ describe('mentorships (US-3.3)', () => {
       menteeId: mentee.id,
     });
     expect(assigned.status).toBe(200);
-    expect(assigned.data.mentorship.mentor.id).toBe(first.id);
-    // First has no manager: allowed, with a warning (BR-MGR-1).
-    expect(assigned.data.warnings).toEqual(['MENTOR_HAS_NO_MANAGER']);
+    expect(assigned.data.mentor.id).toBe(first.id);
 
     const taken = await admin.post('/api/mentorships', {
       mentorId: second.id,
@@ -83,18 +81,16 @@ describe('mentorships (US-3.3)', () => {
       menteeId: mentee.id,
       replace: true,
     });
-    expect(replaced.data.mentorship.mentor.id).toBe(second.id);
+    expect(replaced.data.mentor.id).toBe(second.id);
     const active = (await admin.get('/api/mentorships')).data as {
       id: string;
       mentee: { id: string };
     }[];
     expect(active.filter((m) => m.mentee.id === mentee.id)).toHaveLength(1);
 
-    const ended = await admin.post(
-      `/api/mentorships/${replaced.data.mentorship.id}/end`,
-    );
+    const ended = await admin.post(`/api/mentorships/${replaced.data.id}/end`);
     expect(ended.data.endedAt).not.toBeNull();
-    expect(await auditActions(assigned.data.mentorship.id)).toEqual([
+    expect(await auditActions(assigned.data.id)).toEqual([
       'mentorship.start',
       'mentorship.end',
     ]);

@@ -88,6 +88,9 @@ export const en: Messages = {
     ACTIVITY_TYPE_INVALID: 'Pick an active one-to-one activity type.',
     NOTE_WIDEN_CONFIRM:
       'Sharing a private note shows it to the mentee. Confirm to continue.',
+    MANAGER_NOT_MODERATOR:
+      'Only moderators have a direct manager, and the manager must be a moderator.',
+    MODERATOR_HAS_REPORTS: 'Move the people this moderator manages first.',
     VALIDATION_FAILED: 'Check the fields and try again.',
     FORBIDDEN: "You don't have permission to do that.",
     NOT_FOUND: "We couldn't find that.",
@@ -257,13 +260,18 @@ export const en: Messages = {
       replaceAsk:
         '{{name}} mentors them now. End that mentorship and assign the new mentor?',
       replace: 'End and assign',
-      noManagerWarning: 'Note: this mentor has no direct manager yet.',
       treeTitle: 'Mentoring tree',
       treeEmpty: 'No mentorships yet.',
       menteeCount_one: 'Mentor · 1 mentee',
       menteeCount_other: 'Mentor · {{count}} mentees',
       end: 'End',
       endAsk: 'End {{mentor}} mentoring {{mentee}}? The history is kept.',
+      addMentee: 'Add mentee',
+      addMenteeTo: 'Add a mentee to {{name}}',
+      moveTitle: 'Move mentee',
+      moveAsk:
+        '{{current}} mentors {{mentee}} now. Move them to {{mentor}}? Past follow-ups and notes stay with the old mentorship.',
+      move: 'Move',
       confirmEnd: 'End mentorship',
     },
     log: {
@@ -333,6 +341,25 @@ export const en: Messages = {
       privateNote: 'Private note',
       back: 'Back',
     },
+  },
+  profile: {
+    roles: 'Roles',
+    contact: 'Contact',
+    email: 'Email',
+    phone: 'Phone',
+    manager: 'Direct manager',
+    mentor: 'Mentor',
+    none: '—',
+    deactivated: 'Deactivated',
+    adminNotes: 'Admin notes',
+    adminNotesHint:
+      'Seen only by the people who manage or mentor this member and by moderators; never by the member.',
+    addNote: 'Add note',
+    notePlaceholder: 'Write a note…',
+    noNotes: 'No notes yet.',
+    edit: 'Edit',
+    edited: 'edited',
+    noteBy: '{{name}} · {{date}}',
   },
   account: {
     menu: 'My account',

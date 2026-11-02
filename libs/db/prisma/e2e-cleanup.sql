@@ -13,6 +13,9 @@ CREATE TEMP TABLE e2e_mentorships ON COMMIT DROP AS
   WHERE "mentorId" IN (SELECT id FROM e2e_users) OR "menteeId" IN (SELECT id FROM e2e_users);
 
 UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_users);
+DELETE FROM "AdminNote"
+  WHERE "subjectId" IN (SELECT id FROM e2e_users)
+     OR "authorId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Note"
   WHERE "mentorshipId" IN (SELECT id FROM e2e_mentorships)
      OR "authorId" IN (SELECT id FROM e2e_users);

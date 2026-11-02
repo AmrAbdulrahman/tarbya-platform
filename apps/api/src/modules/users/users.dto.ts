@@ -85,6 +85,13 @@ export class ListUsersQuery {
   @IsIn(['all', 'active', 'inactive'])
   status?: 'all' | 'active' | 'inactive';
 
+  /** Only moderators and the super admin: the people who can be managers. */
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  moderatorsOnly?: boolean;
+
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
   @IsUUID()
@@ -133,11 +140,6 @@ export class CreateUserDto {
   @IsOptional()
   @IsIn(CALENDARS)
   calendar?: 'GREGORIAN' | 'HIJRI' | 'BOTH';
-
-  @ApiPropertyOptional({ type: String, format: 'uuid', nullable: true })
-  @IsOptional()
-  @IsUUID()
-  managerId?: string | null;
 }
 
 export class UpdateUserDto {
@@ -173,6 +175,7 @@ export class UpdateUserDto {
   calendar?: 'GREGORIAN' | 'HIJRI' | 'BOTH';
 }
 
+/** Only moderators have managers, and only moderators or the super admin manage (BR-MGR-1). */
 export class SetManagerDto {
   /** null makes the user top-level. */
   @ApiProperty({ type: String, format: 'uuid', nullable: true })

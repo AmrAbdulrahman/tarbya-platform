@@ -8,9 +8,7 @@ import { SettingsService } from '../settings/settings.service';
 import { ContactService } from './contact.service';
 import type {
   AssignMentorshipDto,
-  AssignResultDto,
   MentorshipDto,
-  MentorshipWarning,
   MyMentoringDto,
 } from './mentorships.dto';
 
@@ -56,7 +54,7 @@ export class MentorshipsService {
   async assign(
     actorId: string,
     dto: AssignMentorshipDto,
-  ): Promise<AssignResultDto> {
+  ): Promise<MentorshipDto> {
     const { mentorId, menteeId } = dto;
     if (mentorId === menteeId) throw cycle();
 
@@ -108,20 +106,12 @@ export class MentorshipsService {
       return created.id;
     });
 
-    const [row, mentor] = await Promise.all([
-      this.prisma.mentorship.findUniqueOrThrow({
+    return toDto(
+      await this.prisma.mentorship.findUniqueOrThrow({
         where: { id },
         select: mentorshipSelect,
       }),
-      this.prisma.user.findUniqueOrThrow({
-        where: { id: mentorId },
-        select: { managerId: true },
-      }),
-    ]);
-    const warnings: MentorshipWarning[] = mentor.managerId
-      ? []
-      : ['MENTOR_HAS_NO_MANAGER'];
-    return { mentorship: toDto(row), warnings };
+    );
   }
 
   /** BR-MEN-4: ending keeps the follow-ups and notes attached to the mentorship. */
