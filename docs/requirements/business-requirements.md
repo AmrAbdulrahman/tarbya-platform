@@ -6,13 +6,13 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## 1. Organisation and locale
 
-| ID       | Requirement                                                                                                                                       | Release |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| BR-ORG-1 | One organisation per installation. No tenant id anywhere.                                                                                         | v1      |
-| BR-ORG-2 | Arabic and right-to-left by default; English and left-to-right supported. Each user picks a default language.                                     | v1      |
-| BR-ORG-3 | One organisation time zone, `Africa/Cairo`. Times are stored in UTC and shown in the organisation zone. Recurring gatherings repeat in that zone. | v1      |
-| BR-ORG-4 | Dates can be shown in the Gregorian calendar, the Hijri (Umm al-Qura) calendar, or both. Each user picks one in their profile; default is both.   | v1      |
-| BR-ORG-5 | Thresholds (contact "due" and "late" days, reminder timing, trend sensitivity) are system settings that moderators can edit.                      | v1      |
+| ID       | Requirement                                                                                                                                                      | Release |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| BR-ORG-1 | One organisation per installation. No tenant id anywhere.                                                                                                        | v1      |
+| BR-ORG-2 | Arabic and right-to-left by default; English and left-to-right supported. Each user picks a default language.                                                    | v1      |
+| BR-ORG-3 | One organisation time zone, `Africa/Cairo`. Times are stored in UTC and shown in the organisation zone. Recurring gatherings repeat in that zone.                | v1      |
+| BR-ORG-4 | Dates can be shown in the Gregorian calendar, the Hijri (Umm al-Qura) calendar, or both. Each user picks one in their profile; default is both.                  | v1      |
+| BR-ORG-5 | Thresholds (contact "due" and "late" days, reminder timing, trend sensitivity, days before a plan check-in is due) are system settings that moderators can edit. | v1      |
 
 ## 2. Users and roles
 

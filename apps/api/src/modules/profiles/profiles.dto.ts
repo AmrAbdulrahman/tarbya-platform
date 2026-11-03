@@ -21,6 +21,8 @@ export class ProfileDto {
   @ApiProperty() canSeePlans!: boolean;
   /** Their current mentor or an admin (BR-PLAN-2). */
   @ApiProperty() canManagePlans!: boolean;
+  /** The viewer is their current mentor: logs follow-ups and writes notes (US-4.3, US-4.6). */
+  @ApiProperty() isMentor!: boolean;
 }
 
 export class AdminNoteDto {

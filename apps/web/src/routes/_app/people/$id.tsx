@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Plus } from 'lucide-react';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -17,10 +18,13 @@ import { Badge, Button, Textarea } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FormError } from '../../../components/login/fields';
+import { FeedList } from '../../../components/feed/feed-list';
+import { NotesPanel } from '../../../components/mentee/notes-panel';
+import { TasksPanel } from '../../../components/mentee/tasks-panel';
 import { PlansSection } from '../../../components/plans/plans-section';
 import { RoleChips } from '../../../components/role-chips';
 
-/** A member's profile; step 6 grows it into the full mentee profile (US-4.2). */
+/** A member's profile, and for their mentor the full mentee profile (US-4.2 · design/screens/Mentee.dc.html). */
 export const Route = createFileRoute('/_app/people/$id')({
   component: ProfilePage,
 });
@@ -53,7 +57,7 @@ function ProfilePage() {
         >
           {p.name.charAt(0)}
         </span>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-1 flex-col gap-1.5">
           <h1 className="text-3xl font-bold text-navy">{p.name}</h1>
           <div
             className="flex flex-wrap gap-1.5"
@@ -65,6 +69,14 @@ function ProfilePage() {
             )}
           </div>
         </div>
+        {p.isMentor && (
+          <Button asChild>
+            <Link to="/mentor/log" search={{ menteeId: p.id }}>
+              <Plus aria-hidden />
+              {t('dashboard.newFollowUp')}
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-wrap items-start gap-6">
@@ -90,7 +102,24 @@ function ProfilePage() {
         {p.canSeeAdminNotes && <AdminNotes subjectId={p.id} />}
       </div>
       {p.canSeePlans && (
-        <PlansSection menteeId={p.id} canManage={p.canManagePlans} />
+        <>
+          <PlansSection menteeId={p.id} canManage={p.canManagePlans} />
+          <div className="flex flex-wrap items-start gap-6">
+            <section
+              aria-labelledby="history-title"
+              className="flex min-w-0 flex-[3_1_420px] flex-col gap-4 rounded-card border border-border bg-card p-6"
+            >
+              <h2 id="history-title" className="text-lg font-bold text-navy">
+                {t('feed.title')}
+              </h2>
+              <FeedList userId={p.id} />
+            </section>
+            <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-6">
+              <NotesPanel mentee={p} canWrite={p.isMentor} />
+              <TasksPanel menteeId={p.id} />
+            </div>
+          </div>
+        </>
       )}
     </>
   );

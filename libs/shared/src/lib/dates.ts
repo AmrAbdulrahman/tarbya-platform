@@ -59,3 +59,34 @@ export function formatDate(
       return gregorian();
   }
 }
+
+/** The time of day, 24-hour, in the organisation zone. */
+export function formatTime(
+  date: Date | string,
+  options: Pick<DateFormatOptions, 'locale' | 'timeZone'>,
+): string {
+  const { locale, timeZone = ORG_TIMEZONE } = options;
+  return new Intl.DateTimeFormat(
+    `${locale === 'ar' ? 'ar-EG' : 'en-GB'}-u-nu-latn`,
+    { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' },
+  ).format(typeof date === 'string' ? new Date(date) : date);
+}
+
+/**
+ * Day number and short month name for a calendar tile, in the user's calendar
+ * (Hijri for HIJRI, Gregorian otherwise).
+ */
+export function formatDayTile(
+  date: Date | string,
+  options: DateFormatOptions,
+): { day: string; month: string } {
+  const { locale, calendar = 'GREGORIAN', timeZone = ORG_TIMEZONE } = options;
+  const ca = calendar === 'HIJRI' ? 'islamic-umalqura' : 'gregory';
+  const parts = new Intl.DateTimeFormat(
+    `${locale === 'ar' ? 'ar-EG' : 'en-GB'}-u-ca-${ca}-nu-latn`,
+    { timeZone, day: 'numeric', month: 'short' },
+  ).formatToParts(typeof date === 'string' ? new Date(date) : date);
+  const part = (type: string) =>
+    parts.find((p) => p.type === type)?.value ?? '';
+  return { day: part('day'), month: part('month') };
+}

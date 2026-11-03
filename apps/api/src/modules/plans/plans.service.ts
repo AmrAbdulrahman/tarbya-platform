@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService, type Prisma } from '@tarbya/db';
-import { planTrend } from '@tarbya/shared';
+import { daysSince, planTrend } from '@tarbya/shared';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
@@ -26,6 +26,7 @@ const planSelect = {
   higherIsBetter: true,
   endsOn: true,
   closedAt: true,
+  createdAt: true,
   trackingMethod: { select: { id: true, nameAr: true, nameEn: true } },
   readings: {
     select: { value: true, recordedAt: true },
@@ -63,6 +64,21 @@ export class PlansService {
         { closedAt: { sort: 'desc', nulls: 'first' } },
         { createdAt: 'desc' },
       ],
+    });
+    const trend = await this.trendOptions();
+    return rows.map((r) => this.summary(r, trend));
+  }
+
+  /**
+   * Open plans of several mentees, newest first, for the dashboards. Callers
+   * have already checked the viewer may see these mentees.
+   */
+  async openPlansOf(menteeIds: string[]): Promise<PlanSummaryDto[]> {
+    if (!menteeIds.length) return [];
+    const rows = await this.prisma.developmentPlan.findMany({
+      where: { menteeId: { in: menteeIds }, closedAt: null },
+      select: planSelect,
+      orderBy: { createdAt: 'desc' },
     });
     const trend = await this.trendOptions();
     return rows.map((r) => this.summary(r, trend));
@@ -224,7 +240,10 @@ export class PlansService {
 
   private summary(
     r: PlanRow,
-    trend: { window: number; steadyBand: number },
+    {
+      checkInDays,
+      ...trend
+    }: { window: number; steadyBand: number; checkInDays: number },
   ): PlanSummaryDto {
     const values = r.readings.map((x) => x.value);
     const last = r.readings[r.readings.length - 1];
@@ -233,6 +252,7 @@ export class PlansService {
       higherIsBetter: r.higherIsBetter,
       target: r.target,
     });
+    const quietSince = last?.recordedAt ?? r.createdAt;
     return {
       id: r.id,
       menteeId: r.menteeId,
@@ -248,15 +268,18 @@ export class PlansService {
       trend: result.trend,
       change: Math.round(result.change * 100) / 100,
       points: values.slice(-12),
+      checkInDue:
+        !r.closedAt && daysSince(quietSince, new Date()) >= checkInDays,
     };
   }
 
   private async trendOptions() {
-    const [window, steadyBand] = await Promise.all([
+    const [window, steadyBand, checkInDays] = await Promise.all([
       this.settings.get('plans.trendWindow'),
       this.settings.get('plans.trendSteadyBand'),
+      this.settings.get('plans.checkInDays'),
     ]);
-    return { window, steadyBand };
+    return { window, steadyBand, checkInDays };
   }
 
   /** BR-PLAN-2: the current mentor or a moderator. */

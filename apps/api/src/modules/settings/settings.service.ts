@@ -19,6 +19,7 @@ const schemas: { [K in SettingKey]: z.ZodType<Settings[K]> } = {
   'gatherings.reminderHours': z.number().int().positive(),
   'plans.trendWindow': z.number().int().positive(),
   'plans.trendSteadyBand': z.number().min(0),
+  'plans.checkInDays': z.number().int().positive(),
 };
 
 /** System settings (BR-ORG-5, BR-AUTH-2, US-3.6). */

@@ -28,6 +28,7 @@ export interface PlanDetailDto {
   trend: Trend;
   change: number;
   points: number[];
+  checkInDue: boolean;
   mentee: UserRefDto;
   readings: PlanReadingDto[];
   canManage: boolean;

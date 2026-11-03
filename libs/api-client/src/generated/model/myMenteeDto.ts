@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ContactStatus } from './contactStatus.js';
+import type { InteractionKind } from './interactionKind.js';
 import type { UserRefDto } from './userRefDto.js';
 
 export interface MyMenteeDto {
@@ -13,6 +14,7 @@ export interface MyMenteeDto {
   startedAt: string;
   /** @nullable */
   lastContactAt: string | null;
+  lastContactKind: InteractionKind | null;
   contactStatus: ContactStatus;
   daysSinceContact: number;
   openTasks: number;

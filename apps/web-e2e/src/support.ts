@@ -11,3 +11,9 @@ export async function ensureArabic(page: Page) {
   }
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
 }
+
+/** The sign-in screen opens on the one-time code; switch to the password form. */
+export async function usePasswordForm(page: Page) {
+  await page.getByRole('button', { name: 'الدخول بكلمة المرور' }).click();
+  await expect(page.getByLabel('كلمة المرور')).toBeVisible();
+}

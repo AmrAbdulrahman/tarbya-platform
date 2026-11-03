@@ -54,6 +54,8 @@ export class PlanSummaryDto {
   @ApiProperty() change!: number;
   /** Up to the last 12 readings, oldest first, for the sparkline. */
   @ApiProperty({ type: Number, isArray: true }) points!: number[];
+  /** Open, and no reading for `plans.checkInDays` days (US-5.1). */
+  @ApiProperty() checkInDue!: boolean;
 }
 
 export class PlanReplyDto {

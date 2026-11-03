@@ -9,6 +9,7 @@ import {
   lookupsControllerActivityTypes,
   mentorshipsControllerMine,
   type ActivityTypeDto,
+  type MyMenteeDto,
   type MyMentoringDto,
   type UserRefDto,
 } from '@tarbya/api-client';
@@ -17,18 +18,35 @@ import { Button, Checkbox, cn, Input, Textarea } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { lookupColors } from '../../../components/admin/lookup-colors';
 import { Field, FormError } from '../../../components/login/fields';
-import { EntryKind, WhenStatus } from '../../../components/mentor/entry-kind';
+import { WhenStatus } from '../../../components/mentor/entry-kind';
 import {
   Card,
   Hint,
   mineQueryKey,
 } from '../../../components/mentor/form-parts';
+import { LogScreen } from '../../../components/mentor/log-screen';
 import { ParticipantsPicker } from '../../../components/mentor/participants-picker';
 
 /** US-4.4 · design/screens/Activity.dc.html */
 export const Route = createFileRoute('/_app/mentor/activity')({
+  validateSearch: z.object({
+    menteeId: z.string().uuid().optional().catch(undefined),
+  }),
   component: ActivityPage,
 });
+
+function ActivityPage() {
+  const { menteeId } = Route.useSearch();
+  return (
+    <LogScreen
+      kind="activity"
+      menteeId={menteeId}
+      form={(m, onSaved) => (
+        <ActivityForm key={m.mentee.id} mentee={m} onSaved={onSaved} />
+      )}
+    />
+  );
+}
 
 const day = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -54,12 +72,13 @@ const schema = z
   );
 type Values = z.infer<typeof schema>;
 
-function blank(): Values {
+function blank(mentee: UserRefDto): Values {
   const now = toZoned(new Date());
   return {
     activityTypeId: '',
     title: '',
-    participants: [],
+    // The chosen mentee takes part; others can be added (BR-FU-2).
+    participants: [mentee],
     date: now.date,
     multiDay: false,
     returnDate: '',
@@ -70,7 +89,13 @@ function blank(): Values {
   };
 }
 
-function ActivityPage() {
+function ActivityForm({
+  mentee,
+  onSaved,
+}: {
+  mentee: MyMenteeDto;
+  onSaved: () => void;
+}) {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const types = useQuery({
@@ -89,7 +114,7 @@ function ActivityPage() {
   );
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: blank(),
+    defaultValues: blank(mentee.mentee),
   });
   const { errors } = form.formState;
 
@@ -109,8 +134,13 @@ function ActivityPage() {
         privateNotes: v.privateNotes || null,
       }),
     onSuccess: async () => {
-      form.reset(blank());
-      await queryClient.invalidateQueries({ queryKey: mineQueryKey });
+      form.reset(blank(mentee.mentee));
+      onSaved();
+      await Promise.all(
+        [mineQueryKey, ['dashboard'], ['feed']].map((queryKey) =>
+          queryClient.invalidateQueries({ queryKey }),
+        ),
+      );
     },
   });
 
@@ -130,17 +160,11 @@ function ActivityPage() {
     <form
       noValidate
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
-      className="flex max-w-4xl flex-col gap-6"
+      className="flex min-w-0 flex-col gap-6"
     >
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-navy">
-          {t('mentoring.log.activityTitle')}
-        </h1>
-        <p className="text-[15px] text-ink-subtle">
-          {t('mentoring.log.activityLead')}
-        </p>
-      </div>
-      <EntryKind current="activity" />
+      <p className="text-[15px] text-ink-subtle">
+        {t('mentoring.log.activityLead')}
+      </p>
 
       <Card>
         <fieldset className="flex flex-col gap-2">
@@ -323,11 +347,6 @@ function ActivityPage() {
       <FormError
         message={save.isError ? errorMessage(t, save.error) : undefined}
       />
-      {save.isSuccess && !form.formState.isDirty && (
-        <p role="status" className="text-sm font-medium text-trend-up">
-          {t('mentoring.log.saved')}
-        </p>
-      )}
       <div className="flex gap-2">
         <Button type="submit" disabled={save.isPending}>
           {t('mentoring.log.save')}

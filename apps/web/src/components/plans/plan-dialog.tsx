@@ -96,7 +96,10 @@ function PlanForm({
         : plansControllerCreate({ ...body, menteeId });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['plans'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['plans'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+      ]);
       onDone();
     },
   });

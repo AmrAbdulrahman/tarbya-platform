@@ -38,7 +38,8 @@ function Login() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { redirect: back } = Route.useSearch();
-  const [method, setMethod] = useState<Method>('password');
+  // A one-time code first: most members won't have set a password.
+  const [method, setMethod] = useState<Method>('code');
   // Kept across tabs so switching method doesn't lose what was typed.
   const [email, setEmail] = useState('');
 

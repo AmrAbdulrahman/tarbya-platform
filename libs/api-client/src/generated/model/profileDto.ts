@@ -24,4 +24,5 @@ export interface ProfileDto {
   canSeeAdminNotes: boolean;
   canSeePlans: boolean;
   canManagePlans: boolean;
+  isMentor: boolean;
 }

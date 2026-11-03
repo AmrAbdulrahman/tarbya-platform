@@ -26,4 +26,5 @@ export interface PlanSummaryDto {
   trend: Trend;
   change: number;
   points: number[];
+  checkInDue: boolean;
 }

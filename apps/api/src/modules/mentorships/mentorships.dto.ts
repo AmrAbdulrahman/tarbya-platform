@@ -35,6 +35,12 @@ export class MyMenteeDto {
   /** The last done follow-up or activity with this mentee, if any (BR-FU-5). */
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   lastContactAt!: string | null;
+  @ApiProperty({
+    enum: ['FOLLOW_UP', 'ACTIVITY'],
+    enumName: 'InteractionKind',
+    nullable: true,
+  })
+  lastContactKind!: 'FOLLOW_UP' | 'ACTIVITY' | null;
 
   @ApiProperty({ enum: CONTACT, enumName: 'ContactStatus' })
   contactStatus!: (typeof CONTACT)[number];
