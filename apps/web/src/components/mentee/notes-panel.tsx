@@ -63,9 +63,9 @@ export function NotesPanel({
   return (
     <section
       aria-labelledby="notes-title"
-      className="flex flex-col gap-4 rounded-card border border-border bg-card p-6"
+      className="flex flex-col gap-4 rounded-card border border-border bg-card p-4"
     >
-      <h2 id="notes-title" className="text-lg font-bold text-navy">
+      <h2 id="notes-title" className="text-base font-bold text-navy">
         {t('mentee.notes')}
       </h2>
       {canWrite && (

@@ -45,13 +45,13 @@ IDs (`BR-…`) are stable; user stories in [user-stories.md](user-stories.md) re
 
 ## 5. Follow-ups and activities
 
-| ID      | Requirement                                                                                                                                                                                                                        | Release |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| BR-FU-1 | A mentor logs a **follow-up** with one mentee: date, time, notes, new challenges and notes on open ones, one-time tasks, and this cycle's value for the mentee's trackables.                                                       | v1      |
-| BR-FU-2 | A mentor logs an **activity** (outing, travel, sport, food — types are lookups) with one or more participants. Any active user can be a participant.                                                                               | v1      |
-| BR-FU-3 | Whether a follow-up or activity is upcoming or done is derived from its date and time; nobody sets it. Upcoming items can notify participants.                                                                                     | v1      |
-| BR-FU-4 | One-time tasks have a title, optional due date and done state. The mentor adds them in a follow-up or on their own; the mentee, mentor or an admin ticks them off. Done tasks stay listed, struck through; overdue ones stand out. | v1      |
-| BR-FU-5 | Each mentee's last contact (latest done follow-up or activity) drives a status: regular, due (≥ due days), late (≥ late days). Defaults 7 and 14 days.                                                                             | v1      |
+| ID      | Requirement                                                                                                                                                                                                                                    | Release |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| BR-FU-1 | A mentor logs a **follow-up** with one mentee: date, time, notes, new challenges and notes on open ones, one-time tasks, and this cycle's value for the mentee's trackables.                                                                   | v1      |
+| BR-FU-2 | A mentor logs an **activity** (outing, travel, sport, food — types are lookups) with one or more participants. Any active user can be a participant.                                                                                           | v1      |
+| BR-FU-3 | Whether a follow-up or activity is upcoming or done is derived from its date and time; nobody sets it. Upcoming items can notify participants.                                                                                                 | v1      |
+| BR-FU-4 | One-time tasks have a title, optional due date and done state. The mentor adds them in a follow-up or on their own; the mentee, mentor or an admin ticks them off. Done tasks stay listed, struck through, for 7 days; overdue ones stand out. | v1      |
+| BR-FU-5 | Each mentee's last contact (latest done follow-up or activity) drives a status: regular, due (≥ due days), late (≥ late days). Defaults 7 and 14 days.                                                                                         | v1      |
 
 ## 6. Trackables and challenges
 

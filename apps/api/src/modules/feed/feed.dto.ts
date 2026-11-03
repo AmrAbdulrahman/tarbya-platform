@@ -152,7 +152,7 @@ export class MentorDashboardDto {
 /** US-5.1 · design/screens/MyJourney.dc.html */
 export class JourneyDto {
   @ApiProperty({ type: UserRefDto, nullable: true }) mentor!: UserRefDto | null;
-  /** Open one-time tasks, soonest due first. */
+  /** Open one-time tasks, soonest due first, then those done in the last 7 days. */
   @ApiProperty({ type: TaskDto, isArray: true }) tasks!: TaskDto[];
   /** Active trackables; `openCycles` lists the cycles waiting to be logged. */
   @ApiProperty({ type: TrackableSummaryDto, isArray: true })

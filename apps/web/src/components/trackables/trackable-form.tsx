@@ -57,6 +57,8 @@ export interface TrackableFormProps {
   showPublic?: boolean;
   /** Under the fields, above the buttons. */
   notice?: ReactNode;
+  submitLabel?: string;
+  cancelLabel?: string;
   pending: boolean;
   error?: string;
   onSubmit: (values: TrackableValues) => void;
@@ -71,6 +73,8 @@ export function TrackableForm({
   showStart,
   showPublic,
   notice,
+  submitLabel,
+  cancelLabel,
   pending,
   error,
   onSubmit,
@@ -207,10 +211,10 @@ export function TrackableForm({
       <FormError message={error} />
       <div className="flex gap-2">
         <Button type="submit" disabled={pending}>
-          {t('admin.common.save')}
+          {submitLabel ?? t('admin.common.save')}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          {t('admin.common.cancel')}
+          {cancelLabel ?? t('admin.common.cancel')}
         </Button>
       </div>
     </form>

@@ -330,4 +330,75 @@ describe('trackables (BR-TRK-1…6, US-4.5, US-5.2, US-4.7)', () => {
       true,
     );
   });
+
+  it('lists entries of every trackable for cycles in a period (US-4.2)', async () => {
+    const { mentee, asMentor, asMentee } = await pair();
+    const start = shift(today(), -10);
+    const read = (
+      await asMentor.post(
+        '/api/trackables',
+        daily(mentee.id, { startsOn: start }),
+      )
+    ).data;
+    const walk = (
+      await asMentor.post(
+        '/api/trackables',
+        daily(mentee.id, {
+          name: 'Walk',
+          type: 'BOOLEAN',
+          target: null,
+          startsOn: start,
+        }),
+      )
+    ).data;
+    await asMentor.put(
+      `/api/trackables/${read.id}/entries/${shift(today(), -8)}`,
+      { value: 5 },
+    );
+    await asMentor.put(
+      `/api/trackables/${read.id}/entries/${shift(today(), -1)}`,
+      { value: 9, note: 'Good' },
+    );
+    await asMentor.put(`/api/trackables/${walk.id}/entries/${today()}`, {
+      value: 1,
+    });
+
+    const res = await asMentee.get(
+      `/api/trackables/entries?menteeId=${mentee.id}&from=${shift(today(), -2)}&to=${today()}`,
+    );
+    expect(res.status).toBe(200);
+    expect(
+      res.data.map(
+        (e: { trackableId: string; periodStart: string; value: number }) => [
+          e.trackableId,
+          e.periodStart,
+          e.value,
+        ],
+      ),
+    ).toEqual([
+      [walk.id, today(), 1],
+      [read.id, shift(today(), -1), 9],
+    ]);
+    expect(res.data[1]).toMatchObject({
+      note: 'Good',
+      author: expect.any(Object),
+    });
+
+    const stranger = await signedIn((await createUser()).id);
+    expect(
+      (
+        await stranger.get(
+          `/api/trackables/entries?menteeId=${mentee.id}&from=${today()}&to=${today()}`,
+        )
+      ).status,
+    ).toBe(403);
+    // At most a year, and from before to.
+    expect(
+      (
+        await asMentor.get(
+          `/api/trackables/entries?menteeId=${mentee.id}&from=${today()}&to=${shift(today(), -1)}`,
+        )
+      ).status,
+    ).toBe(400);
+  });
 });

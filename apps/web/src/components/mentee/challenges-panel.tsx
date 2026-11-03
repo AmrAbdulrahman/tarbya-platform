@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CircleCheck,
   MessageSquare,
+  Mountain,
   RotateCcw,
   TriangleAlert,
 } from 'lucide-react';
@@ -69,9 +70,13 @@ export function ChallengesPanel({
   return (
     <section
       aria-labelledby="challenges-title"
-      className="flex flex-col gap-3 rounded-card border border-border bg-card p-6"
+      className="flex flex-col gap-2 rounded-card border border-border bg-card p-4"
     >
-      <h2 id="challenges-title" className="text-lg font-bold text-navy">
+      <h2
+        id="challenges-title"
+        className="flex items-center gap-2 text-base font-bold text-navy"
+      >
+        <Mountain className="size-4 text-warn" aria-hidden />
         {t('challenges.title')}
       </h2>
       {canManage && (
@@ -80,7 +85,7 @@ export function ChallengesPanel({
             <Input
               aria-label={t('challenges.newChallenge')}
               placeholder={t('challenges.placeholder')}
-              className="h-10 flex-1 text-[15px]"
+              className="h-9 flex-1 text-[15px]"
               maxLength={300}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -88,7 +93,7 @@ export function ChallengesPanel({
             <Button
               type="submit"
               size="sm"
-              className="h-10"
+              className="h-9"
               disabled={add.isPending || !title.trim()}
             >
               {t('challenges.add')}
@@ -154,7 +159,7 @@ function ChallengeItem({
   });
 
   return (
-    <li className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0">
+    <li className="flex flex-col gap-1 py-2 first:pt-0 last:pb-0">
       <div className="flex items-start gap-2">
         {resolved ? (
           <CircleCheck

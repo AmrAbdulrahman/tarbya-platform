@@ -27,12 +27,14 @@ import type {
   AssignTemplateDto,
   CreateTrackableDto,
   LogEntryDto,
+  RangeEntryDto,
   ReplyBodyDto,
   SaveAsTemplateDto,
   TrackableDetailDto,
   TrackableSummaryDto,
   TrackableTemplateDto,
   TrackableTemplatesControllerListParams,
+  TrackablesControllerEntriesParams,
   TrackablesControllerListParams,
   UpdateTemplateDto,
   UpdateTrackableDto
@@ -270,7 +272,120 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTrackablesControllerCreateMutationOptions(options), queryClient);
     }
-    export type trackablesControllerGetResponse200 = {
+    export type trackablesControllerEntriesResponse200 = {
+  data: RangeEntryDto[]
+  status: 200
+}
+
+export type trackablesControllerEntriesResponseSuccess = (trackablesControllerEntriesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type trackablesControllerEntriesResponse = (trackablesControllerEntriesResponseSuccess)
+
+export const getTrackablesControllerEntriesUrl = (params: TrackablesControllerEntriesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/trackables/entries?${stringifiedParams}` : `/api/trackables/entries`
+}
+
+export const trackablesControllerEntries = async (params: TrackablesControllerEntriesParams, options?: Parameters<typeof apiFetch>[1]): Promise<trackablesControllerEntriesResponse> => {
+
+  return apiFetch<trackablesControllerEntriesResponse>(getTrackablesControllerEntriesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackablesControllerEntriesQueryKey = (params?: TrackablesControllerEntriesParams,) => {
+    return [
+    `/api/trackables/entries`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getTrackablesControllerEntriesQueryOptions = <TData = Awaited<ReturnType<typeof trackablesControllerEntries>>, TError = unknown>(params: TrackablesControllerEntriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackablesControllerEntries>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTrackablesControllerEntriesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof trackablesControllerEntries>>> = ({ signal }) => trackablesControllerEntries(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof trackablesControllerEntries>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TrackablesControllerEntriesQueryResult = NonNullable<Awaited<ReturnType<typeof trackablesControllerEntries>>>
+export type TrackablesControllerEntriesQueryError = unknown
+
+
+export function useTrackablesControllerEntries<TData = Awaited<ReturnType<typeof trackablesControllerEntries>>, TError = unknown>(
+ params: TrackablesControllerEntriesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackablesControllerEntries>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof trackablesControllerEntries>>,
+          TError,
+          Awaited<ReturnType<typeof trackablesControllerEntries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTrackablesControllerEntries<TData = Awaited<ReturnType<typeof trackablesControllerEntries>>, TError = unknown>(
+ params: TrackablesControllerEntriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackablesControllerEntries>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof trackablesControllerEntries>>,
+          TError,
+          Awaited<ReturnType<typeof trackablesControllerEntries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTrackablesControllerEntries<TData = Awaited<ReturnType<typeof trackablesControllerEntries>>, TError = unknown>(
+ params: TrackablesControllerEntriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackablesControllerEntries>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useTrackablesControllerEntries<TData = Awaited<ReturnType<typeof trackablesControllerEntries>>, TError = unknown>(
+ params: TrackablesControllerEntriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackablesControllerEntries>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTrackablesControllerEntriesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type trackablesControllerGetResponse200 = {
   data: TrackableDetailDto
   status: 200
 }

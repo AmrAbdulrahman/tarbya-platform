@@ -11,6 +11,7 @@ import {
 import { Badge, Button, cn } from '@tarbya/ui';
 import { ActivityTypeEditor } from '../../../components/admin/activity-type-editor';
 import { lookupColors } from '../../../components/admin/lookup-colors';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
 
 /** US-3.5 · design/screens/ActivityTypes.dc.html */
 export const Route = createFileRoute('/_app/admin/lookups')({
@@ -52,9 +53,12 @@ function LookupsPage() {
 
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: t('nav.admin') }, { label: t('nav.lookups') }]}
+      />
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-1 flex-col gap-1">
-          <h1 className="text-3xl font-bold text-navy">
+          <h1 className="text-2xl font-bold text-navy">
             {t('admin.lookups.title')}
           </h1>
           <p className="text-[15px] text-ink-subtle">
@@ -94,7 +98,7 @@ function LookupsPage() {
         ))}
       </div>
 
-      <div className="flex flex-wrap items-start gap-6">
+      <div className="flex flex-wrap items-start gap-4">
         <section className="min-w-0 flex-[2_1_560px] overflow-x-auto rounded-card border border-border bg-card">
           <table className="w-full min-w-[560px] text-[15px]">
             <thead className="bg-surface text-[13px] text-ink-subtle">

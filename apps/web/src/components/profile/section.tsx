@@ -17,11 +17,11 @@ export function Section({
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="flex scroll-mt-24 flex-col gap-4 rounded-card border border-border bg-card p-6"
+      className="flex scroll-mt-24 flex-col gap-4 rounded-card border border-border bg-card p-4"
     >
       <div className="flex flex-wrap items-start gap-3">
         <div className="flex flex-1 flex-col gap-1">
-          <h2 id={`${id}-title`} className="text-lg font-bold text-navy">
+          <h2 id={`${id}-title`} className="text-base font-bold text-navy">
             {title}
           </h2>
           {hint && <p className="text-[13px] text-ink-subtle">{hint}</p>}

@@ -16,9 +16,10 @@ import { ChallengesPanel } from '../mentee/challenges-panel';
 import { TasksPanel } from '../mentee/tasks-panel';
 import { TrackableCard } from '../trackables/trackable-card';
 import { TrackableDialog } from '../trackables/trackable-dialog';
-import { trackablesQueryKey } from '../trackables/trackables-section';
+import { trackablesQueryKey } from '../trackables/trackables-board';
 import { EntryKind } from './entry-kind';
 import { mineQueryKey } from './form-parts';
+import { Breadcrumbs } from '../breadcrumbs';
 
 type Kind = 'follow-up' | 'activity';
 
@@ -61,15 +62,26 @@ export function LogScreen({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold text-navy">
+    <div className="flex flex-col gap-4">
+      <Breadcrumbs
+        items={[
+          { label: t('nav.menteeDashboard'), to: '/mentor' },
+          {
+            label:
+              kind === 'follow-up'
+                ? t('mentoring.log.followUpTitle')
+                : t('mentoring.log.activityTitle'),
+          },
+        ]}
+      />
+      <h1 className="text-2xl font-bold text-navy">
         {kind === 'follow-up'
           ? t('mentoring.log.followUpTitle')
           : t('mentoring.log.activityTitle')}
       </h1>
       <EntryKind current={kind} menteeId={menteeId} />
 
-      <section className="flex flex-col gap-2 rounded-card border border-border bg-card p-6">
+      <section className="flex flex-col gap-2 rounded-card border border-border bg-card p-4">
         <label
           htmlFor="log-mentee"
           className="text-sm font-semibold text-ink-muted"
@@ -109,7 +121,7 @@ export function LogScreen({
               <span className="grid size-8 place-items-center rounded-full bg-primary text-white">
                 <Plus className="size-4" aria-hidden />
               </span>
-              <span className="flex-1 text-lg font-bold text-navy">
+              <span className="flex-1 text-base font-bold text-navy">
                 {kind === 'follow-up'
                   ? t('mentoring.log.newFollowUpWith', {
                       name: selected.mentee.name,
@@ -145,17 +157,17 @@ export function LogScreen({
 
           <Summary mentee={selected} />
 
-          <div className="flex flex-wrap items-start gap-6">
+          <div className="flex flex-wrap items-start gap-4">
             <section
               aria-labelledby="log-history"
-              className="flex min-w-0 flex-[3_1_420px] flex-col gap-4 rounded-card border border-border bg-card p-6"
+              className="flex min-w-0 flex-[3_1_420px] flex-col gap-4 rounded-card border border-border bg-card p-4"
             >
-              <h2 id="log-history" className="text-lg font-bold text-navy">
+              <h2 id="log-history" className="text-base font-bold text-navy">
                 {t('feed.title')}
               </h2>
               <FeedList userId={selected.mentee.id} />
             </section>
-            <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-6">
+            <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-4">
               <Progress menteeId={selected.mentee.id} />
               <ChallengesPanel menteeId={selected.mentee.id} canManage />
               <TasksPanel menteeId={selected.mentee.id} canManage />
@@ -210,7 +222,7 @@ function Progress({ menteeId }: { menteeId: string }) {
   return (
     <section aria-labelledby="log-progress" className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <h2 id="log-progress" className="flex-1 text-lg font-bold text-navy">
+        <h2 id="log-progress" className="flex-1 text-base font-bold text-navy">
           {t('mentoring.log.progress')}
         </h2>
         <Button size="sm" variant="outline" onClick={() => setAdding(true)}>

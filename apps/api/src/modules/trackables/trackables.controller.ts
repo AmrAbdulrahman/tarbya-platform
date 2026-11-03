@@ -14,6 +14,8 @@ import { ApiConflictResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentAuth, type AuthContext } from '../../common/auth-context';
 import {
   CreateTrackableDto,
+  EntriesQuery,
+  RangeEntryDto,
   LogEntryDto,
   ReplyBodyDto,
   TrackableDetailDto,
@@ -40,6 +42,16 @@ export class TrackablesController {
     @Query() query: TrackablesQuery,
   ): Promise<TrackableSummaryDto[]> {
     return this.trackables.list(auth.userId, query.menteeId);
+  }
+
+  /** In-place history (US-4.2): entries of every trackable between two days. */
+  @Get('entries')
+  @ApiOkResponse({ type: RangeEntryDto, isArray: true })
+  entries(
+    @CurrentAuth() auth: AuthContext,
+    @Query() query: EntriesQuery,
+  ): Promise<RangeEntryDto[]> {
+    return this.trackables.entries(auth.userId, query);
   }
 
   @Get(':id')

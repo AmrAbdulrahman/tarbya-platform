@@ -1,4 +1,5 @@
 import {
+  BookMarked,
   ClipboardList,
   Settings,
   Calendar,
@@ -47,6 +48,7 @@ export const navSections: NavSection[] = [
     items: [
       { label: 'nav.menteeDashboard', to: '/mentor', icon: LayoutDashboard },
       { label: 'nav.followUps', to: '/mentor/log', icon: Calendar },
+      { label: 'nav.library', to: '/trackables/library', icon: BookMarked },
     ],
   },
   {

@@ -15,6 +15,7 @@ import { SIGN_IN_ROLES } from '@tarbya/shared';
 import { Button, Checkbox, Input } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { Field, FormError } from '../../../components/login/fields';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
 
 /** US-3.6 */
 export const Route = createFileRoute('/_app/admin/settings')({
@@ -119,8 +120,11 @@ function SettingsPage() {
 
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: t('nav.admin') }, { label: t('nav.settings') }]}
+      />
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy">
           {t('admin.settings.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">
@@ -234,10 +238,10 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <fieldset className="flex flex-col gap-4 rounded-card border border-border bg-card p-6">
+    <fieldset className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
       <legend className="sr-only">{title}</legend>
       <div className="flex flex-col gap-1">
-        <h2 aria-hidden className="text-lg font-bold text-navy">
+        <h2 aria-hidden className="text-base font-bold text-navy">
           {title}
         </h2>
         {hint && <p className="text-sm text-ink-subtle">{hint}</p>}

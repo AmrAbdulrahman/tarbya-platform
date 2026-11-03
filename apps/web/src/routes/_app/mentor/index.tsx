@@ -56,7 +56,7 @@ function MentorDashboard() {
             calendar: me.calendar,
           })}
         </span>
-        <h1 className="text-3xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy">
           {t('dashboard.greeting', { name: me.name.split(' ')[0] })}
         </h1>
       </div>
@@ -136,10 +136,10 @@ function MentorDashboard() {
         />
       </section>
 
-      <div className="flex flex-wrap items-start gap-6">
+      <div className="flex flex-wrap items-start gap-4">
         <section className="flex min-w-0 flex-[2_1_620px] flex-col overflow-hidden rounded-card border border-border bg-card">
           <div className="flex flex-wrap items-center gap-3 border-b border-border px-6 py-4">
-            <h2 className="flex-1 text-lg font-bold text-navy">
+            <h2 className="flex-1 text-base font-bold text-navy">
               {t('dashboard.mentees')}
             </h2>
             <div
@@ -207,7 +207,7 @@ function MentorDashboard() {
           )}
         </section>
 
-        <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-6">
+        <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-4">
           <Panel title={t('dashboard.upcoming')}>
             <UpcomingList items={upcoming} />
           </Panel>
@@ -400,9 +400,9 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
       <div className="flex items-center gap-2">
-        <h2 className="flex-1 text-lg font-bold text-navy">{title}</h2>
+        <h2 className="flex-1 text-base font-bold text-navy">{title}</h2>
         {aside}
       </div>
       {children}

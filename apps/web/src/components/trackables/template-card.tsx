@@ -6,6 +6,7 @@ import {
   trackableTemplatesControllerRemove,
   trackableTemplatesControllerUpdate,
   type TrackableDetailDto,
+  type TrackableTemplateDto,
 } from '@tarbya/api-client';
 import { Button, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
@@ -28,110 +29,24 @@ export function TemplateCard({
 }) {
   const { t } = useTranslation();
   const toast = useToast();
-  const refresh = useRefreshTrackables();
-  const [editing, setEditing] = useState(false);
-  const [confirmRemove, setConfirmRemove] = useState(false);
   const template = tr.template;
-  const share = useMutation({
-    mutationFn: (isPublic: boolean) =>
-      trackableTemplatesControllerUpdate(template?.id ?? '', { isPublic }),
-    onSuccess: refresh,
-  });
-  const remove = useMutation({
-    mutationFn: () => trackableTemplatesControllerRemove(template?.id ?? ''),
-    onSuccess: async () => {
-      await refresh();
-      setConfirmRemove(false);
-      toast(t('trackables.library.removedToast'));
-    },
-  });
-
   return (
     <section
       aria-labelledby="library-title"
-      className="flex flex-col gap-3 rounded-card border border-border bg-card p-6"
+      className="flex flex-col gap-2 rounded-card border border-border bg-card p-4"
     >
       <h2
         id="library-title"
-        className="flex items-center gap-2 text-lg font-bold text-navy"
+        className="flex items-center gap-2 text-base font-bold text-navy"
       >
-        <BookMarked className="size-5 text-primary" aria-hidden />
+        <BookMarked className="size-4 text-primary" aria-hidden />
         {t('trackables.library.cardTitle')}
       </h2>
       {template ? (
         <>
           <p className="text-[15px]">{t('trackables.library.follows')}</p>
           <TemplateByline template={template} />
-          {template.canEdit && (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setEditing(true)}
-              >
-                {t('trackables.library.edit')}
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                disabled={share.isPending}
-                onClick={() => share.mutate(!template.isPublic)}
-              >
-                {template.isPublic
-                  ? t('trackables.library.makePrivate')
-                  : t('trackables.library.makePublic')}
-              </Button>
-              {confirmRemove ? (
-                <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-trend-down text-trend-down"
-                    disabled={remove.isPending}
-                    onClick={() => remove.mutate()}
-                  >
-                    {t('trackables.library.confirmRemove')}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setConfirmRemove(false)}
-                  >
-                    {t('admin.common.cancel')}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setConfirmRemove(true)}
-                >
-                  {t('trackables.library.remove')}
-                </Button>
-              )}
-            </div>
-          )}
-          {confirmRemove && (
-            <p className="text-[13px] text-ink-subtle">
-              {t('trackables.library.removeHint')}
-            </p>
-          )}
-          <FormError
-            message={
-              share.isError
-                ? errorMessage(t, share.error)
-                : remove.isError
-                  ? errorMessage(t, remove.error)
-                  : undefined
-            }
-          />
-          {template.canEdit && (
-            <TemplateDialog
-              template={template}
-              open={editing}
-              onOpenChange={setEditing}
-            />
-          )}
+          {template.canEdit && <TemplateActions template={template} />}
         </>
       ) : (
         <>
@@ -145,5 +60,97 @@ export function TemplateCard({
         </>
       )}
     </section>
+  );
+}
+
+/** Edit, share or stop sharing, and remove — for the author or an admin. */
+export function TemplateActions({
+  template,
+}: {
+  template: TrackableTemplateDto;
+}) {
+  const { t } = useTranslation();
+  const toast = useToast();
+  const refresh = useRefreshTrackables();
+  const [editing, setEditing] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const share = useMutation({
+    mutationFn: (isPublic: boolean) =>
+      trackableTemplatesControllerUpdate(template.id, { isPublic }),
+    onSuccess: refresh,
+  });
+  const remove = useMutation({
+    mutationFn: () => trackableTemplatesControllerRemove(template.id),
+    onSuccess: async () => {
+      await refresh();
+      setConfirmRemove(false);
+      toast(t('trackables.library.removedToast'));
+    },
+  });
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap gap-1">
+        <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+          {t('trackables.library.edit')}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={share.isPending}
+          onClick={() => share.mutate(!template.isPublic)}
+        >
+          {template.isPublic
+            ? t('trackables.library.makePrivate')
+            : t('trackables.library.makePublic')}
+        </Button>
+        {confirmRemove ? (
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-trend-down text-trend-down"
+              disabled={remove.isPending}
+              onClick={() => remove.mutate()}
+            >
+              {t('trackables.library.confirmRemove')}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setConfirmRemove(false)}
+            >
+              {t('admin.common.cancel')}
+            </Button>
+          </>
+        ) : (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setConfirmRemove(true)}
+          >
+            {t('trackables.library.remove')}
+          </Button>
+        )}
+      </div>
+      {confirmRemove && (
+        <p className="max-w-md text-[13px] text-ink-subtle">
+          {t('trackables.library.removeHint')}
+        </p>
+      )}
+      <FormError
+        message={
+          share.isError
+            ? errorMessage(t, share.error)
+            : remove.isError
+              ? errorMessage(t, remove.error)
+              : undefined
+        }
+      />
+      <TemplateDialog
+        template={template}
+        open={editing}
+        onOpenChange={setEditing}
+      />
+    </div>
   );
 }

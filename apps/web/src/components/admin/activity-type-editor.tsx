@@ -79,9 +79,9 @@ export function ActivityTypeEditor({ type, onDone }: Props) {
       noValidate
       aria-label={t('admin.lookups.editor')}
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
-      className="flex flex-col gap-4 rounded-card border border-border bg-card p-6"
+      className="flex flex-col gap-4 rounded-card border border-border bg-card p-4"
     >
-      <h2 className="text-lg font-bold text-navy">
+      <h2 className="text-base font-bold text-navy">
         {name
           ? t('admin.lookups.editTitle', { name })
           : t('admin.lookups.newTitle')}

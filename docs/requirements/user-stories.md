@@ -164,7 +164,10 @@ As a mentor, I want to see all my mentees at a glance, so that I know who needs 
 
 As a mentor, I want a mentee's full picture: trackables with trend charts, timeline, challenges, tasks and notes.
 
-- Refs: BR-PLAN-4, BR-NOTE-1 · `Mentee.dc.html`
+- The page leads with trackables, action items and challenges; contact details sit in one line under the name; the history log is collapsed until opened.
+- Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. Clicking a cycle logs or re-logs it in place; notes and replies show under it.
+- Breadcrumbs above every page lead back to where I came from.
+- Refs: BR-TRK-4, BR-TRK-5, BR-NOTE-1, BR-FU-4 · `Mentee.dc.html`
 
 ### US-4.3 Log a follow-up — v1
 
@@ -197,9 +200,10 @@ As a mentor, I want to create, edit, archive and restore a mentee's trackables.
 As a mentor, I want to reuse a trackable I made for one mentee with others, and use the ones other mentors share.
 
 - "New trackable" opens the form when the library has nothing for me; otherwise it shows the library (mine and shared) with search and a mine/shared filter, and "create new".
-- Picking a template asks only for the target and start day; templates the mentee already follows are marked and can't be picked again.
+- Picking a template opens its fields, ready to adjust before anything is created. Kept as they are (target and start aside), the trackable follows the template; changing the rest makes it the mentee's own. Templates the mentee already follows are marked and can't be picked again.
 - After creating a trackable, and later on its page, I can save it as a template and choose to share it with all mentors.
 - Each template shows its author, whether it's shared, and how many mentees follow it.
+- A library page lists my templates and shared ones, with the same search and filter.
 - The author (or an admin) edits the template, with a warning that changes reach every mentee who follows it, toggles sharing, or removes it from the library.
 - Refs: BR-TRK-7…9
 

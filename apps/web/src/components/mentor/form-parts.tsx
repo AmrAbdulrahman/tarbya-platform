@@ -11,8 +11,8 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-6">
-      {title && <h2 className="text-lg font-bold text-navy">{title}</h2>}
+    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
+      {title && <h2 className="text-base font-bold text-navy">{title}</h2>}
       {children}
     </section>
   );

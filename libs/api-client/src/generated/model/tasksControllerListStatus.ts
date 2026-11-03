@@ -10,5 +10,6 @@ export type TasksControllerListStatus = typeof TasksControllerListStatus[keyof t
 
 export const TasksControllerListStatus = {
   open: 'open',
+  recent: 'recent',
   all: 'all',
 } as const;

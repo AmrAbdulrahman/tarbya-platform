@@ -279,10 +279,11 @@ export class TasksQuery {
   @IsUUID()
   assigneeId!: string;
 
-  @ApiPropertyOptional({ enum: ['open', 'all'], default: 'open' })
+  /** `recent`: open ones plus those done in the last 7 days. */
+  @ApiPropertyOptional({ enum: ['open', 'recent', 'all'], default: 'open' })
   @IsOptional()
-  @IsIn(['open', 'all'])
-  status?: 'open' | 'all';
+  @IsIn(['open', 'recent', 'all'])
+  status?: 'open' | 'recent' | 'all';
 }
 
 export class UpdateTaskDto {

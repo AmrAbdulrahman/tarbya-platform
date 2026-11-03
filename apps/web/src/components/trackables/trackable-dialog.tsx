@@ -1,10 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { CircleCheck } from 'lucide-react';
+import { BookMarked, CircleCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   trackablesControllerCreate,
   trackablesControllerUpdate,
+  trackableTemplatesControllerAssign,
   trackableTemplatesControllerList,
   trackableTemplatesControllerUpdate,
   type TrackableDetailDto,
@@ -13,13 +14,17 @@ import {
 import { Button, Dialog, DialogContent, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import {
-  AssignForm,
   LibraryPicker,
   SaveAsTemplate,
+  TemplateByline,
   templatesQueryKey,
   useRefreshTrackables,
 } from './library';
-import { sharedFields, TrackableForm } from './trackable-form';
+import {
+  sharedFields,
+  TrackableForm,
+  type TrackableValues,
+} from './trackable-form';
 
 interface Props {
   menteeId: string;
@@ -148,7 +153,8 @@ function AddTrackable({
       );
     case 'assign':
       return (
-        <AssignForm
+        <FromTemplate
+          key={step.template.id}
           template={step.template}
           menteeId={menteeId}
           onBack={() => setStep({ kind: 'library' })}
@@ -199,6 +205,81 @@ function AddTrackable({
         </div>
       );
   }
+}
+
+/**
+ * The template's fields, ready to adjust before anything is created. Kept as
+ * they are (target and start aside), the trackable follows the template;
+ * changing the rest makes it the mentee's own, outside the library.
+ */
+function FromTemplate({
+  template,
+  menteeId,
+  onBack,
+  onDone,
+}: {
+  template: TrackableTemplateDto;
+  menteeId: string;
+  onBack: () => void;
+  onDone: (trackable: TrackableDetailDto) => void;
+}) {
+  const { t } = useTranslation();
+  const refresh = useRefreshTrackables();
+  const save = useMutation({
+    mutationFn: async (v: TrackableValues) => {
+      const shared = sharedFields(v);
+      const follows =
+        shared.name === template.name &&
+        shared.goal === (template.goal ?? null) &&
+        v.type === template.type &&
+        v.cycle === template.cycle &&
+        shared.higherIsBetter === template.higherIsBetter;
+      const res = follows
+        ? await trackableTemplatesControllerAssign(template.id, {
+            menteeId,
+            target: shared.target,
+            startsOn: v.startsOn,
+          })
+        : await trackablesControllerCreate({
+            ...shared,
+            menteeId,
+            type: v.type,
+            cycle: v.cycle,
+            startsOn: v.startsOn,
+          });
+      return res.data as TrackableDetailDto;
+    },
+    onSuccess: async (tr) => {
+      await refresh();
+      onDone(tr);
+    },
+  });
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface/60 px-3 py-2">
+        <span className="flex items-center gap-2 text-[13px] font-semibold text-navy">
+          <BookMarked className="size-4 text-primary" aria-hidden />
+          {t('trackables.library.fromTemplate', { name: template.name })}
+        </span>
+        <TemplateByline template={template} />
+      </div>
+      <TrackableForm
+        initial={template}
+        showStart
+        notice={
+          <p className="text-[13px] text-ink-subtle">
+            {t('trackables.library.adjustHint')}
+          </p>
+        }
+        submitLabel={t('trackables.library.assign')}
+        pending={save.isPending}
+        error={save.isError ? errorMessage(t, save.error) : undefined}
+        onSubmit={(v) => save.mutate(v)}
+        onCancel={onBack}
+        cancelLabel={t('trackables.library.back')}
+      />
+    </div>
+  );
 }
 
 /** A trackable that follows a template only changes its target and start here. */

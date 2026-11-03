@@ -7,6 +7,21 @@ import { RolesService } from '../users/roles.service';
 import type { CreateTaskDto, TaskDto, TasksQuery } from './interactions.dto';
 import { newTask, taskSelect, toTaskDto } from './interactions.service';
 
+/** How long a done task stays listed, struck through, under `recent` (BR-FU-4). */
+export const DONE_TASKS_SHOWN_DAYS = 7;
+
+/** Open tasks, and those done within the last 7 days. */
+export const recentTasks = () => ({
+  OR: [
+    { doneAt: null },
+    {
+      doneAt: {
+        gte: new Date(Date.now() - DONE_TASKS_SHOWN_DAYS * 86_400_000),
+      },
+    },
+  ],
+});
+
 /** One-time tasks (BR-FU-4). */
 @Injectable()
 export class TasksService {
@@ -31,10 +46,12 @@ export class TasksService {
 
   async list(viewerId: string, query: TasksQuery): Promise<TaskDto[]> {
     await this.access.assertCanView(viewerId, query.assigneeId);
+    const status = query.status ?? 'open';
     const rows = await this.prisma.task.findMany({
       where: {
         assigneeId: query.assigneeId,
-        ...((query.status ?? 'open') === 'open' && { doneAt: null }),
+        ...(status === 'open' && { doneAt: null }),
+        ...(status === 'recent' && recentTasks()),
       },
       select: taskSelect,
       orderBy: [

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { LifeBuoy } from 'lucide-react';
+import { createFileRoute } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,20 +18,14 @@ import {
   formatDate,
   toZoned,
 } from '@tarbya/shared';
-import {
-  Badge,
-  Button,
-  Checkbox,
-  cn,
-  Input,
-  Textarea,
-  useToast,
-} from '@tarbya/ui';
+import { Badge, Button, cn, Input, Textarea, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { actedBy } from '../../../components/acted-by';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
 import { FormError } from '../../../components/login/fields';
 import {
+  DoneToggle,
   formatNumber,
   useCycleLabel,
   useFormatValue,
@@ -94,16 +87,21 @@ function TrackablePage() {
 
   return (
     <>
+      <Breadcrumbs
+        items={[
+          isMentee
+            ? { label: t('trackables.mine'), to: '/my/trackables' }
+            : {
+                label: tr.mentee.name,
+                to: '/people/$id',
+                params: { id: tr.mentee.id },
+              },
+          { label: tr.name },
+        ]}
+      />
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex flex-1 flex-col gap-1">
-          <Link
-            to="/people/$id"
-            params={{ id: tr.mentee.id }}
-            className="text-sm text-primary hover:text-primary-hover"
-          >
-            {tr.mentee.name}
-          </Link>
-          <h1 className="text-3xl font-bold text-navy">{tr.name}</h1>
+          <h1 className="text-2xl font-bold text-navy">{tr.name}</h1>
           {tr.goal && <p className="text-[15px] text-ink-muted">{tr.goal}</p>}
           <p className="text-[13px] text-ink-subtle">
             {t(`trackables.cycles.${tr.cycle}`)} ·{' '}
@@ -152,7 +150,7 @@ function TrackablePage() {
         </div>
       </div>
 
-      <section className="flex flex-col gap-3 rounded-card border border-border bg-card p-6">
+      <section className="flex flex-col gap-3 rounded-card border border-border bg-card p-4">
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
           <span className="flex items-baseline gap-2">
             <span className="text-sm text-ink-subtle">
@@ -194,10 +192,10 @@ function TrackablePage() {
       {tr.canLog && open.length > 0 && (
         <section
           aria-labelledby="to-log-title"
-          className="flex flex-col gap-3 rounded-card border-2 border-primary/30 bg-card p-6"
+          className="flex flex-col gap-3 rounded-card border-2 border-primary/30 bg-card p-4"
         >
           <div className="flex flex-col gap-1">
-            <h2 id="to-log-title" className="text-lg font-bold text-navy">
+            <h2 id="to-log-title" className="text-base font-bold text-navy">
               {t('trackables.toLog')}
             </h2>
             <span className="text-[13px] text-ink-subtle">
@@ -210,7 +208,6 @@ function TrackablePage() {
                 <CycleForm
                   trackable={tr}
                   periodStart={start}
-                  isMentee={isMentee}
                   onSaved={setTrackable}
                 />
               </li>
@@ -221,9 +218,9 @@ function TrackablePage() {
 
       <section
         aria-labelledby="history-title"
-        className="flex flex-col gap-3 rounded-card border border-border bg-card p-6"
+        className="flex flex-col gap-3 rounded-card border border-border bg-card p-4"
       >
-        <h2 id="history-title" className="text-lg font-bold text-navy">
+        <h2 id="history-title" className="text-base font-bold text-navy">
           {t('trackables.history')}
         </h2>
         {tr.entries.length === 0 && (
@@ -259,14 +256,12 @@ function CycleForm({
   trackable: tr,
   periodStart,
   entry,
-  isMentee,
   onSaved,
   onCancel,
 }: {
   trackable: TrackableDetailDto;
   periodStart: string;
   entry?: TrackableEntryDto;
-  isMentee: boolean;
   onSaved: (tr: TrackableDetailDto) => void;
   onCancel?: () => void;
 }) {
@@ -275,14 +270,12 @@ function CycleForm({
   const cycleLabel = useCycleLabel();
   const [value, setValue] = useState(entry ? String(entry.value) : '');
   const [note, setNote] = useState(entry?.note ?? '');
-  const [needsHelp, setNeedsHelp] = useState(entry?.needsHelp ?? false);
   const log = useMutation({
     mutationFn: async (v: number) =>
       (
         await trackablesControllerLog(tr.id, periodStart, {
           value: v,
           note: note || null,
-          needsHelp,
         })
       ).data as TrackableDetailDto,
     onSuccess: (next) => {
@@ -310,24 +303,11 @@ function CycleForm({
           )}
         </span>
         {tr.type === 'BOOLEAN' ? (
-          <div
-            role="group"
-            aria-label={`${label} · ${t('trackables.value')}`}
-            className="flex gap-2"
-          >
-            {[1, 0].map((v) => (
-              <Button
-                key={v}
-                type="button"
-                size="sm"
-                variant={value === String(v) ? 'primary' : 'outline'}
-                aria-pressed={value === String(v)}
-                onClick={() => setValue(String(v))}
-              >
-                {v ? t('trackables.done') : t('trackables.notDone')}
-              </Button>
-            ))}
-          </div>
+          <DoneToggle
+            label={`${label} · ${t('trackables.value')}`}
+            value={value === '1' || value === '0' ? value : ''}
+            onChange={setValue}
+          />
         ) : (
           <Input
             type="number"
@@ -361,14 +341,6 @@ function CycleForm({
           </Button>
         )}
       </div>
-      {isMentee && (
-        <Checkbox
-          id={`help-${periodStart}`}
-          label={t('trackables.askHelp')}
-          checked={needsHelp}
-          onChange={(e) => setNeedsHelp(e.target.checked)}
-        />
-      )}
       <FormError
         message={log.isError ? errorMessage(t, log.error) : undefined}
       />
@@ -423,7 +395,6 @@ function Entry({
           trackable={tr}
           periodStart={entry.periodStart}
           entry={entry}
-          isMentee={isMentee}
           onSaved={(next) => {
             setEditing(false);
             onSaved(next);
@@ -456,12 +427,6 @@ function Entry({
           · {actedBy(t, entry.author, entry.impersonator)} ·{' '}
           {date(entry.recordedAt)}
         </span>
-        {entry.needsHelp && (
-          <Badge tone="warn">
-            <LifeBuoy className="me-1 size-3.5" aria-hidden />
-            {t('trackables.needsHelp')}
-          </Badge>
-        )}
         {canEdit && (
           <Button
             size="sm"

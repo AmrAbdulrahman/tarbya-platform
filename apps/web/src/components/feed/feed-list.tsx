@@ -21,7 +21,7 @@ import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
-import { useCycleLabel, useFormatValue } from '../trackables/format';
+import { useCycleLabel, useValueText } from '../trackables/format';
 
 const kinds: Record<FeedKind, { icon: LucideIcon; className: string }> = {
   FOLLOW_UP: {
@@ -90,7 +90,7 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
   const me = useMe();
   const locale = i18n.language as Language;
   const { icon: Icon, className } = kinds[item.kind];
-  const formatValue = useFormatValue();
+  const formatValue = useValueText();
   const cycleLabel = useCycleLabel();
 
   let title: string;

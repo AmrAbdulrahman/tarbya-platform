@@ -21,6 +21,7 @@ import {
 } from '../../../components/admin/use-assign-mentee';
 import { UserPicker } from '../../../components/admin/user-picker';
 import { Field, FormError } from '../../../components/login/fields';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
 
 /** US-3.3 · design/screens/Admin.dc.html (assign panel and mentoring tree) */
 export const Route = createFileRoute('/_app/admin/mentorships')({
@@ -31,15 +32,18 @@ function MentorshipsPage() {
   const { t } = useTranslation();
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: t('nav.admin') }, { label: t('nav.mentorships') }]}
+      />
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy">
           {t('mentoring.mentorships.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">
           {t('mentoring.mentorships.lead')}
         </p>
       </div>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <AssignCard />
         <TreeSection />
       </div>
@@ -68,9 +72,9 @@ function TreeSection() {
   const current = view === 'mentoring' ? active : management;
 
   return (
-    <section className="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-card p-6">
+    <section className="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-card p-4">
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="flex-1 text-lg font-bold text-navy">
+        <h2 className="flex-1 text-base font-bold text-navy">
           {t('mentoring.mentorships.treeTitle')}
         </h2>
         <div
@@ -197,8 +201,8 @@ function AssignCard() {
   const assign = useAssignMentee(() => setMentee(null));
 
   return (
-    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-6">
-      <h2 className="text-lg font-bold text-navy">
+    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
+      <h2 className="text-base font-bold text-navy">
         {t('mentoring.mentorships.assignTitle')}
       </h2>
       <div className="grid gap-4 sm:grid-cols-2">

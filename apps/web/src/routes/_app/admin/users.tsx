@@ -12,6 +12,7 @@ import { Badge, Button, Input } from '@tarbya/ui';
 import { UserDialog } from '../../../components/admin/user-dialog';
 import { RoleChips } from '../../../components/role-chips';
 import { useDebounced } from '../../../lib/use-debounced';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
 
 /** US-3.1 · design/screens/Admin.dc.html (users table) */
 export const Route = createFileRoute('/_app/admin/users')({
@@ -40,8 +41,11 @@ function UsersPage() {
 
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: t('nav.admin') }, { label: t('nav.users') }]}
+      />
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy">
           {t('admin.users.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">{t('admin.users.lead')}</p>

@@ -3,6 +3,7 @@ import {
   createMentorship,
   createUser,
   signedIn,
+  type TestUser,
 } from '../support/fixtures';
 
 afterAll(closeDb);
@@ -14,7 +15,7 @@ const today = () =>
 
 async function mentorWith(menteeCount: number) {
   const mentor = await createUser();
-  const mentees = [];
+  const mentees: TestUser[] = [];
   for (let i = 0; i < menteeCount; i++) {
     const mentee = await createUser();
     await createMentorship(mentor.id, mentee.id);

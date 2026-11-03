@@ -134,6 +134,18 @@ export class TrackableDetailDto extends TrackableSummaryDto {
   @ApiProperty() canLog!: boolean;
 }
 
+/** An entry with the trackable it belongs to, for history across trackables. */
+export class RangeEntryDto extends TrackableEntryDto {
+  @ApiProperty({ format: 'uuid' }) trackableId!: string;
+}
+
+/** A mentee's entries on every trackable, for cycles starting between two days. */
+export class EntriesQuery {
+  @ApiProperty({ format: 'uuid' }) @IsUUID() menteeId!: string;
+  @ApiProperty({ format: 'date' }) @Matches(DAY) from!: string;
+  @ApiProperty({ format: 'date' }) @Matches(DAY) to!: string;
+}
+
 export class TrackablesQuery {
   @ApiProperty({ format: 'uuid' }) @IsUUID() menteeId!: string;
 }

@@ -125,10 +125,21 @@ test('creates a trackable, logs this cycle, and resolves a challenge (US-4.5, US
   await expect(page.getByRole('status')).toContainText('سُجّل.');
   await expect(toLog).toBeHidden();
   await expect(
-    page.getByRole('region', { name: 'الدورات المسجّلة' }),
-  ).toContainText('تم');
+    page
+      .getByRole('region', { name: 'الدورات المسجّلة' })
+      .getByRole('img', { name: 'تم' }),
+  ).toBeVisible();
 
-  await page.goto(`/people/${id}`);
+  // The mentee's page shows this week's cycles, logged in place (US-4.2).
+  await page.getByRole('link', { name }).click();
+  const board = page.getByRole('region', { name: 'المؤشرات' });
+  const today = board.getByRole('button', { name: /: مسجّل$/ });
+  await expect(today.getByRole('img', { name: 'تم' })).toBeVisible();
+  await today.click();
+  await board.getByRole('button', { name: 'لم يتم' }).click();
+  await board.getByRole('button', { name: 'تسجيل' }).click();
+  await expect(today.getByRole('img', { name: 'لم يتم' })).toBeVisible();
+
   const challenges = page.getByRole('region', { name: 'التحديات' });
   await challenges
     .getByRole('textbox', { name: 'تحدٍّ جديد' })

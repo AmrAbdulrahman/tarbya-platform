@@ -4,9 +4,9 @@ import {
   trackablesControllerList,
   type TrackableSummaryDto,
 } from '@tarbya/api-client';
-import { Button, Input } from '@tarbya/ui';
-import { trackablesQueryKey } from '../trackables/trackables-section';
-import { useFormatValue } from '../trackables/format';
+import { Input } from '@tarbya/ui';
+import { trackablesQueryKey } from '../trackables/trackables-board';
+import { DoneToggle, useFormatValue } from '../trackables/format';
 import { Card } from './form-parts';
 
 /** BR-TRK-3: this cycle's value for each active trackable, logged with the follow-up (FollowUp.dc.html). */
@@ -71,23 +71,13 @@ export function TrackableUpdates({
                     </span>
                   </div>
                   {x.type === 'BOOLEAN' ? (
-                    <div role="group" aria-label={label} className="flex gap-2">
-                      {['1', '0'].map((v) => (
-                        <Button
-                          key={v}
-                          type="button"
-                          size="sm"
-                          variant={raw === v ? 'primary' : 'outline'}
-                          aria-pressed={raw === v}
-                          // A second click clears it: nothing to log.
-                          onClick={() => set(x.id, raw === v ? '' : v)}
-                        >
-                          {v === '1'
-                            ? t('trackables.done')
-                            : t('trackables.notDone')}
-                        </Button>
-                      ))}
-                    </div>
+                    // A second click clears it: nothing to log.
+                    <DoneToggle
+                      label={label}
+                      clearable
+                      value={raw === '1' || raw === '0' ? raw : ''}
+                      onChange={(v) => set(x.id, v)}
+                    />
                   ) : (
                     <label className="flex flex-col items-center gap-1 text-[12px] text-ink-subtle">
                       {t('trackables.next')}

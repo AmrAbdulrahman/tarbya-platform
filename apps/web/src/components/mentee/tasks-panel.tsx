@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ListChecks } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,8 +17,8 @@ import { useMe } from '../../auth/session';
 import { mineQueryKey } from '../mentor/form-parts';
 
 /**
- * A mentee's one-time tasks (BR-FU-4): open ones first, done ones struck
- * through below them. The mentee, their mentor and admins tick them; the
+ * A mentee's one-time tasks (BR-FU-4): open ones first, then those done in
+ * the last 7 days, struck through. The mentee, their mentor and admins tick them; the
  * mentor and admins add them, with an optional due date.
  */
 export function TasksPanel({
@@ -35,7 +36,8 @@ export function TasksPanel({
     queryFn: async ({ signal }) =>
       (
         await tasksControllerList(
-          { assigneeId: menteeId, status: 'all' },
+          // Open ones, and those done in the last 7 days (BR-FU-4).
+          { assigneeId: menteeId, status: 'recent' },
           { signal },
         )
       ).data as TaskDto[],
@@ -74,9 +76,13 @@ export function TasksPanel({
   return (
     <section
       aria-labelledby="tasks-title"
-      className="flex flex-col gap-3 rounded-card border border-border bg-card p-6"
+      className="flex flex-col gap-2 rounded-card border border-border bg-card p-4"
     >
-      <h2 id="tasks-title" className="text-lg font-bold text-navy">
+      <h2
+        id="tasks-title"
+        className="flex items-center gap-2 text-base font-bold text-navy"
+      >
+        <ListChecks className="size-4 text-primary" aria-hidden />
         {t('mentee.tasks')}
       </h2>
       {canManage && (
@@ -85,7 +91,7 @@ export function TasksPanel({
             <Input
               aria-label={t('mentee.newTask')}
               placeholder={t('mentee.newTask')}
-              className="h-10 min-w-40 flex-[2_1_160px] text-[15px]"
+              className="h-9 min-w-40 flex-[2_1_160px] text-[15px]"
               maxLength={200}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -94,14 +100,14 @@ export function TasksPanel({
               type="date"
               aria-label={t('mentee.taskDue')}
               title={t('mentee.taskDue')}
-              className="h-10 flex-[1_1_130px] text-[15px]"
+              className="h-9 flex-[1_1_130px] text-[15px]"
               value={dueOn}
               onChange={(e) => setDueOn(e.target.value)}
             />
             <Button
               type="submit"
               size="sm"
-              className="h-10"
+              className="h-9"
               disabled={add.isPending || !title.trim()}
             >
               {t('mentee.addTask')}
@@ -120,7 +126,7 @@ export function TasksPanel({
       {tasks.data?.length === 0 && (
         <p className="text-sm text-ink-subtle">{t('mentee.noTasks')}</p>
       )}
-      <ul className="flex flex-col gap-1">
+      <ul className="flex flex-col">
         {tasks.data?.map((task) => (
           <TaskRow
             key={task.id}
@@ -154,7 +160,7 @@ function TaskRow({
   const overdue =
     !task.doneAt && !!task.dueOn && task.dueOn < toZoned(new Date()).date;
   return (
-    <li className="flex items-start gap-3 rounded-lg px-1 py-2">
+    <li className="flex items-start gap-2.5 rounded-lg px-1 py-1.5">
       <input
         id={id}
         type="checkbox"

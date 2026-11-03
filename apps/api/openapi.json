@@ -1110,6 +1110,7 @@
               "type": "string",
               "enum": [
                 "open",
+                "recent",
                 "all"
               ]
             }
@@ -1228,6 +1229,58 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackables/entries": {
+      "get": {
+        "operationId": "TrackablesController_entries",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RangeEntryDto"
+                  }
                 }
               }
             }
@@ -3787,6 +3840,117 @@
           "points"
         ]
       },
+      "EntrySource": {
+        "type": "string",
+        "enum": [
+          "MENTEE",
+          "MENTOR"
+        ]
+      },
+      "TrackableReplyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "author",
+          "impersonator",
+          "createdAt"
+        ]
+      },
+      "RangeEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date"
+          },
+          "value": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "source": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EntrySource"
+              }
+            ]
+          },
+          "needsHelp": {
+            "type": "boolean"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrackableReplyDto"
+            }
+          },
+          "trackableId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "periodStart",
+          "value",
+          "note",
+          "source",
+          "needsHelp",
+          "recordedAt",
+          "author",
+          "impersonator",
+          "replies",
+          "trackableId"
+        ]
+      },
       "TrackableTemplateDto": {
         "type": "object",
         "properties": {
@@ -3865,48 +4029,6 @@
           "canEdit",
           "reshapable",
           "assigned"
-        ]
-      },
-      "EntrySource": {
-        "type": "string",
-        "enum": [
-          "MENTEE",
-          "MENTOR"
-        ]
-      },
-      "TrackableReplyDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "body": {
-            "type": "string"
-          },
-          "author": {
-            "$ref": "#/components/schemas/UserRefDto"
-          },
-          "impersonator": {
-            "nullable": true,
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserRefDto"
-              }
-            ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "body",
-          "author",
-          "impersonator",
-          "createdAt"
         ]
       },
       "TrackableEntryDto": {

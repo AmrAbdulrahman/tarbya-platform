@@ -45,6 +45,8 @@ function JourneyPage() {
   const { mentor, tasks, trackables, upcoming } = journey.data;
   // BR-TRK-4: anything with a cycle waiting to be logged.
   const due = trackables.filter((x) => x.openCycles.length > 0);
+  // Done tasks stay listed, struck through, for 7 days (BR-FU-4).
+  const open = tasks.filter((x) => !x.doneAt).length;
 
   return (
     <>
@@ -53,7 +55,7 @@ function JourneyPage() {
           <span className="text-sm text-ink-subtle">
             {t('journey.eyebrow')}
           </span>
-          <h1 className="text-3xl font-bold text-navy">{t('journey.title')}</h1>
+          <h1 className="text-2xl font-bold text-navy">{t('journey.title')}</h1>
         </div>
         <div className="flex items-center gap-3 rounded-card border border-border bg-card px-4 py-3">
           <span
@@ -75,14 +77,14 @@ function JourneyPage() {
 
       <section
         aria-labelledby="actions-title"
-        className="flex flex-col gap-3 rounded-card border border-border bg-card p-6"
+        className="flex flex-col gap-3 rounded-card border border-border bg-card p-4"
       >
         <div className="flex items-center gap-2">
-          <h2 id="actions-title" className="text-lg font-bold text-navy">
+          <h2 id="actions-title" className="text-base font-bold text-navy">
             {t('journey.actions')}
           </h2>
           <span className="grid h-6 min-w-6 place-items-center rounded-full bg-primary px-1.5 font-figures text-[13px] font-semibold text-white">
-            {due.length + tasks.length}
+            {due.length + open}
           </span>
         </div>
         {due.length + tasks.length === 0 && (
@@ -123,15 +125,15 @@ function JourneyPage() {
         )}
       </section>
 
-      <div className="flex flex-wrap items-start gap-6">
-        <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-6">
-          <h2 className="text-lg font-bold text-navy">
+      <div className="flex flex-wrap items-start gap-4">
+        <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
+          <h2 className="text-base font-bold text-navy">
             {t('dashboard.upcoming')}
           </h2>
           <UpcomingList items={upcoming} />
         </section>
-        <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-6">
-          <h2 className="text-lg font-bold text-navy">{t('feed.latest')}</h2>
+        <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
+          <h2 className="text-base font-bold text-navy">{t('feed.latest')}</h2>
           <FeedList userId={me.id} />
         </section>
       </div>
@@ -150,7 +152,7 @@ function TaskAction({
   const queryClient = useQueryClient();
   const me = useMe();
   const done = useMutation({
-    mutationFn: () => tasksControllerUpdate(task.id, { done: true }),
+    mutationFn: () => tasksControllerUpdate(task.id, { done: !task.doneAt }),
     onSuccess: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: journeyQueryKey }),
@@ -162,6 +164,7 @@ function TaskAction({
       icon={<ListChecks className="size-4" />}
       iconClass="bg-primary-tint text-primary-hover"
       title={t('journey.task', { title: task.title })}
+      struck={!!task.doneAt}
       meta={
         task.dueOn
           ? t('journey.due', {
@@ -176,11 +179,11 @@ function TaskAction({
     >
       <Button
         size="sm"
-        variant="outline"
+        variant={task.doneAt ? 'ghost' : 'outline'}
         disabled={done.isPending}
         onClick={() => done.mutate()}
       >
-        {t('journey.markDone')}
+        {task.doneAt ? t('journey.undo') : t('journey.markDone')}
       </Button>
     </ActionRow>
   );
@@ -190,6 +193,7 @@ function ActionRow({
   icon,
   iconClass,
   title,
+  struck = false,
   meta,
   error,
   children,
@@ -197,12 +201,13 @@ function ActionRow({
   icon: ReactNode;
   iconClass: string;
   title: string;
+  struck?: boolean;
   meta: string;
   error?: string;
   children: ReactNode;
 }) {
   return (
-    <li className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
+    <li className="flex flex-wrap items-center gap-3 py-2 first:pt-0 last:pb-0">
       <span
         aria-hidden
         className={`grid size-9 shrink-0 place-items-center rounded-full ${iconClass}`}
@@ -210,7 +215,15 @@ function ActionRow({
         {icon}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="font-semibold text-navy">{title}</span>
+        <span
+          className={
+            struck
+              ? 'font-semibold text-ink-subtle line-through decoration-2'
+              : 'font-semibold text-navy'
+          }
+        >
+          {title}
+        </span>
         <span className="text-[13px] text-ink-subtle">{meta}</span>
         {error && (
           <span role="alert" className="text-[13px] text-trend-down">

@@ -6,6 +6,9 @@ export const en: Messages = {
     tagline: 'Mentorship platform',
   },
   nav: {
+    breadcrumbs: 'Breadcrumbs',
+    home: 'Home',
+    library: 'Trackable library',
     admin: 'Administration',
     users: 'Users',
     mentorships: 'Mentorships',
@@ -560,6 +563,7 @@ export const en: Messages = {
     due: 'Due {{date}}',
     noDue: 'No due date',
     markDone: 'Done',
+    undo: 'Undo',
   },
   mentee: {
     notes: 'Notes',
@@ -576,7 +580,7 @@ export const en: Messages = {
     widenTitle: 'Share this note?',
     widenAsk: '{{name}} will be able to read it.',
     widen: 'Yes, share it',
-    tasks: 'One-time tasks',
+    tasks: 'Action items',
     noTasks: 'No tasks yet.',
     newTask: 'New task',
     taskDue: 'Due date (optional)',
@@ -674,7 +678,6 @@ export const en: Messages = {
     log: 'Log',
     value: 'Value',
     note: 'Note (optional)',
-    askHelp: 'I need help from my mentor',
     logged: 'Logged.',
     history: 'Logged cycles',
     fromMentor: 'Logged by the mentor',
@@ -753,6 +756,24 @@ export const en: Messages = {
       removeHint:
         'Trackables that follow it keep their name and settings and become independent. Logged cycles stay.',
       removedToast: 'Removed from the library.',
+      fromTemplate: 'From the library: {{name}}',
+      adjustHint:
+        'Adjust anything before adding it. Kept as it is, it follows the template; changing the name, goal, type, cycle or direction makes it this mentee’s own.',
+      empty:
+        'The library is empty. Save a trackable as a template from its page to reuse it.',
+      lead: 'Your templates and those other mentors share. Add one to a mentee from “New trackable”.',
+    },
+    board: {
+      period: 'Period',
+      periods: { week: 'This week', month: 'This month', custom: 'Pick dates' },
+      from: 'From',
+      to: 'To',
+      archived: 'Archived:',
+      noCycles: 'No cycles in this period.',
+      loggedAria: 'logged',
+      missed: 'missed',
+      open: 'not logged yet',
+      current: 'Now:',
     },
   },
   challenges: {

@@ -21,6 +21,8 @@ import {
 } from './template-view';
 import type {
   CreateTrackableDto,
+  EntriesQuery,
+  RangeEntryDto,
   LogEntryDto,
   TrackableDetailDto,
   TrackableEntryDto,
@@ -46,6 +48,40 @@ const trackableSelect = {
     orderBy: { periodStart: 'asc' },
   },
 } satisfies Prisma.TrackableSelect;
+
+const entrySelect = {
+  id: true,
+  periodStart: true,
+  value: true,
+  note: true,
+  source: true,
+  needsHelp: true,
+  recordedAt: true,
+  author: ref,
+  impersonator: ref,
+  replies: {
+    select: {
+      id: true,
+      body: true,
+      createdAt: true,
+      author: ref,
+      impersonator: ref,
+    },
+    orderBy: { createdAt: 'asc' },
+  },
+} satisfies Prisma.TrackableEntrySelect;
+
+const toEntryDto = (
+  e: Prisma.TrackableEntryGetPayload<{ select: typeof entrySelect }>,
+): TrackableEntryDto => ({
+  ...e,
+  periodStart: day(e.periodStart),
+  recordedAt: e.recordedAt.toISOString(),
+  replies: e.replies.map((r) => ({
+    ...r,
+    createdAt: r.createdAt.toISOString(),
+  })),
+});
 
 type TrackableRow = Prisma.TrackableGetPayload<{
   select: typeof trackableSelect;
@@ -121,6 +157,30 @@ export class TrackablesService {
     return rows.map((r) => this.summary(r, options));
   }
 
+  /** Entries whose cycle starts within [from, to], newest first; at most a year. */
+  async entries(
+    viewerId: string,
+    query: EntriesQuery,
+  ): Promise<RangeEntryDto[]> {
+    await this.access.assertCanView(viewerId, query.menteeId);
+    if (query.from > query.to || query.to > addDays(query.from, 366)) {
+      throw new AppException(400, {
+        code: 'VALIDATION_FAILED',
+        title: 'Pick up to a year, from before to',
+        errors: { to: ['must be on or after from, within a year'] },
+      });
+    }
+    const rows = await this.prisma.trackableEntry.findMany({
+      where: {
+        trackable: { menteeId: query.menteeId },
+        periodStart: { gte: asDate(query.from), lte: asDate(query.to) },
+      },
+      select: { trackableId: true, ...entrySelect },
+      orderBy: { periodStart: 'desc' },
+    });
+    return rows.map((e) => ({ trackableId: e.trackableId, ...toEntryDto(e) }));
+  }
+
   async get(viewerId: string, id: string): Promise<TrackableDetailDto> {
     const row = await this.prisma.trackable.findUnique({
       where: { id },
@@ -137,27 +197,7 @@ export class TrackablesService {
       this.template(viewerId, row.template),
       this.prisma.trackableEntry.findMany({
         where: { trackableId: id },
-        select: {
-          id: true,
-          periodStart: true,
-          value: true,
-          note: true,
-          source: true,
-          needsHelp: true,
-          recordedAt: true,
-          author: ref,
-          impersonator: ref,
-          replies: {
-            select: {
-              id: true,
-              body: true,
-              createdAt: true,
-              author: ref,
-              impersonator: ref,
-            },
-            orderBy: { createdAt: 'asc' },
-          },
-        },
+        select: entrySelect,
         orderBy: { periodStart: 'desc' },
       }),
     ]);
@@ -165,15 +205,7 @@ export class TrackablesService {
       ...this.summary(row, await this.trendOptions()),
       mentee: row.mentee,
       template,
-      entries: entries.map((e): TrackableEntryDto => ({
-        ...e,
-        periodStart: day(e.periodStart),
-        recordedAt: e.recordedAt.toISOString(),
-        replies: e.replies.map((r) => ({
-          ...r,
-          createdAt: r.createdAt.toISOString(),
-        })),
-      })),
+      entries: entries.map(toEntryDto),
       canManage,
       canLog: !row.archivedAt && (canManage || viewerId === row.menteeId),
     };

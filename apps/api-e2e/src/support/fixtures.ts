@@ -165,3 +165,12 @@ export async function setPassword(userId: string, password: string) {
     [userId, await hash(password)],
   );
 }
+
+/** Backdates when a task was done. */
+export async function markTaskDoneDaysAgo(taskId: string, days: number) {
+  const c = await db();
+  await c.query(
+    `UPDATE "Task" SET "doneAt" = now() - ($2 || ' days')::interval WHERE id = $1`,
+    [taskId, String(days)],
+  );
+}

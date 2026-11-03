@@ -2,6 +2,7 @@ import {
   closeDb,
   createMentorship,
   createUser,
+  markTaskDoneDaysAgo,
   signedIn,
 } from '../support/fixtures';
 
@@ -186,5 +187,26 @@ describe('tasks on their own (BR-FU-4)', () => {
       id: task.data.id,
       doneAt: expect.any(String),
     });
+  });
+
+  it('lists done tasks under "recent" for 7 days after they are done (BR-FU-4)', async () => {
+    const { mentee, asMentor } = await pair();
+    const mk = async (title: string) =>
+      (await asMentor.post('/api/tasks', { assigneeId: mentee.id, title }))
+        .data;
+    const open = await mk('Open');
+    const fresh = await mk('Done today');
+    const old = await mk('Done long ago');
+    await asMentor.patch(`/api/tasks/${fresh.id}`, { done: true });
+    await asMentor.patch(`/api/tasks/${old.id}`, { done: true });
+    await markTaskDoneDaysAgo(old.id, 8);
+    const titles = async (status: string) =>
+      (
+        await asMentor.get(
+          `/api/tasks?assigneeId=${mentee.id}&status=${status}`,
+        )
+      ).data.map((x: { title: string }) => x.title);
+    expect(await titles('recent')).toEqual([open.title, fresh.title]);
+    expect(await titles('all')).toHaveLength(3);
   });
 });

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@tarbya/db';
 import { fromZoned, toZoned } from '@tarbya/shared';
 import { taskSelect, toTaskDto } from '../interactions/interactions.service';
+import { recentTasks } from '../interactions/tasks.service';
 import { ContactService } from '../mentorships/contact.service';
 import { MentorshipsService } from '../mentorships/mentorships.service';
 import type { TrackableSummaryDto } from '../trackables/trackables.dto';
@@ -86,9 +87,10 @@ export class DashboardService {
         select: { mentor: { select: { id: true, name: true } } },
       }),
       this.prisma.task.findMany({
-        where: { assigneeId: userId, doneAt: null },
+        where: { assigneeId: userId, ...recentTasks() },
         select: taskSelect,
         orderBy: [
+          { doneAt: { sort: 'desc', nulls: 'first' } },
           { dueOn: { sort: 'asc', nulls: 'last' } },
           { createdAt: 'asc' },
         ],

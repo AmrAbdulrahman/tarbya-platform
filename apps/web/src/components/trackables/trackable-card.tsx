@@ -19,7 +19,7 @@ export function TrackableCard({
     <Link
       to="/trackables/$id"
       params={{ id: tr.id }}
-      className="flex flex-col gap-3 rounded-card border border-border bg-card p-5 hover:border-primary/50"
+      className="flex flex-col gap-3 rounded-card border border-border bg-card p-4 hover:border-primary/50"
     >
       <div className="flex flex-wrap items-start gap-2">
         <div className="flex flex-1 flex-col gap-0.5">

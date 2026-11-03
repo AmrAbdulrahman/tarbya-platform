@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Plus } from 'lucide-react';
+import { History, Mail, Phone, Plus } from 'lucide-react';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,7 +24,9 @@ import { FeedList } from '../../../components/feed/feed-list';
 import { NotesPanel } from '../../../components/mentee/notes-panel';
 import { TasksPanel } from '../../../components/mentee/tasks-panel';
 import { ChallengesPanel } from '../../../components/mentee/challenges-panel';
-import { TrackablesSection } from '../../../components/trackables/trackables-section';
+import { TrackablesBoard } from '../../../components/trackables/trackables-board';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
+import { CollapsibleSection } from '../../../components/collapsible-section';
 import { RoleChips } from '../../../components/role-chips';
 
 /** A member's profile, and for their mentor the full mentee profile (US-4.2 · design/screens/Mentee.dc.html). */
@@ -55,91 +57,118 @@ function ProfilePage() {
   const isAdmin = hasAnyRole(me.roles, ['SUPER_ADMIN', 'MODERATOR']);
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4">
+      <Breadcrumbs
+        items={[
+          ...(p.isMentor
+            ? [{ label: t('nav.menteeDashboard'), to: '/mentor' }]
+            : isAdmin
+              ? [{ label: t('nav.users'), to: '/admin/users' }]
+              : []),
+          { label: p.name },
+        ]}
+      />
+      <header className="flex flex-wrap items-center gap-3">
         <span
           aria-hidden
-          className="grid size-14 place-items-center rounded-full bg-primary-tint text-2xl font-bold text-primary-hover"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-tint text-lg font-bold text-primary-hover"
         >
           {p.name.charAt(0)}
         </span>
-        <div className="flex flex-1 flex-col gap-1.5">
-          <h1 className="text-3xl font-bold text-navy">{p.name}</h1>
-          <div
-            className="flex flex-wrap gap-1.5"
-            aria-label={t('profile.roles')}
-          >
-            <RoleChips roles={p.roles} />
-            {p.deactivatedAt && (
-              <Badge tone="danger">{t('profile.deactivated')}</Badge>
-            )}
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold text-navy">{p.name}</h1>
+            <div
+              className="flex flex-wrap gap-1"
+              aria-label={t('profile.roles')}
+            >
+              <RoleChips roles={p.roles} />
+              {p.deactivatedAt && (
+                <Badge tone="danger">{t('profile.deactivated')}</Badge>
+              )}
+            </div>
           </div>
+          <dl
+            aria-label={t('profile.contact')}
+            className="flex flex-wrap gap-x-4 gap-y-0.5 text-[13px] text-ink-subtle"
+          >
+            {p.email && (
+              <Detail icon={<Mail />} label={t('profile.email')}>
+                <bdi>{p.email}</bdi>
+              </Detail>
+            )}
+            {p.phone && (
+              <Detail icon={<Phone />} label={t('profile.phone')}>
+                <bdi>{p.phone}</bdi>
+              </Detail>
+            )}
+            {p.mentor && (
+              <Detail label={t('profile.mentor')}>
+                <PersonLink user={p.mentor} />
+              </Detail>
+            )}
+            {p.manager && (
+              <Detail label={t('profile.manager')}>
+                <PersonLink user={p.manager} />
+              </Detail>
+            )}
+          </dl>
         </div>
         {p.isMentor && (
-          <Button asChild>
+          <Button asChild size="sm">
             <Link to="/mentor/log" search={{ menteeId: p.id }}>
               <Plus aria-hidden />
               {t('dashboard.newFollowUp')}
             </Link>
           </Button>
         )}
-      </div>
+      </header>
 
-      <div className="flex flex-wrap items-start gap-6">
-        <section className="flex flex-[1_1_300px] flex-col gap-4 rounded-card border border-border bg-card p-6">
-          <h2 className="text-lg font-bold text-navy">
-            {t('profile.contact')}
-          </h2>
-          <dl className="flex flex-col gap-3 text-[15px]">
-            <Detail label={t('profile.email')}>
-              {p.email ? <bdi>{p.email}</bdi> : t('profile.none')}
-            </Detail>
-            <Detail label={t('profile.phone')}>
-              {p.phone ? <bdi>{p.phone}</bdi> : t('profile.none')}
-            </Detail>
-            <Detail label={t('profile.manager')}>
-              <PersonLink user={p.manager} />
-            </Detail>
-            <Detail label={t('profile.mentor')}>
-              <PersonLink user={p.mentor} />
-            </Detail>
-          </dl>
-        </section>
-        {p.canSeeAdminNotes && <AdminNotes subjectId={p.id} />}
-      </div>
-      {p.canSeeMentoring && (
-        <>
-          <TrackablesSection menteeId={p.id} canManage={p.canManageMentoring} />
-          <div className="flex flex-wrap items-start gap-6">
-            <section
-              aria-labelledby="history-title"
-              className="flex min-w-0 flex-[3_1_420px] flex-col gap-4 rounded-card border border-border bg-card p-6"
+      {p.canSeeMentoring ? (
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
+          <div className="flex min-w-0 flex-col gap-4">
+            <TrackablesBoard menteeId={p.id} canManage={p.canManageMentoring} />
+            <CollapsibleSection
+              title={t('feed.title')}
+              icon={<History className="size-4 text-primary" aria-hidden />}
             >
-              <h2 id="history-title" className="text-lg font-bold text-navy">
-                {t('feed.title')}
-              </h2>
               <FeedList userId={p.id} />
-            </section>
-            <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-6">
-              <ChallengesPanel
-                menteeId={p.id}
-                canManage={p.canManageMentoring}
-              />
-              <TasksPanel menteeId={p.id} canManage={p.canManageMentoring} />
-              <NotesPanel mentee={p} canWrite={p.isMentor} />
-            </div>
+            </CollapsibleSection>
           </div>
-        </>
+          <div className="flex min-w-0 flex-col gap-4">
+            <TasksPanel menteeId={p.id} canManage={p.canManageMentoring} />
+            <ChallengesPanel menteeId={p.id} canManage={p.canManageMentoring} />
+            <NotesPanel mentee={p} canWrite={p.isMentor} />
+            {p.canSeeAdminNotes && <AdminNotes subjectId={p.id} />}
+          </div>
+        </div>
+      ) : (
+        p.canSeeAdminNotes && <AdminNotes subjectId={p.id} />
       )}
       {isAdmin && <ChangeLog userId={p.id} />}
     </>
   );
 }
 
-function Detail({ label, children }: { label: string; children: ReactNode }) {
+function Detail({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon?: ReactNode;
+  children: ReactNode;
+}) {
   return (
-    <div className="flex items-baseline justify-between gap-4">
-      <dt className="text-ink-subtle">{label}</dt>
-      <dd className="font-medium">{children}</dd>
+    <div className="flex items-center gap-1">
+      {icon ? (
+        <dt className="[&_svg]:size-3.5">
+          <span className="sr-only">{label}</span>
+          <span aria-hidden>{icon}</span>
+        </dt>
+      ) : (
+        <dt>{label}:</dt>
+      )}
+      <dd className="font-medium text-ink">{children}</dd>
     </div>
   );
 }
@@ -184,9 +213,9 @@ function AdminNotes({ subjectId }: { subjectId: string }) {
   };
 
   return (
-    <section className="flex flex-[2_1_420px] flex-col gap-4 rounded-card border border-border bg-card p-6">
+    <section className="flex flex-col gap-3 rounded-card border border-border bg-card p-4">
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-bold text-navy">
+        <h2 className="text-base font-bold text-navy">
           {t('profile.adminNotes')}
         </h2>
         <p className="text-[13px] text-ink-subtle">
@@ -199,7 +228,7 @@ function AdminNotes({ subjectId }: { subjectId: string }) {
         </label>
         <Textarea
           id="admin-note"
-          rows={3}
+          rows={2}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder={t('profile.notePlaceholder')}

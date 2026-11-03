@@ -42,10 +42,10 @@ export function ChangeLog({ userId }: { userId: string }) {
   return (
     <section
       aria-labelledby="changes-title"
-      className="flex flex-col gap-4 rounded-card border border-border bg-card p-6"
+      className="flex flex-col gap-4 rounded-card border border-border bg-card p-4"
     >
       <div className="flex flex-col gap-1">
-        <h2 id="changes-title" className="text-lg font-bold text-navy">
+        <h2 id="changes-title" className="text-base font-bold text-navy">
           {t('changes.title')}
         </h2>
         <span className="text-[13px] text-ink-subtle">{t('changes.hint')}</span>

@@ -1,19 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookMarked, Check, Globe, Lock, Plus, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   trackablesControllerSaveAsTemplate,
-  trackableTemplatesControllerAssign,
   type TrackableDetailDto,
   type TrackableTemplateDto,
 } from '@tarbya/api-client';
-import { toZoned } from '@tarbya/shared';
 import { Badge, Button, Checkbox, cn, Input } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
-import { Field, FormError } from '../login/fields';
+import { FormError } from '../login/fields';
 import { formatNumber } from './format';
 
 export const templatesQueryKey = (menteeId?: string) =>
@@ -56,20 +54,26 @@ export function useShapeLabel() {
 
 /**
  * US-4.9: the library — the viewer's templates and those shared by other
- * mentors, with search and a mine/shared filter; or start from scratch.
+ * mentors, with search and a mine/shared filter. With `onPick` each template
+ * is a button; `actions` adds controls beside each one.
  */
-export function LibraryPicker({
+export function LibraryList({
   templates,
   onPick,
-  onCreate,
+  actions,
+  toolbar,
+  scroll = false,
 }: {
   templates: TrackableTemplateDto[];
-  onPick: (template: TrackableTemplateDto) => void;
-  onCreate: () => void;
+  onPick?: (template: TrackableTemplateDto) => void;
+  actions?: (template: TrackableTemplateDto) => ReactNode;
+  /** Beside the search box, e.g. "create new". */
+  toolbar?: ReactNode;
+  /** Scroll inside a dialog instead of growing. */
+  scroll?: boolean;
 }) {
   const { t } = useTranslation();
   const me = useMe();
-  const shape = useShapeLabel();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const q = query.trim().toLowerCase();
@@ -83,7 +87,7 @@ export function LibraryPicker({
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-48 flex-1">
           <Search
@@ -94,15 +98,12 @@ export function LibraryPicker({
             type="search"
             aria-label={t('trackables.library.search')}
             placeholder={t('trackables.library.search')}
-            className="h-10 ps-9 text-[15px]"
+            className="h-9 ps-9 text-[15px]"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        <Button size="sm" className="h-10" onClick={onCreate}>
-          <Plus aria-hidden />
-          {t('trackables.library.createNew')}
-        </Button>
+        {toolbar}
       </div>
       <div
         role="group"
@@ -110,56 +111,130 @@ export function LibraryPicker({
         className="flex gap-1"
       >
         {(['all', 'mine', 'shared'] as const).map((f) => (
-          <Button
+          <FilterChip
             key={f}
-            size="sm"
-            variant={filter === f ? 'primary' : 'ghost'}
-            aria-pressed={filter === f}
+            pressed={filter === f}
             onClick={() => setFilter(f)}
           >
             {t(`trackables.library.filters.${f}`)}
-          </Button>
+          </FilterChip>
         ))}
       </div>
       {shown.length === 0 && (
         <p className="text-sm text-ink-subtle">
-          {t('trackables.library.noMatch')}
+          {templates.length
+            ? t('trackables.library.noMatch')
+            : t('trackables.library.empty')}
         </p>
       )}
-      <ul className="-mx-2 flex max-h-[50vh] flex-col overflow-y-auto">
-        {shown.map((x) => (
-          <li key={x.id}>
-            <button
-              type="button"
-              disabled={x.assigned}
-              onClick={() => onPick(x)}
-              className={cn(
-                'flex w-full flex-col gap-1 rounded-lg px-2 py-3 text-start',
-                'hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary',
-                'disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent',
+      <ul
+        className={cn(
+          'flex flex-col divide-y divide-divider',
+          scroll && '-mx-2 max-h-[50vh] overflow-y-auto',
+        )}
+      >
+        {shown.map((x) => {
+          const body = <TemplateSummary template={x} />;
+          return (
+            <li key={x.id} className="flex flex-wrap items-center gap-2">
+              {onPick ? (
+                <button
+                  type="button"
+                  disabled={x.assigned}
+                  onClick={() => onPick(x)}
+                  className={cn(
+                    'flex min-w-0 flex-1 flex-col gap-0.5 rounded-lg px-2 py-2.5 text-start',
+                    'hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary',
+                    'disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent',
+                  )}
+                >
+                  {body}
+                </button>
+              ) : (
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5 py-2.5">
+                  {body}
+                </div>
               )}
-            >
-              <span className="flex flex-wrap items-center gap-2">
-                <span className="text-[15px] font-semibold text-navy">
-                  {x.name}
-                </span>
-                {x.assigned && (
-                  <Badge tone="success">
-                    <Check className="me-1 size-3.5" aria-hidden />
-                    {t('trackables.library.assigned')}
-                  </Badge>
-                )}
-              </span>
-              {x.goal && (
-                <span className="text-[13px] text-ink-muted">{x.goal}</span>
-              )}
-              <span className="text-[13px] text-ink-subtle">{shape(x)}</span>
-              <TemplateByline template={x} />
-            </button>
-          </li>
-        ))}
+              {actions?.(x)}
+            </li>
+          );
+        })}
       </ul>
     </div>
+  );
+}
+
+/** A small toggle chip, for filters. */
+export function FilterChip({
+  pressed,
+  onClick,
+  children,
+}: {
+  pressed: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={pressed}
+      onClick={onClick}
+      className={cn(
+        'h-8 rounded-full border px-3 text-[13px] font-medium transition-colors',
+        pressed
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-border bg-card text-ink-muted hover:border-primary hover:text-primary',
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TemplateSummary({ template: x }: { template: TrackableTemplateDto }) {
+  const { t } = useTranslation();
+  const shape = useShapeLabel();
+  return (
+    <>
+      <span className="flex flex-wrap items-center gap-2">
+        <span className="text-[15px] font-semibold text-navy">{x.name}</span>
+        {x.assigned && (
+          <Badge tone="success">
+            <Check className="me-1 size-3.5" aria-hidden />
+            {t('trackables.library.assigned')}
+          </Badge>
+        )}
+      </span>
+      {x.goal && <span className="text-[13px] text-ink-muted">{x.goal}</span>}
+      <span className="text-[13px] text-ink-subtle">{shape(x)}</span>
+      <TemplateByline template={x} />
+    </>
+  );
+}
+
+/** Picking from the library in the new-trackable dialog, or starting fresh. */
+export function LibraryPicker({
+  templates,
+  onPick,
+  onCreate,
+}: {
+  templates: TrackableTemplateDto[];
+  onPick: (template: TrackableTemplateDto) => void;
+  onCreate: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <LibraryList
+      templates={templates}
+      onPick={onPick}
+      scroll
+      toolbar={
+        <Button size="sm" onClick={onCreate}>
+          <Plus aria-hidden />
+          {t('trackables.library.createNew')}
+        </Button>
+      }
+    />
   );
 }
 
@@ -195,109 +270,6 @@ export function TemplateByline({
   );
 }
 
-/** Gives the mentee their own trackable from the template: target and start. */
-export function AssignForm({
-  template,
-  menteeId,
-  onBack,
-  onDone,
-}: {
-  template: TrackableTemplateDto;
-  menteeId: string;
-  onBack: () => void;
-  onDone: (trackable: TrackableDetailDto) => void;
-}) {
-  const { t } = useTranslation();
-  const shape = useShapeLabel();
-  const refresh = useRefreshTrackables();
-  const today = toZoned(new Date()).date;
-  const [target, setTarget] = useState(
-    template.target === null ? '' : String(template.target),
-  );
-  const [startsOn, setStartsOn] = useState(today);
-  const assign = useMutation({
-    mutationFn: async () =>
-      (
-        await trackableTemplatesControllerAssign(template.id, {
-          menteeId,
-          startsOn,
-          target:
-            template.type === 'BOOLEAN' || target.trim() === ''
-              ? null
-              : Number(target),
-        })
-      ).data as TrackableDetailDto,
-    onSuccess: async (tr) => {
-      await refresh();
-      onDone(tr);
-    },
-  });
-
-  return (
-    <form
-      noValidate
-      className="flex flex-col gap-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        assign.mutate();
-      }}
-    >
-      <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface/60 p-4">
-        <span className="flex items-center gap-2 text-[15px] font-semibold text-navy">
-          <BookMarked className="size-4 text-primary" aria-hidden />
-          {template.name}
-        </span>
-        {template.goal && (
-          <span className="text-[13px] text-ink-muted">{template.goal}</span>
-        )}
-        <span className="text-[13px] text-ink-subtle">{shape(template)}</span>
-        <TemplateByline template={template} />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {template.type !== 'BOOLEAN' && (
-          <Field id="assign-target" label={t('trackables.target')}>
-            <Input
-              id="assign-target"
-              type="number"
-              min={0}
-              max={template.type === 'PERCENTAGE' ? 100 : undefined}
-              step="any"
-              dir="ltr"
-              className="h-11 font-figures text-[15px]"
-              value={target}
-              onChange={(e) => setTarget(e.target.value)}
-            />
-          </Field>
-        )}
-        <Field id="assign-starts" label={t('trackables.startsOn')}>
-          <Input
-            id="assign-starts"
-            type="date"
-            max={today}
-            className="h-11 text-[15px]"
-            value={startsOn}
-            onChange={(e) => setStartsOn(e.target.value)}
-          />
-        </Field>
-      </div>
-      <p className="text-[13px] text-ink-subtle">
-        {t('trackables.library.followsHint')}
-      </p>
-      <FormError
-        message={assign.isError ? errorMessage(t, assign.error) : undefined}
-      />
-      <div className="flex gap-2">
-        <Button type="submit" disabled={assign.isPending || !startsOn}>
-          {t('trackables.library.assign')}
-        </Button>
-        <Button type="button" variant="outline" onClick={onBack}>
-          {t('trackables.library.back')}
-        </Button>
-      </div>
-    </form>
-  );
-}
-
 /** "Save as template", with the choice to share it with every mentor. */
 export function SaveAsTemplate({
   trackableId,
@@ -307,7 +279,7 @@ export function SaveAsTemplate({
   trackableId: string;
   onSaved: (trackable: TrackableDetailDto) => void;
   /** Another button beside "Save as template". */
-  extra?: React.ReactNode;
+  extra?: ReactNode;
 }) {
   const { t } = useTranslation();
   const refresh = useRefreshTrackables();

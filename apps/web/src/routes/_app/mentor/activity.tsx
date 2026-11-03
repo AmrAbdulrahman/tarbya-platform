@@ -160,7 +160,7 @@ function ActivityForm({
     <form
       noValidate
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
-      className="flex min-w-0 flex-col gap-6"
+      className="flex min-w-0 flex-col gap-4"
     >
       <p className="text-[15px] text-ink-subtle">
         {t('mentoring.log.activityLead')}

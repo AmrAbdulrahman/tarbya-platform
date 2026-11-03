@@ -159,7 +159,7 @@ function FollowUpForm({
     <form
       noValidate
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
-      className="flex min-w-0 flex-col gap-6"
+      className="flex min-w-0 flex-col gap-4"
     >
       <Card>
         <div className="grid gap-4 sm:grid-cols-3">

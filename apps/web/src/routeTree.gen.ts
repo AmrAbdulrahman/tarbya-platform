@@ -26,6 +26,7 @@ import { Route as AppMyIndexRouteImport } from './routes/_app/my/index'
 import { Route as AppMyTrackablesRouteImport } from './routes/_app/my/trackables'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people/$id'
 import { Route as AppTrackablesIdRouteImport } from './routes/_app/trackables/$id'
+import { Route as AppTrackablesLibraryRouteImport } from './routes/_app/trackables/library'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -111,6 +112,11 @@ const AppTrackablesIdRoute = AppTrackablesIdRouteImport.update({
   path: '/trackables/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTrackablesLibraryRoute = AppTrackablesLibraryRouteImport.update({
+  id: '/trackables/library',
+  path: '/trackables/library',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
   '/trackables/$id': typeof AppTrackablesIdRoute
+  '/trackables/library': typeof AppTrackablesLibraryRoute
   '/mentor/': typeof AppMentorIndexRoute
   '/my/': typeof AppMyIndexRoute
 }
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
   '/trackables/$id': typeof AppTrackablesIdRoute
+  '/trackables/library': typeof AppTrackablesLibraryRoute
   '/mentor': typeof AppMentorIndexRoute
   '/my': typeof AppMyIndexRoute
 }
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/_app/my/trackables': typeof AppMyTrackablesRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
   '/_app/trackables/$id': typeof AppTrackablesIdRoute
+  '/_app/trackables/library': typeof AppTrackablesLibraryRoute
   '/_app/mentor/': typeof AppMentorIndexRoute
   '/_app/my/': typeof AppMyIndexRoute
 }
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/my/trackables'
     | '/people/$id'
     | '/trackables/$id'
+    | '/trackables/library'
     | '/mentor/'
     | '/my/'
   fileRoutesByTo: FileRoutesByTo
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/my/trackables'
     | '/people/$id'
     | '/trackables/$id'
+    | '/trackables/library'
     | '/mentor'
     | '/my'
   id:
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/_app/my/trackables'
     | '/_app/people/$id'
     | '/_app/trackables/$id'
+    | '/_app/trackables/library'
     | '/_app/mentor/'
     | '/_app/my/'
   fileRoutesById: FileRoutesById
@@ -350,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTrackablesIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/trackables/library': {
+      id: '/_app/trackables/library'
+      path: '/trackables/library'
+      fullPath: '/trackables/library'
+      preLoaderRoute: typeof AppTrackablesLibraryRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -395,6 +414,7 @@ interface AppRouteChildren {
   AppMyTrackablesRoute: typeof AppMyTrackablesRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
   AppTrackablesIdRoute: typeof AppTrackablesIdRoute
+  AppTrackablesLibraryRoute: typeof AppTrackablesLibraryRoute
   AppMyIndexRoute: typeof AppMyIndexRoute
 }
 
@@ -406,6 +426,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMyTrackablesRoute: AppMyTrackablesRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,
   AppTrackablesIdRoute: AppTrackablesIdRoute,
+  AppTrackablesLibraryRoute: AppTrackablesLibraryRoute,
   AppMyIndexRoute: AppMyIndexRoute,
 }
 
