@@ -10,11 +10,12 @@ import {
   type MyMentoringDto,
   type TrackableSummaryDto,
 } from '@tarbya/api-client';
-import { Badge, cn, Select, useToast } from '@tarbya/ui';
+import { Badge, Button, cn, Select, useToast } from '@tarbya/ui';
 import { FeedList } from '../feed/feed-list';
 import { ChallengesPanel } from '../mentee/challenges-panel';
 import { TasksPanel } from '../mentee/tasks-panel';
 import { TrackableCard } from '../trackables/trackable-card';
+import { TrackableDialog } from '../trackables/trackable-dialog';
 import { trackablesQueryKey } from '../trackables/trackables-section';
 import { EntryKind } from './entry-kind';
 import { mineQueryKey } from './form-parts';
@@ -195,9 +196,10 @@ function Summary({ mentee }: { mentee: MyMenteeDto }) {
   );
 }
 
-/** The mentee's active trackables with their trend. */
+/** The mentee's active trackables with their trend, and "new trackable" for the mentor (US-4.5). */
 function Progress({ menteeId }: { menteeId: string }) {
   const { t } = useTranslation();
+  const [adding, setAdding] = useState(false);
   const trackables = useQuery({
     queryKey: trackablesQueryKey(menteeId),
     queryFn: async ({ signal }) =>
@@ -207,15 +209,26 @@ function Progress({ menteeId }: { menteeId: string }) {
   const active = (trackables.data ?? []).filter((x) => !x.archivedAt);
   return (
     <section aria-labelledby="log-progress" className="flex flex-col gap-3">
-      <h2 id="log-progress" className="text-lg font-bold text-navy">
-        {t('mentoring.log.progress')}
-      </h2>
+      <div className="flex items-center gap-2">
+        <h2 id="log-progress" className="flex-1 text-lg font-bold text-navy">
+          {t('mentoring.log.progress')}
+        </h2>
+        <Button size="sm" variant="outline" onClick={() => setAdding(true)}>
+          <Plus aria-hidden />
+          {t('trackables.add')}
+        </Button>
+      </div>
       {trackables.isSuccess && !active.length && (
         <p className="text-sm text-ink-subtle">{t('trackables.noActive')}</p>
       )}
       {active.map((x) => (
         <TrackableCard key={x.id} trackable={x} />
       ))}
+      <TrackableDialog
+        menteeId={menteeId}
+        open={adding}
+        onOpenChange={setAdding}
+      />
     </section>
   );
 }
