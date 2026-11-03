@@ -193,3 +193,49 @@ test('saves a trackable as a template and reuses it from the library for another
   await expect(library).toContainText('هذا المؤشر يتبع قالبًا من المكتبة.');
   await expect(library).toContainText('مستخدم مع مسترشدَين');
 });
+
+test("logs a trackable's waiting cycles right in the mentee's things to do (US-5.1, US-5.2)", async ({
+  page,
+}) => {
+  await signIn(page);
+  const { id } = await newMentee(page);
+  const day = (offset: number) => {
+    const d = new Date(
+      `${new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(new Date())}T00:00:00Z`,
+    );
+    d.setUTCDate(d.getUTCDate() + offset);
+    return d.toISOString().slice(0, 10);
+  };
+  const created = await page.request.post('/api/trackables', {
+    headers,
+    data: {
+      menteeId: id,
+      name: 'المشي الصباحي',
+      type: 'BOOLEAN',
+      cycle: 'DAILY',
+      startsOn: day(-1),
+    },
+  });
+  expect(created.ok(), await created.text()).toBe(true);
+
+  // See the journey as the mentee.
+  const as = await page.request.post('/api/auth/impersonation', {
+    headers,
+    data: { userId: id },
+  });
+  expect(as.ok(), await as.text()).toBe(true);
+  try {
+    await page.goto('/my');
+    const item = page
+      .getByRole('region', { name: 'إجراءات مطلوبة' })
+      .getByRole('listitem')
+      .filter({ hasText: 'المشي الصباحي' });
+    await expect(item).toContainText('دورتان بانتظار التسجيل');
+    await item.getByRole('button', { pressed: false }).first().click();
+    await item.getByRole('button', { name: 'تم', exact: true }).click();
+    await item.getByRole('button', { name: 'تسجيل' }).click();
+    await expect(item).toContainText('دورة واحدة بانتظار التسجيل');
+  } finally {
+    await page.request.delete('/api/auth/impersonation', { headers });
+  }
+});

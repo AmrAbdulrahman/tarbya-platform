@@ -564,6 +564,8 @@ export const en: Messages = {
     noDue: 'No due date',
     markDone: 'Done',
     undo: 'Undo',
+    open: 'Open',
+    moreCycles: '+{{count}} more',
   },
   mentee: {
     notes: 'Notes',
@@ -773,6 +775,7 @@ export const en: Messages = {
       loggedAria: 'logged',
       missed: 'missed',
       open: 'not logged yet',
+      ahead: 'still to come',
       current: 'Now:',
     },
   },

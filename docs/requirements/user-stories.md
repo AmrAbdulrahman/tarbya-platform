@@ -165,7 +165,7 @@ As a mentor, I want to see all my mentees at a glance, so that I know who needs 
 As a mentor, I want a mentee's full picture: trackables with trend charts, timeline, challenges, tasks and notes.
 
 - The page leads with trackables, action items and challenges; contact details sit in one line under the name; the history log is collapsed until opened.
-- Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. Clicking a cycle logs or re-logs it in place; notes and replies show under it.
+- Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. This week shows every day, with the days to come as placeholders. Clicking a past cycle logs or re-logs it in place, even before the trackable's start (which then moves back); notes and replies show under it.
 - Breadcrumbs above every page lead back to where I came from.
 - Refs: BR-TRK-4, BR-TRK-5, BR-NOTE-1, BR-FU-4 · `Mentee.dc.html`
 
@@ -235,7 +235,8 @@ As a mentor, I want to reply to what a mentee logs on a trackable, and be notifi
 
 As a mentee, I want a home with my actions, upcoming events, my trackables and my feed.
 
-- Actions: open tasks, due check-ins, pending RSVPs; I can mark tasks done here.
+- Actions: open tasks, trackable cycles waiting to be logged, pending RSVPs. I mark tasks done and log waiting cycles right here.
+- Done tasks stay listed, struck through, for 7 days.
 - Refs: BR-FU-4, BR-GRP-9 · `MyJourney.dc.html`
 
 ### US-5.2 Log my trackables — v1

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ListChecks, TrendingUp } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { ListChecks, Plus, TrendingUp } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   feedControllerJourney,
@@ -10,12 +10,19 @@ import {
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
 import { formatDate } from '@tarbya/shared';
-import { Button } from '@tarbya/ui';
+import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FeedList, feedQueryKey } from '../../../components/feed/feed-list';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
 import { TrackableCard } from '../../../components/trackables/trackable-card';
+import {
+  CycleTile,
+  QuickLog,
+} from '../../../components/trackables/trackables-board';
+
+/** Waiting cycles offered in "Things to do"; the rest are on the trackable's page. */
+const SHOWN_CYCLES = 7;
 
 /** US-5.1 · design/screens/MyJourney.dc.html */
 export const Route = createFileRoute('/_app/my/')({
@@ -92,19 +99,7 @@ function JourneyPage() {
         )}
         <ul className="flex flex-col divide-y divide-border">
           {due.map((x) => (
-            <ActionRow
-              key={x.id}
-              icon={<TrendingUp className="size-4" />}
-              iconClass="bg-amber-50 text-warn"
-              title={t('trackables.logName', { name: x.name })}
-              meta={t('trackables.waiting', { count: x.openCycles.length })}
-            >
-              <Button asChild size="sm">
-                <Link to="/trackables/$id" params={{ id: x.id }}>
-                  {t('trackables.log')}
-                </Link>
-              </Button>
-            </ActionRow>
+            <TrackableAction key={x.id} trackable={x} />
           ))}
           {tasks.map((task) => (
             <TaskAction key={task.id} task={task} calendar={me.calendar} />
@@ -138,6 +133,78 @@ function JourneyPage() {
         </section>
       </div>
     </>
+  );
+}
+
+/** Cycles waiting to be logged (BR-TRK-4), logged right here. */
+function TrackableAction({
+  trackable: x,
+}: {
+  trackable: JourneyDto['trackables'][number];
+}) {
+  const { t } = useTranslation();
+  const [selected, setSelected] = useState<string | null>(null);
+  // Newest first; older ones are on the trackable's page.
+  const cycles = [...x.openCycles].reverse().slice(0, SHOWN_CYCLES);
+  return (
+    <ActionRow
+      icon={<TrendingUp className="size-4" />}
+      iconClass="bg-amber-50 text-warn"
+      title={t('trackables.logName', { name: x.name })}
+      meta={t('trackables.waiting', { count: x.openCycles.length })}
+      below={
+        <>
+          <div
+            role="group"
+            aria-label={t('trackables.toLog')}
+            className="flex flex-wrap gap-1.5"
+          >
+            {cycles.map((c) => (
+              <button
+                key={c}
+                type="button"
+                aria-pressed={selected === c}
+                onClick={() => setSelected(selected === c ? null : c)}
+                className={cn(
+                  'flex min-w-14 flex-col items-center gap-0.5 rounded-lg border border-dashed border-primary/50 bg-primary-tint/40 px-2 py-1 text-[12px] leading-tight hover:border-primary',
+                  c === x.currentCycle && 'ring-2 ring-primary/40',
+                  selected === c &&
+                    'border-solid border-primary bg-primary-tint',
+                )}
+              >
+                <CycleTile start={c} cycle={x.cycle} />
+                <Plus className="size-4 text-primary" aria-hidden />
+              </button>
+            ))}
+            {x.openCycles.length > cycles.length && (
+              <Link
+                to="/trackables/$id"
+                params={{ id: x.id }}
+                className="self-center text-[13px] text-primary hover:text-primary-hover"
+              >
+                {t('journey.moreCycles', {
+                  count: x.openCycles.length - cycles.length,
+                })}
+              </Link>
+            )}
+          </div>
+          {selected && (
+            <QuickLog
+              key={selected}
+              trackable={x}
+              periodStart={selected}
+              onDone={() => setSelected(null)}
+            />
+          )}
+        </>
+      }
+    >
+      <Button asChild size="sm" variant="ghost">
+        <Link to="/trackables/$id" params={{ id: x.id }}>
+          {t('journey.open')}
+        </Link>
+      </Button>
+    </ActionRow>
   );
 }
 
@@ -196,6 +263,7 @@ function ActionRow({
   struck = false,
   meta,
   error,
+  below,
   children,
 }: {
   icon: ReactNode;
@@ -204,6 +272,8 @@ function ActionRow({
   struck?: boolean;
   meta: string;
   error?: string;
+  /** Full width under the row. */
+  below?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -232,6 +302,7 @@ function ActionRow({
         )}
       </div>
       {children}
+      {below && <div className="flex basis-full flex-col gap-2">{below}</div>}
     </li>
   );
 }

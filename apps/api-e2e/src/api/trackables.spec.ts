@@ -168,16 +168,21 @@ describe('trackables (BR-TRK-1…6, US-4.5, US-5.2, US-4.7)', () => {
       periodStart: old,
       source: 'MENTOR',
     });
-    // Not before it started, not in the future, not a bad day.
-    for (const day of [shift(today(), -41), shift(today(), 1)]) {
-      expect(
-        (
-          await asMentor.put(`/api/trackables/${tr.id}/entries/${day}`, {
-            value: 1,
-          })
-        ).data.code,
-      ).toBe('CYCLE_OUT_OF_RANGE');
-    }
+    // Before it started: the start moves back to that cycle.
+    const earlier = await asMentor.put(
+      `/api/trackables/${tr.id}/entries/${shift(today(), -42)}`,
+      { value: 3 },
+    );
+    expect(earlier.data).toMatchObject({ startsOn: shift(today(), -42) });
+    // Not in the future, not a bad day.
+    expect(
+      (
+        await asMentor.put(
+          `/api/trackables/${tr.id}/entries/${shift(today(), 1)}`,
+          { value: 1 },
+        )
+      ).data.code,
+    ).toBe('CYCLE_OUT_OF_RANGE');
     expect(
       (
         await asMentor.put(`/api/trackables/${tr.id}/entries/not-a-day`, {

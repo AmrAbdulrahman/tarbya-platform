@@ -553,6 +553,8 @@ export const ar = {
     noDue: 'بلا موعد',
     markDone: 'تمت',
     undo: 'تراجع',
+    open: 'فتح',
+    moreCycles: '+{{count}} أخرى',
   },
   mentee: {
     notes: 'الملاحظات',
@@ -759,6 +761,7 @@ export const ar = {
       loggedAria: 'مسجّل',
       missed: 'فائت',
       open: 'لم يُسجَّل بعد',
+      ahead: 'لم يحن بعد',
       current: 'الحالي:',
     },
   },

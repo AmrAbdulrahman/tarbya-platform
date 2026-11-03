@@ -362,10 +362,7 @@ export class TrackablesService {
       });
     }
     const today = toZoned(new Date()).date;
-    const first = cycleStart(day(row.startsOn), row.cycle);
-    if (periodStart < first || periodStart > cycleStart(today, row.cycle)) {
-      throw outOfRange();
-    }
+    if (periodStart > cycleStart(today, row.cycle)) throw outOfRange();
     if (
       by.limitToWindow &&
       cycleEnd(periodStart, row.cycle) < addDays(today, -FILL_WINDOW_DAYS)
@@ -382,6 +379,13 @@ export class TrackablesService {
         errors: {
           value: [row.type === 'BOOLEAN' ? 'must be 0 or 1' : 'must be 0–100'],
         },
+      });
+    }
+    // Logging a cycle before the start moves the start back to it (BR-TRK-4).
+    if (periodStart < day(row.startsOn)) {
+      await db.trackable.update({
+        where: { id: row.id },
+        data: { startsOn: asDate(periodStart) },
       });
     }
     const data = {

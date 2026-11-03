@@ -50,8 +50,11 @@ function periodRange(
   today: string,
   custom: { from: string; to: string },
 ) {
-  if (period === 'week')
-    return { from: cycleStart(today, 'WEEKLY'), to: today };
+  // The whole week, so the days still to come show as placeholders.
+  if (period === 'week') {
+    const from = cycleStart(today, 'WEEKLY');
+    return { from, to: addDays(from, 6) };
+  }
   if (period === 'month')
     return { from: cycleStart(today, 'MONTHLY'), to: today };
   return custom.from <= custom.to
@@ -84,6 +87,8 @@ export function TrackablesBoard({
   const range = periodRange(period, today, custom);
   // Monthly cycles that overlap the period start before it.
   const fetchFrom = cycleStart(range.from, 'MONTHLY');
+  // Nothing is logged ahead of today.
+  const fetchTo = range.to < today ? range.to : today;
   const trackables = useQuery({
     queryKey: trackablesQueryKey(menteeId),
     queryFn: async ({ signal }) =>
@@ -91,11 +96,11 @@ export function TrackablesBoard({
         .data as TrackableSummaryDto[],
   });
   const entries = useQuery({
-    queryKey: [...trackablesQueryKey(menteeId), 'entries', fetchFrom, range.to],
+    queryKey: [...trackablesQueryKey(menteeId), 'entries', fetchFrom, fetchTo],
     queryFn: async ({ signal }) =>
       (
         await trackablesControllerEntries(
-          { menteeId, from: fetchFrom, to: range.to },
+          { menteeId, from: fetchFrom, to: fetchTo },
           { signal },
         )
       ).data as RangeEntryDto[],
@@ -247,12 +252,13 @@ function TrackableRow({
   const [selected, setSelected] = useState<string | null>(null);
   const first = cycleStart(tr.startsOn, tr.cycle);
   const current = cycleStart(today, tr.cycle);
-  const cycles = cycleStarts(range.from, range.to, tr.cycle).filter(
-    (s) => s >= first && s <= current,
-  );
-  // BR-TRK-4: the mentee fills cycles that ended within the last 30 days.
+  // Every cycle in the period. Ones before the start can be logged too, which
+  // moves the start back (BR-TRK-4); ones still to come wait.
+  const cycles = cycleStarts(range.from, range.to, tr.cycle);
+  // The mentee fills cycles that ended within the last 30 days.
   const loggable = (start: string) =>
     canLog &&
+    start <= current &&
     (!isMentee ||
       cycleEnd(start, tr.cycle) >= addDays(today, -FILL_WINDOW_DAYS));
   const notes = cycles
@@ -290,10 +296,12 @@ function TrackableRow({
         </p>
       ) : (
         <div className="flex flex-wrap gap-1.5">
-          {[...cycles].reverse().map((s) => {
+          {cycles.map((s) => {
             const entry = entries.get(s);
             const canPick = loggable(s);
-            const missed = !entry && cycleEnd(s, tr.cycle) < today;
+            const missed =
+              !entry && s >= first && cycleEnd(s, tr.cycle) < today;
+            const ahead = s > current;
             return (
               <button
                 key={s}
@@ -305,16 +313,20 @@ function TrackableRow({
                     ? t('trackables.board.loggedAria')
                     : missed
                       ? t('trackables.board.missed')
-                      : t('trackables.board.open')
+                      : ahead
+                        ? t('trackables.board.ahead')
+                        : t('trackables.board.open')
                 }`}
                 onClick={() => setSelected(selected === s ? null : s)}
                 className={cn(
                   'flex min-w-14 flex-col items-center gap-0.5 rounded-lg border px-2 py-1 text-[12px] leading-tight transition-colors',
                   entry
                     ? 'border-border bg-surface'
-                    : missed
-                      ? 'border-dashed border-trend-down/40 bg-red-50/40'
-                      : 'border-dashed border-primary/50 bg-primary-tint/40',
+                    : ahead
+                      ? 'border-dashed border-border opacity-50'
+                      : missed
+                        ? 'border-dashed border-trend-down/40 bg-red-50/40'
+                        : 'border-dashed border-primary/50 bg-primary-tint/40',
                   s === current && 'ring-2 ring-primary/40',
                   selected === s && 'border-primary bg-primary-tint',
                   canPick
@@ -326,10 +338,16 @@ function TrackableRow({
                 <span className="flex h-6 items-center font-figures text-[15px] font-semibold text-navy">
                   {entry ? (
                     formatValue(entry.value, tr.type)
-                  ) : missed ? (
+                  ) : ahead || !canPick ? (
                     <span className="text-ink-subtle">—</span>
                   ) : (
-                    <Plus className="size-4 text-primary" aria-hidden />
+                    <Plus
+                      className={cn(
+                        'size-4',
+                        missed ? 'text-trend-down' : 'text-primary',
+                      )}
+                      aria-hidden
+                    />
                   )}
                 </span>
               </button>
@@ -369,7 +387,7 @@ function TrackableRow({
 }
 
 /** A cycle's short name: the day for daily and weekly cycles, the month for monthly. */
-function CycleTile({
+export function CycleTile({
   start,
   cycle,
 }: {
@@ -394,7 +412,7 @@ function CycleTile({
 }
 
 /** Logs or re-logs one cycle right in the board. */
-function QuickLog({
+export function QuickLog({
   trackable: tr,
   periodStart,
   entry,
