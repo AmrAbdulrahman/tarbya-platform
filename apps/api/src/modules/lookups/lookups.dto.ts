@@ -85,18 +85,3 @@ export class CreateActivityTypeDto extends Names {
 }
 
 export class UpdateActivityTypeDto extends PartialType(CreateActivityTypeDto) {}
-
-export class TrackingMethodDto {
-  @ApiProperty({ format: 'uuid' }) id!: string;
-  @ApiProperty() nameAr!: string;
-  @ApiProperty() nameEn!: string;
-  @ApiProperty() active!: boolean;
-}
-
-export class CreateTrackingMethodDto extends Names {
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() active?: boolean;
-}
-
-export class UpdateTrackingMethodDto extends PartialType(
-  CreateTrackingMethodDto,
-) {}

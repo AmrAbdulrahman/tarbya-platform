@@ -11,7 +11,6 @@ import {
 import { Badge, Button, cn } from '@tarbya/ui';
 import { ActivityTypeEditor } from '../../../components/admin/activity-type-editor';
 import { lookupColors } from '../../../components/admin/lookup-colors';
-import { TrackingMethods } from '../../../components/admin/tracking-methods';
 
 /** US-3.5 · design/screens/ActivityTypes.dc.html */
 export const Route = createFileRoute('/_app/admin/lookups')({
@@ -185,8 +184,6 @@ function LookupsPage() {
           </div>
         )}
       </div>
-
-      <TrackingMethods />
     </>
   );
 }

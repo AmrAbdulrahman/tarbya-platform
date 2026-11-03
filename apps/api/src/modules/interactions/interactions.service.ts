@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService, type Prisma } from '@tarbya/db';
-import { interactionStatus } from '@tarbya/shared';
+import { cycleStart, interactionStatus, toZoned } from '@tarbya/shared';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
+import { TrackablesService } from '../trackables/trackables.service';
 import { RolesService } from '../users/roles.service';
 import type {
   CreateActivityDto,
@@ -36,7 +37,7 @@ const interactionSelect = {
   endsAt: true,
   place: true,
   sharedNotes: true,
-  challenges: true,
+  challenges: { select: { title: true }, orderBy: { createdAt: 'asc' } },
   createdById: true,
   createdBy: ref,
   impersonator: ref,
@@ -69,6 +70,7 @@ export class InteractionsService {
     private readonly prisma: PrismaService,
     private readonly access: MentoringAccess,
     private readonly roles: RolesService,
+    private readonly trackables: TrackablesService,
   ) {}
 
   async createFollowUp(
@@ -80,59 +82,124 @@ export class InteractionsService {
       dto.menteeId,
     );
     const startsAt = new Date(dto.startsAt);
-    const updates = dto.planUpdates ?? [];
-    if (updates.length) {
-      // Readings describe what happened; an upcoming follow-up has nothing to report yet.
-      if (startsAt > new Date()) {
-        throw new AppException(400, {
-          code: 'VALIDATION_FAILED',
-          title: 'Plan updates need a follow-up that has happened',
-          errors: { planUpdates: ['only for a follow-up in the past'] },
-        });
-      }
-      const ids = [...new Set(updates.map((u) => u.planId))];
-      const open = await this.prisma.developmentPlan.count({
-        where: { id: { in: ids }, menteeId: dto.menteeId, closedAt: null },
+    const updates = dto.trackableUpdates ?? [];
+    const notes = dto.challengeNotes ?? [];
+    const trackables = updates.length
+      ? await this.trackablesFor(dto.menteeId, startsAt, updates)
+      : new Map();
+    if (notes.length) {
+      const ids = [...new Set(notes.map((n) => n.challengeId))];
+      const mine = await this.prisma.challenge.count({
+        where: { id: { in: ids }, menteeId: dto.menteeId },
       });
-      if (open !== ids.length || ids.length !== updates.length) {
+      if (mine !== ids.length || ids.length !== notes.length) {
         throw new AppException(400, {
           code: 'VALIDATION_FAILED',
-          title: "Each update must be for one of the mentee's open plans, once",
-          errors: { planUpdates: ['unknown, closed or repeated plan'] },
+          title: "Each note must be for one of the mentee's challenges, once",
+          errors: { challengeNotes: ['unknown or repeated challenge'] },
         });
       }
     }
-    const created = await this.prisma.interaction.create({
-      data: {
-        kind: 'FOLLOW_UP',
-        mentorshipId: mentorship.id,
-        createdById: actorId,
-        ...impersonation(),
-        startsAt,
-        place: dto.place ?? null,
-        sharedNotes: dto.sharedNotes ?? null,
-        privateNotes: dto.privateNotes ?? null,
-        challenges: dto.challenges ?? [],
-        participants: { create: [{ userId: dto.menteeId }] },
-        tasks: {
-          create: (dto.tasks ?? []).map((t) =>
-            newTask(t, dto.menteeId, actorId),
-          ),
+    // The follow-up's day decides which cycle each update fills.
+    const followUpDay = toZoned(startsAt).date;
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const interaction = await tx.interaction.create({
+        data: {
+          kind: 'FOLLOW_UP',
+          mentorshipId: mentorship.id,
+          createdById: actorId,
+          ...impersonation(),
+          startsAt,
+          place: dto.place ?? null,
+          sharedNotes: dto.sharedNotes ?? null,
+          privateNotes: dto.privateNotes ?? null,
+          participants: { create: [{ userId: dto.menteeId }] },
+          tasks: {
+            create: (dto.tasks ?? []).map((t) =>
+              newTask(t, dto.menteeId, actorId),
+            ),
+          },
+          challenges: {
+            create: (dto.challenges ?? []).map((title) => ({
+              menteeId: dto.menteeId,
+              createdById: actorId,
+              title,
+              ...impersonation(),
+            })),
+          },
         },
-        readings: {
-          create: updates.map((u) => ({
-            planId: u.planId,
-            value: u.value,
-            note: u.note ?? null,
-            source: 'FOLLOW_UP' as const,
-            authorId: actorId,
-            recordedAt: startsAt,
-            ...impersonation(),
-          })),
-        },
-      },
+      });
+      for (const note of notes) {
+        if (note.comment) {
+          await tx.challengeComment.create({
+            data: {
+              challengeId: note.challengeId,
+              authorId: actorId,
+              interactionId: interaction.id,
+              body: note.comment,
+              ...impersonation(),
+            },
+          });
+        }
+        if (note.resolve) {
+          await tx.challenge.updateMany({
+            where: { id: note.challengeId, resolvedAt: null },
+            data: { resolvedAt: startsAt, resolvedById: actorId },
+          });
+        }
+      }
+      for (const u of updates) {
+        const row = trackables.get(u.trackableId);
+        await this.trackables.upsertEntry(
+          tx,
+          row,
+          cycleStart(followUpDay, row.cycle),
+          { value: u.value, note: u.note, interactionId: interaction.id },
+          { authorId: actorId, source: 'MENTOR', limitToWindow: false },
+        );
+      }
+      return interaction;
     });
     return this.get(actorId, created.id);
+  }
+
+  /** The mentee's active trackables the updates name, each once, for a follow-up that has happened. */
+  private async trackablesFor(
+    menteeId: string,
+    startsAt: Date,
+    updates: { trackableId: string }[],
+  ) {
+    // Entries describe what happened; an upcoming follow-up has nothing to log yet.
+    if (startsAt > new Date()) {
+      throw new AppException(400, {
+        code: 'VALIDATION_FAILED',
+        title: 'Trackable updates need a follow-up that has happened',
+        errors: { trackableUpdates: ['only for a follow-up in the past'] },
+      });
+    }
+    const ids = [...new Set(updates.map((u) => u.trackableId))];
+    const rows = await this.prisma.trackable.findMany({
+      where: { id: { in: ids }, menteeId, archivedAt: null },
+      select: {
+        id: true,
+        type: true,
+        cycle: true,
+        startsOn: true,
+        archivedAt: true,
+      },
+    });
+    if (rows.length !== ids.length || ids.length !== updates.length) {
+      throw new AppException(400, {
+        code: 'VALIDATION_FAILED',
+        title:
+          "Each update must be for one of the mentee's active trackables, once",
+        errors: {
+          trackableUpdates: ['unknown, archived or repeated trackable'],
+        },
+      });
+    }
+    return new Map(rows.map((r) => [r.id, r]));
   }
 
   async createActivity(
@@ -255,7 +322,7 @@ export class InteractionsService {
       place: r.place,
       sharedNotes: r.sharedNotes,
       privateNotes: notes.get(r.id) ?? null,
-      challenges: r.challenges,
+      challenges: r.challenges.map((c) => c.title),
       createdBy: r.createdBy,
       impersonator: r.impersonator,
       participants: r.participants.map((p) => p.user),
@@ -264,7 +331,11 @@ export class InteractionsService {
   }
 }
 
-function newTask(t: NewTaskDto, assigneeId: string, createdById: string) {
+export function newTask(
+  t: NewTaskDto,
+  assigneeId: string,
+  createdById: string,
+) {
   return {
     title: t.title,
     dueOn: t.dueOn ? new Date(`${t.dueOn}T00:00:00Z`) : null,

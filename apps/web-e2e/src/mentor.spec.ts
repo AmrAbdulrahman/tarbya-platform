@@ -42,7 +42,7 @@ test('the mentor finds a mentee on the dashboard and shares a note with them (US
 
   await page.goto('/mentor');
   const row = page.getByRole('row').filter({ hasText: name });
-  await expect(row).toContainText('لم تُسند خطة بعد');
+  await expect(row).toContainText('لا مؤشرات بعد');
   await row.getByRole('link', { name, exact: true }).click();
   await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
 
@@ -88,4 +88,43 @@ test('picks a mentee first, then logs a follow-up from the panel (US-4.3)', asyn
   await expect(page.getByRole('status')).toContainText('حُفظت المتابعة.');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(history).toContainText('لقاء متابعة');
+});
+
+test('creates a trackable, logs this cycle, and resolves a challenge (US-4.5, US-5.2, BR-CHL-1…3)', async ({
+  page,
+}) => {
+  await signIn(page);
+  const { id, name } = await newMentee(page);
+
+  await page.goto(`/people/${id}`);
+  await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
+  await page.getByRole('button', { name: 'مؤشر جديد' }).click();
+  const dialog = page.getByRole('dialog', { name: 'مؤشر جديد' });
+  await dialog.getByLabel('الاسم').fill('صلاة الفجر في المسجد');
+  await dialog.getByLabel('النوع').selectOption('BOOLEAN');
+  await dialog.getByLabel('يُقاس').selectOption('DAILY');
+  await dialog.getByRole('button', { name: 'حفظ' }).click();
+  await expect(dialog).toBeHidden();
+
+  await page.getByRole('link', { name: /صلاة الفجر في المسجد/ }).click();
+  const toLog = page.getByRole('region', { name: 'بانتظار التسجيل' });
+  await toLog.getByRole('button', { name: 'تم', exact: true }).click();
+  await toLog.getByRole('button', { name: 'تسجيل' }).click();
+  await expect(page.getByRole('status')).toContainText('سُجّل.');
+  await expect(toLog).toBeHidden();
+  await expect(
+    page.getByRole('region', { name: 'الدورات المسجّلة' }),
+  ).toContainText('تم');
+
+  await page.goto(`/people/${id}`);
+  const challenges = page.getByRole('region', { name: 'التحديات' });
+  await challenges
+    .getByRole('textbox', { name: 'تحدٍّ جديد' })
+    .fill('ضغط الاختبارات');
+  await challenges.getByRole('button', { name: 'إضافة' }).click();
+  const item = challenges
+    .getByRole('listitem')
+    .filter({ hasText: 'ضغط الاختبارات' });
+  await item.getByRole('button', { name: 'تم تجاوزه' }).click();
+  await expect(item.getByRole('button', { name: 'إعادة فتح' })).toBeVisible();
 });

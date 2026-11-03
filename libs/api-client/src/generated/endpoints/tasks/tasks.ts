@@ -24,6 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CreateTaskDto,
   TaskDto,
   TasksControllerListParams,
   UpdateTaskDto
@@ -55,7 +56,100 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export type tasksControllerListResponse200 = {
+export type tasksControllerCreateResponse200 = {
+  data: TaskDto
+  status: 200
+}
+
+export type tasksControllerCreateResponseSuccess = (tasksControllerCreateResponse200) & {
+  headers: Headers;
+};
+;
+
+export type tasksControllerCreateResponse = (tasksControllerCreateResponseSuccess)
+
+export const getTasksControllerCreateUrl = () => {
+
+
+
+
+  return `/api/tasks`
+}
+
+export const tasksControllerCreate = async (createTaskDto: CreateTaskDto, options?: Parameters<typeof apiFetch>[1]): Promise<tasksControllerCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<tasksControllerCreateResponse>(getTasksControllerCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createTaskDto)
+  }
+);}
+
+
+
+
+
+export const getTasksControllerCreateMutationKey = () => ['tasksControllerCreate'] as const;
+
+export const getTasksControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tasksControllerCreate>>, TError,TasksControllerCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof tasksControllerCreate>>, TError,TasksControllerCreateMutationVariables, TContext> => {
+
+const mutationKey = getTasksControllerCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tasksControllerCreate>>, TasksControllerCreateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  tasksControllerCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TasksControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof tasksControllerCreate>>>
+    export type TasksControllerCreateMutationBody = CreateTaskDto
+    export type TasksControllerCreateMutationError = unknown
+    export type TasksControllerCreateMutationVariables = {data: CreateTaskDto}
+
+    export const useTasksControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tasksControllerCreate>>, TError,TasksControllerCreateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof tasksControllerCreate>>,
+        TError,
+        TasksControllerCreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTasksControllerCreateMutationOptions(options), queryClient);
+    }
+    export type tasksControllerListResponse200 = {
   data: TaskDto[]
   status: 200
 }

@@ -6,7 +6,7 @@
  */
 import type { ContactStatus } from './contactStatus.js';
 import type { InteractionKind } from './interactionKind.js';
-import type { PlanSummaryDto } from './planSummaryDto.js';
+import type { TrackableSummaryDto } from './trackableSummaryDto.js';
 import type { UserRefDto } from './userRefDto.js';
 
 export interface DashboardMenteeDto {
@@ -20,7 +20,8 @@ export interface DashboardMenteeDto {
   daysSinceContact: number;
   openTasks: number;
   /** @nullable */
-  mainPlan: PlanSummaryDto | null;
-  openPlans: number;
-  worseningPlans: number;
+  mainTrackable: TrackableSummaryDto | null;
+  activeTrackables: number;
+  worseningTrackables: number;
+  openChallenges: number;
 }

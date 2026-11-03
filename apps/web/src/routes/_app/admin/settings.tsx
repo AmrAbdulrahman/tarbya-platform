@@ -36,7 +36,6 @@ const schema = z
     rsvpRequestHours: int(1, 336),
     reminderHours: int(1, 72),
     trendWindow: int(2, 10),
-    checkInDays: int(1, 90),
     // Shown and edited as a percentage; stored as a fraction.
     trendSteadyPercent: z
       .number({ error: 'validation.number' })
@@ -56,7 +55,6 @@ const toValues = (s: SettingsDto): Values => ({
   rsvpRequestHours: s.rsvpRequestHours,
   reminderHours: s.reminderHours,
   trendWindow: s.trendWindow,
-  checkInDays: s.checkInDays,
   trendSteadyPercent: Math.round(s.trendSteadyBand * 1000) / 10,
 });
 
@@ -204,13 +202,6 @@ function SettingsPage() {
               error={err('trendSteadyPercent')}
             >
               {number('trendSteadyPercent', '0.5')}
-            </Field>
-            <Field
-              id="s-checkInDays"
-              label={t('admin.settings.checkInDays')}
-              error={err('checkInDays')}
-            >
-              {number('checkInDays')}
             </Field>
           </div>
         </Section>

@@ -10,15 +10,25 @@ import {
 } from 'class-validator';
 import { ActivityTypeRefDto, TaskDto } from '../interactions/interactions.dto';
 import { MyMenteeDto } from '../mentorships/mentorships.dto';
-import { PlanSummaryDto } from '../plans/plans.dto';
+import { TrackableSummaryDto } from '../trackables/trackables.dto';
 import { UserRefDto } from '../users/users.dto';
 
-const FEED_KINDS = ['FOLLOW_UP', 'ACTIVITY', 'CHECK_IN', 'REPLY'] as const;
+const FEED_KINDS = ['FOLLOW_UP', 'ACTIVITY', 'ENTRY', 'REPLY'] as const;
 type FeedKind = (typeof FEED_KINDS)[number];
 
-export class PlanRefDto {
+export class TrackableRefDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() name!: string;
+  @ApiProperty({
+    enum: ['COUNT', 'BOOLEAN', 'PERCENTAGE'],
+    enumName: 'TrackableType',
+  })
+  type!: 'COUNT' | 'BOOLEAN' | 'PERCENTAGE';
+  @ApiProperty({
+    enum: ['DAILY', 'WEEKLY', 'MONTHLY'],
+    enumName: 'TrackingCycle',
+  })
+  cycle!: 'DAILY' | 'WEEKLY' | 'MONTHLY';
 }
 
 /**
@@ -30,7 +40,7 @@ export class FeedItemDto {
   @ApiProperty() key!: string;
   @ApiProperty({ enum: FEED_KINDS, enumName: 'FeedKind' }) kind!: FeedKind;
   @ApiProperty({ format: 'date-time' }) at!: string;
-  /** Who logged the follow-up or activity, checked in, or replied. */
+  /** Who logged the follow-up, activity or entry, or replied. */
   @ApiProperty({ type: UserRefDto }) actor!: UserRefDto;
   /** The super admin who did it while impersonating the actor (BR-ADM-5). */
   @ApiProperty({ type: UserRefDto, nullable: true })
@@ -42,16 +52,21 @@ export class FeedItemDto {
   @ApiProperty({ type: String, nullable: true }) title!: string | null;
   @ApiProperty({ type: ActivityTypeRefDto, nullable: true })
   activityType!: ActivityTypeRefDto | null;
-  @ApiProperty() planUpdates!: number;
-  /** The follow-up's challenges, as written. */
+  /** Trackable cycles logged in the follow-up. */
+  @ApiProperty() trackableUpdates!: number;
+  /** Challenges raised in the follow-up. */
   @ApiProperty({ type: String, isArray: true }) challenges!: string[];
   @ApiProperty() tasks!: number;
   @ApiProperty() participants!: number;
 
-  /** Check-ins and replies. */
-  @ApiProperty({ type: PlanRefDto, nullable: true }) plan!: PlanRefDto | null;
+  /** The mentee's entries, and replies to entries. */
+  @ApiProperty({ type: TrackableRefDto, nullable: true })
+  trackable!: TrackableRefDto | null;
+  /** The cycle the entry is for (its first day). */
+  @ApiProperty({ type: String, format: 'date', nullable: true })
+  cycle!: string | null;
   @ApiProperty({ type: Number, nullable: true }) value!: number | null;
-  /** The check-in's note or the reply. */
+  /** The entry's note or the reply. */
   @ApiProperty({ type: String, nullable: true }) text!: string | null;
 }
 
@@ -95,11 +110,12 @@ export class UpcomingDto {
 }
 
 export class DashboardMenteeDto extends MyMenteeDto {
-  /** The open plan with the latest reading, else the newest open plan. */
-  @ApiProperty({ type: PlanSummaryDto, nullable: true })
-  mainPlan!: PlanSummaryDto | null;
-  @ApiProperty() openPlans!: number;
-  @ApiProperty() worseningPlans!: number;
+  /** The active trackable logged most recently, else the newest one. */
+  @ApiProperty({ type: TrackableSummaryDto, nullable: true })
+  mainTrackable!: TrackableSummaryDto | null;
+  @ApiProperty() activeTrackables!: number;
+  @ApiProperty() worseningTrackables!: number;
+  @ApiProperty() openChallenges!: number;
 }
 
 export class MentorStatsDto {
@@ -109,7 +125,7 @@ export class MentorStatsDto {
   /** Done this calendar month in the organisation zone. */
   @ApiProperty() monthFollowUps!: number;
   @ApiProperty() monthActivities!: number;
-  @ApiProperty() openPlans!: number;
+  @ApiProperty() activeTrackables!: number;
   @ApiProperty() improving!: number;
   @ApiProperty() steady!: number;
   @ApiProperty() worse!: number;
@@ -119,7 +135,7 @@ export class MyMentorDto {
   @ApiProperty({ type: UserRefDto }) user!: UserRefDto;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   lastContactAt!: string | null;
-  @ApiProperty() openPlans!: number;
+  @ApiProperty() activeTrackables!: number;
 }
 
 /** US-4.1 · design/screens/Main.dc.html */
@@ -138,8 +154,8 @@ export class JourneyDto {
   @ApiProperty({ type: UserRefDto, nullable: true }) mentor!: UserRefDto | null;
   /** Open one-time tasks, soonest due first. */
   @ApiProperty({ type: TaskDto, isArray: true }) tasks!: TaskDto[];
-  /** Open plans; `checkInDue` marks the ones waiting for a report. */
-  @ApiProperty({ type: PlanSummaryDto, isArray: true })
-  plans!: PlanSummaryDto[];
+  /** Active trackables; `openCycles` lists the cycles waiting to be logged. */
+  @ApiProperty({ type: TrackableSummaryDto, isArray: true })
+  trackables!: TrackableSummaryDto[];
   @ApiProperty({ type: UpcomingDto, isArray: true }) upcoming!: UpcomingDto[];
 }

@@ -21,7 +21,7 @@ import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
-import { formatNumber } from '../plans/plan-card';
+import { useCycleLabel, useFormatValue } from '../trackables/format';
 
 const kinds: Record<FeedKind, { icon: LucideIcon; className: string }> = {
   FOLLOW_UP: {
@@ -29,7 +29,7 @@ const kinds: Record<FeedKind, { icon: LucideIcon; className: string }> = {
     className: 'bg-primary-tint text-primary-hover',
   },
   ACTIVITY: { icon: Sparkles, className: 'bg-emerald-50 text-trend-up' },
-  CHECK_IN: { icon: TrendingUp, className: 'bg-amber-50 text-warn' },
+  ENTRY: { icon: TrendingUp, className: 'bg-amber-50 text-warn' },
   REPLY: {
     icon: MessageSquareReply,
     className: 'bg-manager-tint text-manager',
@@ -90,6 +90,8 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
   const me = useMe();
   const locale = i18n.language as Language;
   const { icon: Icon, className } = kinds[item.kind];
+  const formatValue = useFormatValue();
+  const cycleLabel = useCycleLabel();
 
   let title: string;
   let body: string | null = null;
@@ -99,7 +101,7 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
       title = t('feed.followUp');
       // The challenges are listed below, one by one.
       body = [
-        t('feed.planUpdates', { count: item.planUpdates }),
+        t('feed.trackableUpdates', { count: item.trackableUpdates }),
         t('feed.tasks', { count: item.tasks }),
       ].join(' · ');
       break;
@@ -110,17 +112,23 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
       }
       body = t('feed.participants', { count: item.participants });
       break;
-    case 'CHECK_IN':
-      title = t('feed.checkIn', {
-        plan: item.plan?.name,
-        value: formatNumber(item.value ?? 0, i18n.language),
+    case 'ENTRY':
+      title = t('feed.entry', {
+        trackable: item.trackable?.name,
+        value:
+          item.trackable && item.value !== null
+            ? formatValue(item.value, item.trackable.type)
+            : '',
       });
+      if (item.trackable && item.cycle) {
+        kind = `${kind} · ${cycleLabel(item.cycle, item.trackable.cycle)}`;
+      }
       body = item.text;
       break;
     case 'REPLY':
       title = t('feed.reply', {
         name: actedBy(t, item.actor, item.impersonator),
-        plan: item.plan?.name,
+        trackable: item.trackable?.name,
       });
       body = item.text;
       break;
@@ -142,10 +150,10 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1 pb-5">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          {item.plan ? (
+          {item.trackable ? (
             <Link
-              to="/plans/$id"
-              params={{ id: item.plan.id }}
+              to="/trackables/$id"
+              params={{ id: item.trackable.id }}
               className="font-semibold text-navy hover:text-primary"
             >
               {title}

@@ -1,22 +1,32 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  tasksControllerCreate,
   tasksControllerList,
   tasksControllerUpdate,
   type TaskDto,
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
-import { formatDate } from '@tarbya/shared';
-import { cn } from '@tarbya/ui';
+import { formatDate, toZoned } from '@tarbya/shared';
+import { Button, cn, Input } from '@tarbya/ui';
+import { FormError } from '../login/fields';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { mineQueryKey } from '../mentor/form-parts';
 
 /**
  * A mentee's one-time tasks (BR-FU-4): open ones first, done ones struck
- * through below them. The mentee, their mentor and admins tick them.
+ * through below them. The mentee, their mentor and admins tick them; the
+ * mentor and admins add them, with an optional due date.
  */
-export function TasksPanel({ menteeId }: { menteeId: string }) {
+export function TasksPanel({
+  menteeId,
+  canManage = false,
+}: {
+  menteeId: string;
+  canManage?: boolean;
+}) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const queryKey = ['tasks', menteeId];
@@ -30,16 +40,36 @@ export function TasksPanel({ menteeId }: { menteeId: string }) {
         )
       ).data as TaskDto[],
   });
+  const refresh = () =>
+    Promise.all(
+      [queryKey, ['dashboard'], mineQueryKey].map((key) =>
+        queryClient.invalidateQueries({ queryKey: key }),
+      ),
+    );
   const toggle = useMutation({
     mutationFn: (task: TaskDto) =>
       tasksControllerUpdate(task.id, { done: !task.doneAt }),
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey }),
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-        queryClient.invalidateQueries({ queryKey: mineQueryKey }),
-      ]),
+    onSuccess: refresh,
   });
+  const [title, setTitle] = useState('');
+  const [dueOn, setDueOn] = useState('');
+  const add = useMutation({
+    mutationFn: () =>
+      tasksControllerCreate({
+        assigneeId: menteeId,
+        title,
+        dueOn: dueOn || null,
+      }),
+    onSuccess: async () => {
+      setTitle('');
+      setDueOn('');
+      await refresh();
+    },
+  });
+  const onAdd = (e: FormEvent) => {
+    e.preventDefault();
+    if (title.trim()) add.mutate();
+  };
 
   return (
     <section
@@ -49,6 +79,39 @@ export function TasksPanel({ menteeId }: { menteeId: string }) {
       <h2 id="tasks-title" className="text-lg font-bold text-navy">
         {t('mentee.tasks')}
       </h2>
+      {canManage && (
+        <form onSubmit={onAdd} className="flex flex-col gap-1">
+          <div className="flex flex-wrap gap-2">
+            <Input
+              aria-label={t('mentee.newTask')}
+              placeholder={t('mentee.newTask')}
+              className="h-10 min-w-40 flex-[2_1_160px] text-[15px]"
+              maxLength={200}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <Input
+              type="date"
+              aria-label={t('mentee.taskDue')}
+              title={t('mentee.taskDue')}
+              className="h-10 flex-[1_1_130px] text-[15px]"
+              value={dueOn}
+              onChange={(e) => setDueOn(e.target.value)}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="h-10"
+              disabled={add.isPending || !title.trim()}
+            >
+              {t('mentee.addTask')}
+            </Button>
+          </div>
+          <FormError
+            message={add.isError ? errorMessage(t, add.error) : undefined}
+          />
+        </form>
+      )}
       {tasks.isError && (
         <p className="text-sm text-ink-subtle">
           {errorMessage(t, tasks.error)}
@@ -88,6 +151,8 @@ function TaskRow({
   const { t, i18n } = useTranslation();
   const me = useMe();
   const id = `task-${task.id}`;
+  const overdue =
+    !task.doneAt && !!task.dueOn && task.dueOn < toZoned(new Date()).date;
   return (
     <li className="flex items-start gap-3 rounded-lg px-1 py-2">
       <input
@@ -109,7 +174,13 @@ function TaskRow({
           {task.title}
         </span>
         {task.dueOn && (
-          <span className="text-[13px] text-ink-subtle">
+          <span
+            className={cn(
+              'text-[13px]',
+              overdue ? 'font-semibold text-trend-down' : 'text-ink-subtle',
+            )}
+          >
+            {overdue && <>{t('mentee.overdue')} · </>}
             {t('journey.due', {
               date: formatDate(new Date(`${task.dueOn}T12:00:00Z`), {
                 locale: i18n.language as Language,

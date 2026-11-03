@@ -1,6 +1,6 @@
 # Tarbya platform
 
-A closed mentorship platform for one organisation: mentors and mentees, development plans with trends, groups with gatherings and attendance, and a management hierarchy separate from mentorship. Arabic/RTL by default, English/LTR supported.
+A closed mentorship platform for one organisation: mentors and mentees, trackables measured per cycle with trends, challenges, groups with gatherings and attendance, and a management hierarchy separate from mentorship. Arabic/RTL by default, English/LTR supported.
 
 ## Read before working
 

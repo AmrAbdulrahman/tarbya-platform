@@ -23,7 +23,8 @@ import { ChangeLog } from '../../../components/admin/change-log';
 import { FeedList } from '../../../components/feed/feed-list';
 import { NotesPanel } from '../../../components/mentee/notes-panel';
 import { TasksPanel } from '../../../components/mentee/tasks-panel';
-import { PlansSection } from '../../../components/plans/plans-section';
+import { ChallengesPanel } from '../../../components/mentee/challenges-panel';
+import { TrackablesSection } from '../../../components/trackables/trackables-section';
 import { RoleChips } from '../../../components/role-chips';
 
 /** A member's profile, and for their mentor the full mentee profile (US-4.2 · design/screens/Mentee.dc.html). */
@@ -105,9 +106,9 @@ function ProfilePage() {
         </section>
         {p.canSeeAdminNotes && <AdminNotes subjectId={p.id} />}
       </div>
-      {p.canSeePlans && (
+      {p.canSeeMentoring && (
         <>
-          <PlansSection menteeId={p.id} canManage={p.canManagePlans} />
+          <TrackablesSection menteeId={p.id} canManage={p.canManageMentoring} />
           <div className="flex flex-wrap items-start gap-6">
             <section
               aria-labelledby="history-title"
@@ -119,8 +120,12 @@ function ProfilePage() {
               <FeedList userId={p.id} />
             </section>
             <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-6">
+              <ChallengesPanel
+                menteeId={p.id}
+                canManage={p.canManageMentoring}
+              />
+              <TasksPanel menteeId={p.id} canManage={p.canManageMentoring} />
               <NotesPanel mentee={p} canWrite={p.isMentor} />
-              <TasksPanel menteeId={p.id} />
             </div>
           </div>
         </>

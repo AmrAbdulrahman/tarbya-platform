@@ -5,15 +5,17 @@ import { useId, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   mentorshipsControllerMine,
-  plansControllerList,
+  trackablesControllerList,
   type MyMenteeDto,
   type MyMentoringDto,
-  type PlanSummaryDto,
+  type TrackableSummaryDto,
 } from '@tarbya/api-client';
 import { Badge, cn, Select, useToast } from '@tarbya/ui';
 import { FeedList } from '../feed/feed-list';
+import { ChallengesPanel } from '../mentee/challenges-panel';
 import { TasksPanel } from '../mentee/tasks-panel';
-import { PlanCard } from '../plans/plan-card';
+import { TrackableCard } from '../trackables/trackable-card';
+import { trackablesQueryKey } from '../trackables/trackables-section';
 import { EntryKind } from './entry-kind';
 import { mineQueryKey } from './form-parts';
 
@@ -154,7 +156,8 @@ export function LogScreen({
             </section>
             <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-6">
               <Progress menteeId={selected.mentee.id} />
-              <TasksPanel menteeId={selected.mentee.id} />
+              <ChallengesPanel menteeId={selected.mentee.id} canManage />
+              <TasksPanel menteeId={selected.mentee.id} canManage />
             </div>
           </div>
         </>
@@ -192,26 +195,26 @@ function Summary({ mentee }: { mentee: MyMenteeDto }) {
   );
 }
 
-/** The mentee's open plans with their trend. */
+/** The mentee's active trackables with their trend. */
 function Progress({ menteeId }: { menteeId: string }) {
   const { t } = useTranslation();
-  const plans = useQuery({
-    queryKey: ['plans', menteeId],
+  const trackables = useQuery({
+    queryKey: trackablesQueryKey(menteeId),
     queryFn: async ({ signal }) =>
-      (await plansControllerList({ menteeId }, { signal }))
-        .data as PlanSummaryDto[],
+      (await trackablesControllerList({ menteeId }, { signal }))
+        .data as TrackableSummaryDto[],
   });
-  const open = (plans.data ?? []).filter((p) => !p.closedAt);
+  const active = (trackables.data ?? []).filter((x) => !x.archivedAt);
   return (
     <section aria-labelledby="log-progress" className="flex flex-col gap-3">
       <h2 id="log-progress" className="text-lg font-bold text-navy">
         {t('mentoring.log.progress')}
       </h2>
-      {plans.isSuccess && !open.length && (
-        <p className="text-sm text-ink-subtle">{t('plans.noPlans')}</p>
+      {trackables.isSuccess && !active.length && (
+        <p className="text-sm text-ink-subtle">{t('trackables.noActive')}</p>
       )}
-      {open.map((plan) => (
-        <PlanCard key={plan.id} plan={plan} />
+      {active.map((x) => (
+        <TrackableCard key={x.id} trackable={x} />
       ))}
     </section>
   );

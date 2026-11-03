@@ -23,9 +23,9 @@ import { Route as AppMentorIndexRouteImport } from './routes/_app/mentor/index'
 import { Route as AppMentorActivityRouteImport } from './routes/_app/mentor/activity'
 import { Route as AppMentorLogRouteImport } from './routes/_app/mentor/log'
 import { Route as AppMyIndexRouteImport } from './routes/_app/my/index'
-import { Route as AppMyPlansRouteImport } from './routes/_app/my/plans'
+import { Route as AppMyTrackablesRouteImport } from './routes/_app/my/trackables'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people/$id'
-import { Route as AppPlansIdRouteImport } from './routes/_app/plans/$id'
+import { Route as AppTrackablesIdRouteImport } from './routes/_app/trackables/$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -96,9 +96,9 @@ const AppMyIndexRoute = AppMyIndexRouteImport.update({
   path: '/my/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMyPlansRoute = AppMyPlansRouteImport.update({
-  id: '/my/plans',
-  path: '/my/plans',
+const AppMyTrackablesRoute = AppMyTrackablesRouteImport.update({
+  id: '/my/trackables',
+  path: '/my/trackables',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
@@ -106,9 +106,9 @@ const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
   path: '/people/$id',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPlansIdRoute = AppPlansIdRouteImport.update({
-  id: '/plans/$id',
-  path: '/plans/$id',
+const AppTrackablesIdRoute = AppTrackablesIdRouteImport.update({
+  id: '/trackables/$id',
+  path: '/trackables/$id',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -124,9 +124,9 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AppAdminUsersRoute
   '/mentor/activity': typeof AppMentorActivityRoute
   '/mentor/log': typeof AppMentorLogRoute
-  '/my/plans': typeof AppMyPlansRoute
+  '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
-  '/plans/$id': typeof AppPlansIdRoute
+  '/trackables/$id': typeof AppTrackablesIdRoute
   '/mentor/': typeof AppMentorIndexRoute
   '/my/': typeof AppMyIndexRoute
 }
@@ -141,9 +141,9 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AppAdminUsersRoute
   '/mentor/activity': typeof AppMentorActivityRoute
   '/mentor/log': typeof AppMentorLogRoute
-  '/my/plans': typeof AppMyPlansRoute
+  '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
-  '/plans/$id': typeof AppPlansIdRoute
+  '/trackables/$id': typeof AppTrackablesIdRoute
   '/mentor': typeof AppMentorIndexRoute
   '/my': typeof AppMyIndexRoute
 }
@@ -161,9 +161,9 @@ export interface FileRoutesById {
   '/_app/admin/users': typeof AppAdminUsersRoute
   '/_app/mentor/activity': typeof AppMentorActivityRoute
   '/_app/mentor/log': typeof AppMentorLogRoute
-  '/_app/my/plans': typeof AppMyPlansRoute
+  '/_app/my/trackables': typeof AppMyTrackablesRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
-  '/_app/plans/$id': typeof AppPlansIdRoute
+  '/_app/trackables/$id': typeof AppTrackablesIdRoute
   '/_app/mentor/': typeof AppMentorIndexRoute
   '/_app/my/': typeof AppMyIndexRoute
 }
@@ -181,9 +181,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/mentor/activity'
     | '/mentor/log'
-    | '/my/plans'
+    | '/my/trackables'
     | '/people/$id'
-    | '/plans/$id'
+    | '/trackables/$id'
     | '/mentor/'
     | '/my/'
   fileRoutesByTo: FileRoutesByTo
@@ -198,9 +198,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/mentor/activity'
     | '/mentor/log'
-    | '/my/plans'
+    | '/my/trackables'
     | '/people/$id'
-    | '/plans/$id'
+    | '/trackables/$id'
     | '/mentor'
     | '/my'
   id:
@@ -217,9 +217,9 @@ export interface FileRouteTypes {
     | '/_app/admin/users'
     | '/_app/mentor/activity'
     | '/_app/mentor/log'
-    | '/_app/my/plans'
+    | '/_app/my/trackables'
     | '/_app/people/$id'
-    | '/_app/plans/$id'
+    | '/_app/trackables/$id'
     | '/_app/mentor/'
     | '/_app/my/'
   fileRoutesById: FileRoutesById
@@ -329,11 +329,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMyIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/my/plans': {
-      id: '/_app/my/plans'
-      path: '/my/plans'
-      fullPath: '/my/plans'
-      preLoaderRoute: typeof AppMyPlansRouteImport
+    '/_app/my/trackables': {
+      id: '/_app/my/trackables'
+      path: '/my/trackables'
+      fullPath: '/my/trackables'
+      preLoaderRoute: typeof AppMyTrackablesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/people/$id': {
@@ -343,11 +343,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeopleIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/plans/$id': {
-      id: '/_app/plans/$id'
-      path: '/plans/$id'
-      fullPath: '/plans/$id'
-      preLoaderRoute: typeof AppPlansIdRouteImport
+    '/_app/trackables/$id': {
+      id: '/_app/trackables/$id'
+      path: '/trackables/$id'
+      fullPath: '/trackables/$id'
+      preLoaderRoute: typeof AppTrackablesIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -392,9 +392,9 @@ interface AppRouteChildren {
   AppMentorRoute: typeof AppMentorRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppMyPlansRoute: typeof AppMyPlansRoute
+  AppMyTrackablesRoute: typeof AppMyTrackablesRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
-  AppPlansIdRoute: typeof AppPlansIdRoute
+  AppTrackablesIdRoute: typeof AppTrackablesIdRoute
   AppMyIndexRoute: typeof AppMyIndexRoute
 }
 
@@ -403,9 +403,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppMentorRoute: AppMentorRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
-  AppMyPlansRoute: AppMyPlansRoute,
+  AppMyTrackablesRoute: AppMyTrackablesRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,
-  AppPlansIdRoute: AppPlansIdRoute,
+  AppTrackablesIdRoute: AppTrackablesIdRoute,
   AppMyIndexRoute: AppMyIndexRoute,
 }
 

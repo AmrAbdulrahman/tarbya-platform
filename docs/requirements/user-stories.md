@@ -126,14 +126,14 @@ As the super admin, I want to pick a user from the header and see the app as the
 
 - A banner shows whose view this is and has a button back to my account.
 - Starting and stopping are audited; changes I make meanwhile are recorded as mine on their behalf.
-- Follow-ups, activities, notes, plans, reports and replies I write meanwhile show "X on behalf of Y" wherever their author is shown.
+- Follow-ups, activities, notes, trackables, entries, challenges and replies I write meanwhile show "X on behalf of Y" wherever their author is shown.
 - Admins see a change log on each member's profile, with entries made while impersonating marked.
 - Their password, email, phone and sessions can't be changed while impersonating.
 - Refs: BR-ADM-5, BR-ADM-4
 
 ### US-3.5 Manage lookups — v1
 
-As a moderator, I want to manage activity types, gathering types and plan tracking methods.
+As a moderator, I want to manage activity types and gathering types.
 
 - Arabic and English names; active flag; colour for activity types; scope (individual or group).
 - Used values can't be deleted, only deactivated.
@@ -154,23 +154,24 @@ As a moderator, I want to edit thresholds and which roles can sign in.
 
 As a mentor, I want to see all my mentees at a glance, so that I know who needs me.
 
-- Headline numbers: mentees, needing contact, follow-ups this month, plans improving.
-- Table: last contact with status (regular / due / late) and type, main plan, trend sparkline with label.
-- Filters: all, needs contact, plans worsening.
+- Headline numbers: mentees, needing contact, follow-ups this month, trackables improving.
+- Table: last contact with status (regular / due / late) and type, open challenges, main trackable, trend sparkline with label.
+- Filters: all, needs contact, trackables getting worse.
 - Side panels: upcoming items, my mentor, latest notifications.
 - Refs: BR-FU-5, BR-PLAN-4 · `Main.dc.html`
 
 ### US-4.2 Mentee profile — v1
 
-As a mentor, I want a mentee's full picture: plans with trend charts, timeline, notes and tasks.
+As a mentor, I want a mentee's full picture: trackables with trend charts, timeline, challenges, tasks and notes.
 
 - Refs: BR-PLAN-4, BR-NOTE-1 · `Mentee.dc.html`
 
 ### US-4.3 Log a follow-up — v1
 
-As a mentor, I want to record a follow-up with date, time, notes, challenges, one-time tasks and plan updates.
+As a mentor, I want to record a follow-up with date, time, notes, challenges, one-time tasks and trackable updates.
 
-- Plan updates add readings to the mentee's plans.
+- Trackable updates log the follow-up's cycle for each trackable.
+- New challenges are raised for the mentee; open ones get a comment or are resolved.
 - A future date makes it upcoming and offers notifying the mentee.
 - Refs: BR-FU-1, BR-FU-3, BR-FU-4 · `FollowUp.dc.html`
 
@@ -183,12 +184,20 @@ As a mentor, I want to record an outing, trip, sport or meal with one or more pe
 - Done activities appear in each participant's feed.
 - Refs: BR-FU-2, BR-FU-3 · `Activity.dc.html`
 
-### US-4.5 Create and manage a development plan — v1
+### US-4.5 Create and manage a trackable — v1
 
-As a mentor, I want to create, edit, close and reopen a mentee's plan.
+As a mentor, I want to create, edit, archive and restore a mentee's trackables.
 
-- Fields: name, goal, tracking method, target, optional end date.
-- Refs: BR-PLAN-1, BR-PLAN-2 · `Mentee.dc.html` (create-plan entry point; form still to be designed)
+- Fields: name, optional goal, type (count, done/not done, percentage), cycle (daily, weekly, monthly), whether more is better, optional target, start day.
+- Type, cycle and start change only until something is logged.
+- Refs: BR-TRK-1, BR-TRK-6 · `Mentee.dc.html`
+
+### US-4.8 Follow a mentee's challenges — v1
+
+As a mentor, I want to raise challenges for a mentee, discuss them with the mentee, and mark them resolved.
+
+- Open challenges first; resolved ones stay visible, struck through, with who resolved them and when.
+- Refs: BR-CHL-1…3
 
 ### US-4.6 Write notes — v1
 
@@ -199,9 +208,9 @@ As a mentor, I want to write shared or private notes on a mentee.
 
 ### US-4.7 Reply to a check-in — v1
 
-As a mentor, I want to reply to a mentee's plan check-in, and be notified when one arrives.
+As a mentor, I want to reply to what a mentee logs on a trackable, and be notified when they log.
 
-- Refs: BR-PLAN-5 · `MyPlan.dc.html`
+- Refs: BR-TRK-6 · `MyPlan.dc.html`
 
 ---
 
@@ -209,17 +218,18 @@ As a mentor, I want to reply to a mentee's plan check-in, and be notified when o
 
 ### US-5.1 My journey — v1
 
-As a mentee, I want a home with my actions, upcoming events, my plans and my feed.
+As a mentee, I want a home with my actions, upcoming events, my trackables and my feed.
 
 - Actions: open tasks, due check-ins, pending RSVPs; I can mark tasks done here.
 - Refs: BR-FU-4, BR-GRP-9 · `MyJourney.dc.html`
 
-### US-5.2 Report progress on a plan — v1
+### US-5.2 Log my trackables — v1
 
-As a mentee, I want to submit a check-in (value + note) and see the trend update.
+As a mentee, I want to log each cycle of my trackables (a count, done/not done, or a percentage, with an optional note) and see the trend update.
 
-- History shows my check-ins and my mentor's replies.
-- Refs: BR-PLAN-3, BR-PLAN-5 · `MyPlan.dc.html`
+- I can fill the current cycle and any I missed in the last 30 days; older ones show only if logged.
+- History shows what I logged and my mentor's replies.
+- Refs: BR-TRK-2…5 · `MyPlan.dc.html`
 
 ### US-5.3 See my mentor and shared notes — v1
 

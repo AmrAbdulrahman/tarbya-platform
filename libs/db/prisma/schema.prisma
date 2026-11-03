@@ -54,17 +54,23 @@ model User {
   adminNotes                AdminNote[]              @relation("AdminNoteSubject")
   adminNotesWritten         AdminNote[]              @relation("AdminNoteAuthor")
   contactChanges            ContactChange[]
-  plans                     DevelopmentPlan[]        @relation("PlanMentee")
-  plansCreated              DevelopmentPlan[]        @relation("PlanCreator")
-  readings                  PlanReading[]            @relation("ReadingAuthor")
-  replies                   PlanReply[]              @relation("ReplyAuthor")
+  trackables                Trackable[]              @relation("TrackableMentee")
+  trackablesCreated         Trackable[]              @relation("TrackableCreator")
+  entries                   TrackableEntry[]         @relation("EntryAuthor")
+  replies                   TrackableReply[]         @relation("ReplyAuthor")
+  challenges                Challenge[]              @relation("ChallengeMentee")
+  challengesRaised          Challenge[]              @relation("ChallengeCreator")
+  challengesResolved        Challenge[]              @relation("ChallengeResolver")
+  challengeComments         ChallengeComment[]       @relation("ChallengeCommentAuthor")
   createdInImpersonation    Interaction[]            @relation("InteractionImpersonator")
   tasksSetInImpersonation   Task[]                   @relation("TaskImpersonator")
   notesInImpersonation      Note[]                   @relation("NoteImpersonator")
   adminNotesInImpersonation AdminNote[]              @relation("AdminNoteImpersonator")
-  plansInImpersonation      DevelopmentPlan[]        @relation("PlanImpersonator")
-  readingsInImpersonation   PlanReading[]            @relation("ReadingImpersonator")
-  repliesInImpersonation    PlanReply[]              @relation("ReplyImpersonator")
+  trackablesInImpersonation Trackable[]              @relation("TrackableImpersonator")
+  entriesInImpersonation    TrackableEntry[]         @relation("EntryImpersonator")
+  repliesInImpersonation    TrackableReply[]         @relation("ReplyImpersonator")
+  challengesInImpersonation Challenge[]              @relation("ChallengeImpersonator")
+  commentsInImpersonation   ChallengeComment[]       @relation("ChallengeCommentImpersonator")
   auditedOnBehalf           AuditLog[]               @relation("AuditOnBehalfOf")
 
   @@index([managerId])
@@ -171,13 +177,14 @@ model Interaction {
   sharedNotes    String?
   /// The creator and moderators only; dropped in the query for anyone else (BR-NOTE-1).
   privateNotes   String?
-  challenges     String[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
   participants InteractionParticipant[]
   tasks        Task[]
-  readings     PlanReading[]
+  entries      TrackableEntry[]
+  challenges   Challenge[]
+  comments     ChallengeComment[]
 
   @@index([mentorshipId, startsAt])
   @@index([createdById, startsAt])
@@ -291,17 +298,6 @@ model ActivityType {
   interactions Interaction[]
 }
 
-model TrackingMethod {
-  id        String   @id @default(uuid()) @db.Uuid
-  nameAr    String
-  nameEn    String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  plans DevelopmentPlan[]
-}
-
 // ── Audit (BR-ADM-4, BR-MGR-8) ──────────────────────────────────────────
 
 model AuditLog {
@@ -377,76 +373,139 @@ model ContactChange {
   @@index([userId, kind, createdAt])
 }
 
-// ── Development plans (US-4.5, US-5.2, US-4.7, BR-PLAN-1…5) ───────────────
-// A plan belongs to the mentee, so it outlives a change of mentor.
+// ── Trackables (BR-TRK-1…6), challenges (BR-CHL-1…3) ─────────────────────
 
-model DevelopmentPlan {
-  id               String         @id @default(uuid()) @db.Uuid
-  menteeId         String         @db.Uuid
-  mentee           User           @relation("PlanMentee", fields: [menteeId], references: [id])
-  createdById      String         @db.Uuid
-  createdBy        User           @relation("PlanCreator", fields: [createdById], references: [id])
+enum TrackableType {
+  COUNT
+  /// Done or not done: logged as 1 or 0.
+  BOOLEAN
+  /// 0 to 100.
+  PERCENTAGE
+}
+
+enum TrackingCycle {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum EntrySource {
+  /// The mentee logged it.
+  MENTEE
+  /// Their mentor or an admin logged it, on its own or in a follow-up.
+  MENTOR
+}
+
+/// Something a mentee tracks, measured once per cycle. Belongs to the mentee, so it survives a change of mentor.
+model Trackable {
+  id             String        @id @default(uuid()) @db.Uuid
+  menteeId       String        @db.Uuid
+  mentee         User          @relation("TrackableMentee", fields: [menteeId], references: [id])
+  createdById    String        @db.Uuid
+  createdBy      User          @relation("TrackableCreator", fields: [createdById], references: [id])
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
-  impersonatorId   String?        @db.Uuid
-  impersonator     User?          @relation("PlanImpersonator", fields: [impersonatorId], references: [id])
-  name             String
-  goal             String
-  trackingMethodId String         @db.Uuid
-  trackingMethod   TrackingMethod @relation(fields: [trackingMethodId], references: [id])
-  target           Float
+  impersonatorId String?       @db.Uuid
+  impersonator   User?         @relation("TrackableImpersonator", fields: [impersonatorId], references: [id])
+  name           String
+  goal           String?
+  type           TrackableType
+  cycle          TrackingCycle
   /// False for things that should go down (screen time, absences).
-  higherIsBetter   Boolean        @default(true)
-  endsOn           DateTime?      @db.Date
-  closedAt         DateTime?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  higherIsBetter Boolean       @default(true)
+  /// Per cycle; optional.
+  target         Float?
+  /// The first day tracking counts from (organisation calendar).
+  startsOn       DateTime      @db.Date
+  archivedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
-  readings PlanReading[]
+  entries TrackableEntry[]
 
-  @@index([menteeId, closedAt])
+  @@index([menteeId, archivedAt])
 }
 
-enum ReadingSource {
-  FOLLOW_UP
-  CHECK_IN
-}
-
-model PlanReading {
-  id             String          @id @default(uuid()) @db.Uuid
-  planId         String          @db.Uuid
-  plan           DevelopmentPlan @relation(fields: [planId], references: [id])
+/// One cycle's value. Logging the same cycle again replaces it.
+model TrackableEntry {
+  id             String       @id @default(uuid()) @db.Uuid
+  trackableId    String       @db.Uuid
+  trackable      Trackable    @relation(fields: [trackableId], references: [id])
+  /// First day of the cycle (organisation calendar).
+  periodStart    DateTime     @db.Date
   value          Float
   note           String?
-  source         ReadingSource
-  /// The follow-up that recorded it (FOLLOW_UP readings).
-  interactionId  String?         @db.Uuid
-  interaction    Interaction?    @relation(fields: [interactionId], references: [id])
-  authorId       String          @db.Uuid
-  author         User            @relation("ReadingAuthor", fields: [authorId], references: [id])
+  source         EntrySource
+  /// The follow-up it was logged in, if any.
+  interactionId  String?      @db.Uuid
+  interaction    Interaction? @relation(fields: [interactionId], references: [id])
+  authorId       String       @db.Uuid
+  author         User         @relation("EntryAuthor", fields: [authorId], references: [id])
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
-  impersonatorId String?         @db.Uuid
-  impersonator   User?           @relation("ReadingImpersonator", fields: [impersonatorId], references: [id])
-  /// The mentee asked their mentor for help with this check-in.
-  needsHelp      Boolean         @default(false)
-  recordedAt     DateTime        @default(now())
+  impersonatorId String?      @db.Uuid
+  impersonator   User?        @relation("EntryImpersonator", fields: [impersonatorId], references: [id])
+  /// The mentee asked their mentor for help with this cycle.
+  needsHelp      Boolean      @default(false)
+  recordedAt     DateTime     @default(now())
 
-  replies PlanReply[]
+  replies TrackableReply[]
 
-  @@index([planId, recordedAt])
+  @@unique([trackableId, periodStart])
 }
 
-/// The mentor's answer to a check-in (BR-PLAN-5).
-model PlanReply {
-  id             String      @id @default(uuid()) @db.Uuid
-  readingId      String      @db.Uuid
-  reading        PlanReading @relation(fields: [readingId], references: [id], onDelete: Cascade)
-  authorId       String      @db.Uuid
-  author         User        @relation("ReplyAuthor", fields: [authorId], references: [id])
+model TrackableReply {
+  id             String         @id @default(uuid()) @db.Uuid
+  entryId        String         @db.Uuid
+  entry          TrackableEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  authorId       String         @db.Uuid
+  author         User           @relation("ReplyAuthor", fields: [authorId], references: [id])
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
-  impersonatorId String?     @db.Uuid
-  impersonator   User?       @relation("ReplyImpersonator", fields: [impersonatorId], references: [id])
+  impersonatorId String?        @db.Uuid
+  impersonator   User?          @relation("ReplyImpersonator", fields: [impersonatorId], references: [id])
   body           String
-  createdAt      DateTime    @default(now())
+  createdAt      DateTime       @default(now())
 
-  @@index([readingId])
+  @@index([entryId])
+}
+
+/// Something a mentee is struggling with, followed until resolved.
+model Challenge {
+  id             String       @id @default(uuid()) @db.Uuid
+  menteeId       String       @db.Uuid
+  mentee         User         @relation("ChallengeMentee", fields: [menteeId], references: [id])
+  createdById    String       @db.Uuid
+  createdBy      User         @relation("ChallengeCreator", fields: [createdById], references: [id])
+  /// The super admin who wrote this while impersonating the author (BR-ADM-5).
+  impersonatorId String?      @db.Uuid
+  impersonator   User?        @relation("ChallengeImpersonator", fields: [impersonatorId], references: [id])
+  /// The follow-up it was raised in, if any.
+  interactionId  String?      @db.Uuid
+  interaction    Interaction? @relation(fields: [interactionId], references: [id])
+  title          String
+  resolvedAt     DateTime?
+  resolvedById   String?      @db.Uuid
+  resolvedBy     User?        @relation("ChallengeResolver", fields: [resolvedById], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  comments ChallengeComment[]
+
+  @@index([menteeId, resolvedAt])
+}
+
+model ChallengeComment {
+  id             String       @id @default(uuid()) @db.Uuid
+  challengeId    String       @db.Uuid
+  challenge      Challenge    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  authorId       String       @db.Uuid
+  author         User         @relation("ChallengeCommentAuthor", fields: [authorId], references: [id])
+  /// The super admin who wrote this while impersonating the author (BR-ADM-5).
+  impersonatorId String?      @db.Uuid
+  impersonator   User?        @relation("ChallengeCommentImpersonator", fields: [impersonatorId], references: [id])
+  /// The follow-up it was written in, if any.
+  interactionId  String?      @db.Uuid
+  interaction    Interaction? @relation(fields: [interactionId], references: [id])
+  body           String
+  createdAt      DateTime     @default(now())
+
+  @@index([challengeId, createdAt])
 }

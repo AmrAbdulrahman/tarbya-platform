@@ -90,3 +90,15 @@ export function formatDayTile(
     parts.find((p) => p.type === type)?.value ?? '';
   return { day: part('day'), month: part('month') };
 }
+
+/** Month and year, e.g. a monthly cycle. Cycles follow Gregorian months whatever the user's calendar. */
+export function formatMonth(
+  date: Date | string,
+  options: Pick<DateFormatOptions, 'locale' | 'timeZone'>,
+): string {
+  const { locale, timeZone = ORG_TIMEZONE } = options;
+  return new Intl.DateTimeFormat(
+    `${locale === 'ar' ? 'ar-EG' : 'en-GB'}-u-ca-gregory-nu-latn`,
+    { timeZone, month: 'long', year: 'numeric' },
+  ).format(typeof date === 'string' ? new Date(date) : date);
+}

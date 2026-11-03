@@ -806,99 +806,6 @@
         ]
       }
     },
-    "/api/lookups/tracking-methods": {
-      "get": {
-        "operationId": "LookupsController_trackingMethods",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TrackingMethodDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "lookups"
-        ]
-      },
-      "post": {
-        "operationId": "LookupsController_createTrackingMethod",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTrackingMethodDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrackingMethodDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "lookups"
-        ]
-      }
-    },
-    "/api/lookups/tracking-methods/{id}": {
-      "patch": {
-        "operationId": "LookupsController_updateTrackingMethod",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTrackingMethodDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrackingMethodDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "lookups"
-        ]
-      }
-    },
     "/api/mentorships/mine": {
       "get": {
         "operationId": "MentorshipsController_mine",
@@ -1153,6 +1060,35 @@
       }
     },
     "/api/tasks": {
+      "post": {
+        "operationId": "TasksController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tasks"
+        ]
+      },
       "get": {
         "operationId": "TasksController_list",
         "parameters": [
@@ -1236,6 +1172,228 @@
         },
         "tags": [
           "tasks"
+        ]
+      }
+    },
+    "/api/trackables": {
+      "get": {
+        "operationId": "TrackablesController_list",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackableSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      },
+      "post": {
+        "operationId": "TrackablesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTrackableDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackables/{id}": {
+      "get": {
+        "operationId": "TrackablesController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      },
+      "patch": {
+        "operationId": "TrackablesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTrackableDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackables/{id}/entries/{periodStart}": {
+      "put": {
+        "operationId": "TrackablesController_log",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "periodStart",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "TRACKABLE_ARCHIVED, CYCLE_OUT_OF_RANGE"
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackables/entries/{entryId}/replies": {
+      "post": {
+        "operationId": "TrackablesController_reply",
+        "parameters": [
+          {
+            "name": "entryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplyBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
         ]
       }
     },
@@ -1697,9 +1855,9 @@
         ]
       }
     },
-    "/api/plans": {
+    "/api/challenges": {
       "get": {
-        "operationId": "PlansController_list",
+        "operationId": "ChallengesController_list",
         "parameters": [
           {
             "name": "menteeId",
@@ -1719,7 +1877,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PlanSummaryDto"
+                    "$ref": "#/components/schemas/ChallengeDto"
                   }
                 }
               }
@@ -1727,18 +1885,18 @@
           }
         },
         "tags": [
-          "plans"
+          "challenges"
         ]
       },
       "post": {
-        "operationId": "PlansController_create",
+        "operationId": "ChallengesController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePlanDto"
+                "$ref": "#/components/schemas/CreateChallengeDto"
               }
             }
           }
@@ -1749,48 +1907,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlanDetailDto"
+                  "$ref": "#/components/schemas/ChallengeDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "plans"
+          "challenges"
         ]
       }
     },
-    "/api/plans/{id}": {
-      "get": {
-        "operationId": "PlansController_get",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanDetailDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "plans"
-        ]
-      },
+    "/api/challenges/{id}": {
       "patch": {
-        "operationId": "PlansController_update",
+        "operationId": "ChallengesController_update",
         "parameters": [
           {
             "name": "id",
@@ -1806,7 +1936,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdatePlanDto"
+                "$ref": "#/components/schemas/UpdateChallengeDto"
               }
             }
           }
@@ -1817,20 +1947,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlanDetailDto"
+                  "$ref": "#/components/schemas/ChallengeDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "plans"
+          "challenges"
         ]
       }
     },
-    "/api/plans/{id}/check-ins": {
+    "/api/challenges/{id}/comments": {
       "post": {
-        "operationId": "PlansController_checkIn",
+        "operationId": "ChallengesController_comment",
         "parameters": [
           {
             "name": "id",
@@ -1846,7 +1976,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckInDto"
+                "$ref": "#/components/schemas/CommentBodyDto"
               }
             }
           }
@@ -1857,54 +1987,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlanDetailDto"
+                  "$ref": "#/components/schemas/ChallengeDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "plans"
-        ]
-      }
-    },
-    "/api/plans/readings/{readingId}/replies": {
-      "post": {
-        "operationId": "PlansController_reply",
-        "parameters": [
-          {
-            "name": "readingId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PlanReplyBodyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanDetailDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "plans"
+          "challenges"
         ]
       }
     },
@@ -2208,11 +2298,6 @@
             "type": "number",
             "minimum": 0,
             "maximum": 0.5
-          },
-          "checkInDays": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 90
           }
         },
         "required": [
@@ -2222,8 +2307,7 @@
           "rsvpRequestHours",
           "reminderHours",
           "trendWindow",
-          "trendSteadyBand",
-          "checkInDays"
+          "trendSteadyBand"
         ]
       },
       "UpdateSettingsDto": {
@@ -2264,11 +2348,6 @@
             "type": "number",
             "minimum": 0,
             "maximum": 0.5
-          },
-          "checkInDays": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 90
           }
         }
       },
@@ -2810,70 +2889,6 @@
           }
         }
       },
-      "TrackingMethodDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "nameAr": {
-            "type": "string"
-          },
-          "nameEn": {
-            "type": "string"
-          },
-          "active": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "nameAr",
-          "nameEn",
-          "active"
-        ]
-      },
-      "CreateTrackingMethodDto": {
-        "type": "object",
-        "properties": {
-          "nameAr": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80
-          },
-          "nameEn": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80
-          },
-          "active": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "nameAr",
-          "nameEn"
-        ]
-      },
-      "UpdateTrackingMethodDto": {
-        "type": "object",
-        "properties": {
-          "nameAr": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80
-          },
-          "nameEn": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80
-          },
-          "active": {
-            "type": "boolean"
-          }
-        }
-      },
       "InteractionKind": {
         "type": "string",
         "enum": [
@@ -3239,6 +3254,26 @@
           "nextCursor"
         ]
       },
+      "ChallengeNoteDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          },
+          "resolve": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "challengeId"
+        ]
+      },
       "NewTaskDto": {
         "type": "object",
         "properties": {
@@ -3257,10 +3292,10 @@
           "title"
         ]
       },
-      "PlanUpdateDto": {
+      "TrackableUpdateDto": {
         "type": "object",
         "properties": {
-          "planId": {
+          "trackableId": {
             "type": "string",
             "format": "uuid"
           },
@@ -3274,7 +3309,7 @@
           }
         },
         "required": [
-          "planId",
+          "trackableId",
           "value"
         ]
       },
@@ -3311,6 +3346,13 @@
               "type": "string"
             }
           },
+          "challengeNotes": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChallengeNoteDto"
+            }
+          },
           "tasks": {
             "maxItems": 20,
             "type": "array",
@@ -3318,11 +3360,11 @@
               "$ref": "#/components/schemas/NewTaskDto"
             }
           },
-          "planUpdates": {
+          "trackableUpdates": {
             "maxItems": 20,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PlanUpdateDto"
+              "$ref": "#/components/schemas/TrackableUpdateDto"
             }
           }
         },
@@ -3384,6 +3426,29 @@
           "participantIds"
         ]
       },
+      "CreateTaskDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "dueOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "title",
+          "assigneeId"
+        ]
+      },
       "UpdateTaskDto": {
         "type": "object",
         "properties": {
@@ -3393,6 +3458,516 @@
         },
         "required": [
           "done"
+        ]
+      },
+      "TrackableType": {
+        "type": "string",
+        "enum": [
+          "COUNT",
+          "BOOLEAN",
+          "PERCENTAGE"
+        ]
+      },
+      "TrackingCycle": {
+        "type": "string",
+        "enum": [
+          "DAILY",
+          "WEEKLY",
+          "MONTHLY"
+        ]
+      },
+      "Trend": {
+        "type": "string",
+        "enum": [
+          "IMPROVING",
+          "STEADY",
+          "WORSE",
+          "NEW"
+        ]
+      },
+      "TrackableSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
+          },
+          "higherIsBetter": {
+            "type": "boolean"
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "currentCycle": {
+            "type": "string",
+            "format": "date"
+          },
+          "latestCycle": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "latest": {
+            "type": "number",
+            "nullable": true
+          },
+          "logged": {
+            "type": "number"
+          },
+          "missed": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number",
+            "nullable": true
+          },
+          "openCycles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "trend": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Trend"
+              }
+            ]
+          },
+          "change": {
+            "type": "number"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "menteeId",
+          "name",
+          "goal",
+          "type",
+          "cycle",
+          "higherIsBetter",
+          "target",
+          "startsOn",
+          "archivedAt",
+          "currentCycle",
+          "latestCycle",
+          "latest",
+          "logged",
+          "missed",
+          "rate",
+          "openCycles",
+          "trend",
+          "change",
+          "points"
+        ]
+      },
+      "EntrySource": {
+        "type": "string",
+        "enum": [
+          "MENTEE",
+          "MENTOR"
+        ]
+      },
+      "TrackableReplyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "author",
+          "impersonator",
+          "createdAt"
+        ]
+      },
+      "TrackableEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date"
+          },
+          "value": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "source": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EntrySource"
+              }
+            ]
+          },
+          "needsHelp": {
+            "type": "boolean"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrackableReplyDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "periodStart",
+          "value",
+          "note",
+          "source",
+          "needsHelp",
+          "recordedAt",
+          "author",
+          "impersonator",
+          "replies"
+        ]
+      },
+      "TrackableDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
+          },
+          "higherIsBetter": {
+            "type": "boolean"
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "currentCycle": {
+            "type": "string",
+            "format": "date"
+          },
+          "latestCycle": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "latest": {
+            "type": "number",
+            "nullable": true
+          },
+          "logged": {
+            "type": "number"
+          },
+          "missed": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number",
+            "nullable": true
+          },
+          "openCycles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "trend": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Trend"
+              }
+            ]
+          },
+          "change": {
+            "type": "number"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "mentee": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrackableEntryDto"
+            }
+          },
+          "canManage": {
+            "type": "boolean"
+          },
+          "canLog": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "menteeId",
+          "name",
+          "goal",
+          "type",
+          "cycle",
+          "higherIsBetter",
+          "target",
+          "startsOn",
+          "archivedAt",
+          "currentCycle",
+          "latestCycle",
+          "latest",
+          "logged",
+          "missed",
+          "rate",
+          "openCycles",
+          "trend",
+          "change",
+          "points",
+          "mentee",
+          "entries",
+          "canManage",
+          "canLog"
+        ]
+      },
+      "CreateTrackableDto": {
+        "type": "object",
+        "properties": {
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "goal": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
+          },
+          "higherIsBetter": {
+            "type": "boolean",
+            "default": true
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "menteeId",
+          "name",
+          "type",
+          "cycle"
+        ]
+      },
+      "UpdateTrackableDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "goal": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
+          },
+          "higherIsBetter": {
+            "type": "boolean",
+            "default": true
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LogEntryDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2000
+          },
+          "needsHelp": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "ReplyBodyDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "body"
         ]
       },
       "NoteVisibility": {
@@ -3546,10 +4121,10 @@
           "canSeeAdminNotes": {
             "type": "boolean"
           },
-          "canSeePlans": {
+          "canSeeMentoring": {
             "type": "boolean"
           },
-          "canManagePlans": {
+          "canManageMentoring": {
             "type": "boolean"
           },
           "isMentor": {
@@ -3566,8 +4141,8 @@
           "mentor",
           "deactivatedAt",
           "canSeeAdminNotes",
-          "canSeePlans",
-          "canManagePlans",
+          "canSeeMentoring",
+          "canManageMentoring",
           "isMentor"
         ]
       },
@@ -3772,126 +4347,7 @@
           "newPassword"
         ]
       },
-      "TrackingMethodRefDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "nameAr": {
-            "type": "string"
-          },
-          "nameEn": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "nameAr",
-          "nameEn"
-        ]
-      },
-      "Trend": {
-        "type": "string",
-        "enum": [
-          "IMPROVING",
-          "STEADY",
-          "WORSE",
-          "NEW"
-        ]
-      },
-      "PlanSummaryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "menteeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "goal": {
-            "type": "string"
-          },
-          "trackingMethod": {
-            "$ref": "#/components/schemas/TrackingMethodRefDto"
-          },
-          "target": {
-            "type": "number"
-          },
-          "higherIsBetter": {
-            "type": "boolean"
-          },
-          "endsOn": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "closedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "latest": {
-            "type": "number",
-            "nullable": true
-          },
-          "latestAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "trend": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Trend"
-              }
-            ]
-          },
-          "change": {
-            "type": "number"
-          },
-          "points": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "checkInDue": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "menteeId",
-          "name",
-          "goal",
-          "trackingMethod",
-          "target",
-          "higherIsBetter",
-          "endsOn",
-          "closedAt",
-          "latest",
-          "latestAt",
-          "trend",
-          "change",
-          "points",
-          "checkInDue"
-        ]
-      },
-      "ReadingSource": {
-        "type": "string",
-        "enum": [
-          "FOLLOW_UP",
-          "CHECK_IN"
-        ]
-      },
-      "PlanReplyDto": {
+      "ChallengeCommentDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -3913,6 +4369,11 @@
               }
             ]
           },
+          "interactionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3923,38 +4384,25 @@
           "body",
           "author",
           "impersonator",
+          "interactionId",
           "createdAt"
         ]
       },
-      "PlanReadingDto": {
+      "ChallengeDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "value": {
-            "type": "number"
-          },
-          "note": {
+          "menteeId": {
             "type": "string",
-            "nullable": true
+            "format": "uuid"
           },
-          "source": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ReadingSource"
-              }
-            ]
+          "title": {
+            "type": "string"
           },
-          "needsHelp": {
-            "type": "boolean"
-          },
-          "recordedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "author": {
+          "createdBy": {
             "$ref": "#/components/schemas/UserRefDto"
           },
           "impersonator": {
@@ -3966,219 +4414,79 @@
               }
             ]
           },
-          "replies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlanReplyDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "value",
-          "note",
-          "source",
-          "needsHelp",
-          "recordedAt",
-          "author",
-          "impersonator",
-          "replies"
-        ]
-      },
-      "PlanDetailDto": {
-        "type": "object",
-        "properties": {
-          "id": {
+          "interactionId": {
             "type": "string",
-            "format": "uuid"
-          },
-          "menteeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "goal": {
-            "type": "string"
-          },
-          "trackingMethod": {
-            "$ref": "#/components/schemas/TrackingMethodRefDto"
-          },
-          "target": {
-            "type": "number"
-          },
-          "higherIsBetter": {
-            "type": "boolean"
-          },
-          "endsOn": {
-            "type": "string",
-            "format": "date",
+            "format": "uuid",
             "nullable": true
           },
-          "closedAt": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedAt": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "latest": {
-            "type": "number",
-            "nullable": true
-          },
-          "latestAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "trend": {
+          "resolvedBy": {
+            "nullable": true,
+            "type": "object",
             "allOf": [
               {
-                "$ref": "#/components/schemas/Trend"
+                "$ref": "#/components/schemas/UserRefDto"
               }
             ]
           },
-          "change": {
-            "type": "number"
-          },
-          "points": {
+          "comments": {
             "type": "array",
             "items": {
-              "type": "number"
+              "$ref": "#/components/schemas/ChallengeCommentDto"
             }
-          },
-          "checkInDue": {
-            "type": "boolean"
-          },
-          "mentee": {
-            "$ref": "#/components/schemas/UserRefDto"
-          },
-          "readings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlanReadingDto"
-            }
-          },
-          "canManage": {
-            "type": "boolean"
-          },
-          "canCheckIn": {
-            "type": "boolean"
           }
         },
         "required": [
           "id",
           "menteeId",
-          "name",
-          "goal",
-          "trackingMethod",
-          "target",
-          "higherIsBetter",
-          "endsOn",
-          "closedAt",
-          "latest",
-          "latestAt",
-          "trend",
-          "change",
-          "points",
-          "checkInDue",
-          "mentee",
-          "readings",
-          "canManage",
-          "canCheckIn"
+          "title",
+          "createdBy",
+          "impersonator",
+          "interactionId",
+          "createdAt",
+          "resolvedAt",
+          "resolvedBy",
+          "comments"
         ]
       },
-      "CreatePlanDto": {
+      "CreateChallengeDto": {
         "type": "object",
         "properties": {
           "menteeId": {
             "type": "string",
             "format": "uuid"
           },
-          "name": {
-            "type": "string",
-            "maxLength": 120
-          },
-          "goal": {
+          "title": {
             "type": "string",
             "maxLength": 300
-          },
-          "trackingMethodId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "target": {
-            "type": "number"
-          },
-          "higherIsBetter": {
-            "type": "boolean",
-            "default": true
-          },
-          "endsOn": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
           }
         },
         "required": [
           "menteeId",
-          "name",
-          "goal",
-          "trackingMethodId",
-          "target"
+          "title"
         ]
       },
-      "UpdatePlanDto": {
+      "UpdateChallengeDto": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 120
-          },
-          "goal": {
+          "title": {
             "type": "string",
             "maxLength": 300
           },
-          "trackingMethodId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "target": {
-            "type": "number"
-          },
-          "higherIsBetter": {
-            "type": "boolean",
-            "default": true
-          },
-          "endsOn": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "closed": {
+          "resolved": {
             "type": "boolean"
           }
         }
       },
-      "CheckInDto": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "number"
-          },
-          "note": {
-            "type": "string",
-            "nullable": true,
-            "maxLength": 2000
-          },
-          "needsHelp": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "value"
-        ]
-      },
-      "PlanReplyBodyDto": {
+      "CommentBodyDto": {
         "type": "object",
         "properties": {
           "body": {
@@ -4195,11 +4503,11 @@
         "enum": [
           "FOLLOW_UP",
           "ACTIVITY",
-          "CHECK_IN",
+          "ENTRY",
           "REPLY"
         ]
       },
-      "PlanRefDto": {
+      "TrackableRefDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4208,11 +4516,27 @@
           },
           "name": {
             "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
           }
         },
         "required": [
           "id",
-          "name"
+          "name",
+          "type",
+          "cycle"
         ]
       },
       "FeedItemDto": {
@@ -4262,7 +4586,7 @@
               }
             ]
           },
-          "planUpdates": {
+          "trackableUpdates": {
             "type": "number"
           },
           "challenges": {
@@ -4277,14 +4601,19 @@
           "participants": {
             "type": "number"
           },
-          "plan": {
+          "trackable": {
             "nullable": true,
             "type": "object",
             "allOf": [
               {
-                "$ref": "#/components/schemas/PlanRefDto"
+                "$ref": "#/components/schemas/TrackableRefDto"
               }
             ]
+          },
+          "cycle": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
           },
           "value": {
             "type": "number",
@@ -4304,11 +4633,12 @@
           "interactionId",
           "title",
           "activityType",
-          "planUpdates",
+          "trackableUpdates",
           "challenges",
           "tasks",
           "participants",
-          "plan",
+          "trackable",
+          "cycle",
           "value",
           "text"
         ]
@@ -4348,7 +4678,7 @@
           "monthActivities": {
             "type": "number"
           },
-          "openPlans": {
+          "activeTrackables": {
             "type": "number"
           },
           "improving": {
@@ -4366,7 +4696,7 @@
           "needContact",
           "monthFollowUps",
           "monthActivities",
-          "openPlans",
+          "activeTrackables",
           "improving",
           "steady",
           "worse"
@@ -4412,19 +4742,22 @@
           "openTasks": {
             "type": "number"
           },
-          "mainPlan": {
+          "mainTrackable": {
             "nullable": true,
             "type": "object",
             "allOf": [
               {
-                "$ref": "#/components/schemas/PlanSummaryDto"
+                "$ref": "#/components/schemas/TrackableSummaryDto"
               }
             ]
           },
-          "openPlans": {
+          "activeTrackables": {
             "type": "number"
           },
-          "worseningPlans": {
+          "worseningTrackables": {
+            "type": "number"
+          },
+          "openChallenges": {
             "type": "number"
           }
         },
@@ -4437,9 +4770,10 @@
           "contactStatus",
           "daysSinceContact",
           "openTasks",
-          "mainPlan",
-          "openPlans",
-          "worseningPlans"
+          "mainTrackable",
+          "activeTrackables",
+          "worseningTrackables",
+          "openChallenges"
         ]
       },
       "UpcomingDto": {
@@ -4509,14 +4843,14 @@
             "format": "date-time",
             "nullable": true
           },
-          "openPlans": {
+          "activeTrackables": {
             "type": "number"
           }
         },
         "required": [
           "user",
           "lastContactAt",
-          "openPlans"
+          "activeTrackables"
         ]
       },
       "MentorDashboardDto": {
@@ -4572,10 +4906,10 @@
               "$ref": "#/components/schemas/TaskDto"
             }
           },
-          "plans": {
+          "trackables": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PlanSummaryDto"
+              "$ref": "#/components/schemas/TrackableSummaryDto"
             }
           },
           "upcoming": {
@@ -4588,7 +4922,7 @@
         "required": [
           "mentor",
           "tasks",
-          "plans",
+          "trackables",
           "upcoming"
         ]
       }

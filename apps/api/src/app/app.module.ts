@@ -19,7 +19,8 @@ import { InteractionsModule } from '../modules/interactions/interactions.module'
 import { LookupsModule } from '../modules/lookups/lookups.module';
 import { MentorshipsModule } from '../modules/mentorships/mentorships.module';
 import { NotesModule } from '../modules/notes/notes.module';
-import { PlansModule } from '../modules/plans/plans.module';
+import { TrackablesModule } from '../modules/trackables/trackables.module';
+import { ChallengesModule } from '../modules/challenges/challenges.module';
 import { ProfilesModule } from '../modules/profiles/profiles.module';
 import { MailModule } from '../modules/mail/mail.module';
 import { SettingsModule } from '../modules/settings/settings.module';
@@ -47,7 +48,8 @@ import { HealthController } from './health.controller';
     ProfilesModule,
     FilesModule,
     MeModule,
-    PlansModule,
+    TrackablesModule,
+    ChallengesModule,
     FeedModule,
   ],
   controllers: [HealthController],

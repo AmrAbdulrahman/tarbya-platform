@@ -7,10 +7,8 @@ export interface Settings {
   'contact.lateDays': number;
   'gatherings.rsvpRequestHours': number;
   'gatherings.reminderHours': number;
-  'plans.trendWindow': number;
-  'plans.trendSteadyBand': number;
-  /** Days after a plan's last reading before the mentee's check-in is due. */
-  'plans.checkInDays': number;
+  'trackables.trendWindow': number;
+  'trackables.trendSteadyBand': number;
 }
 
 export type SettingKey = keyof Settings;
@@ -21,7 +19,6 @@ export const DEFAULT_SETTINGS: Settings = {
   'contact.lateDays': 14,
   'gatherings.rsvpRequestHours': 48,
   'gatherings.reminderHours': 3,
-  'plans.trendWindow': 3,
-  'plans.trendSteadyBand': 0.05,
-  'plans.checkInDays': 14,
+  'trackables.trendWindow': 3,
+  'trackables.trendSteadyBand': 0.05,
 };

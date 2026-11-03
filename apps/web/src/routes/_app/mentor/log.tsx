@@ -18,7 +18,11 @@ import {
   mineQueryKey,
 } from '../../../components/mentor/form-parts';
 import { LogScreen } from '../../../components/mentor/log-screen';
-import { PlanUpdates } from '../../../components/mentor/plan-updates';
+import {
+  ChallengeNotes,
+  type ChallengeNote,
+} from '../../../components/mentor/challenge-notes';
+import { TrackableUpdates } from '../../../components/mentor/trackable-updates';
 
 /** US-4.3 · design/screens/FollowUp.dc.html */
 export const Route = createFileRoute('/_app/mentor/log')({
@@ -83,7 +87,12 @@ function FollowUpForm({
     resolver: zodResolver(schema),
     defaultValues: blank(),
   });
-  const [planValues, setPlanValues] = useState<Record<string, string>>({});
+  const [trackableValues, setTrackableValues] = useState<
+    Record<string, string>
+  >({});
+  const [challengeNotes, setChallengeNotes] = useState<
+    Record<string, ChallengeNote>
+  >({});
   const challenges = useFieldArray({
     control: form.control,
     name: 'challenges',
@@ -103,20 +112,32 @@ function FollowUpForm({
         tasks: v.tasks
           .filter((task) => task.title.trim())
           .map((task) => ({ title: task.title, dueOn: task.dueOn || null })),
-        planUpdates: Object.entries(planValues)
+        trackableUpdates: Object.entries(trackableValues)
           .filter(
             ([, value]) =>
               value.trim() !== '' && Number.isFinite(Number(value)),
           )
-          .map(([planId, value]) => ({ planId, value: Number(value) })),
+          .map(([trackableId, value]) => ({
+            trackableId,
+            value: Number(value),
+          })),
+        challengeNotes: Object.entries(challengeNotes)
+          .filter(([, n]) => n.comment.trim() || n.resolve)
+          .map(([challengeId, n]) => ({
+            challengeId,
+            comment: n.comment.trim() || null,
+            resolve: n.resolve,
+          })),
       }),
     onSuccess: async () => {
       form.reset(blank());
-      setPlanValues({});
+      setTrackableValues({});
+      setChallengeNotes({});
       onSaved();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: mineQueryKey }),
-        queryClient.invalidateQueries({ queryKey: ['plans'] }),
+        queryClient.invalidateQueries({ queryKey: ['trackables'] }),
+        queryClient.invalidateQueries({ queryKey: ['challenges', menteeId] }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
         queryClient.invalidateQueries({ queryKey: ['feed'] }),
         queryClient.invalidateQueries({ queryKey: ['tasks', menteeId] }),
@@ -209,6 +230,14 @@ function FollowUpForm({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title={t('mentoring.log.challenges')}>
+          <ChallengeNotes
+            menteeId={menteeId}
+            notes={challengeNotes}
+            onChange={setChallengeNotes}
+          />
+          <span className="text-sm font-semibold text-ink-muted">
+            {t('challenges.newTitle')}
+          </span>
           {challenges.fields.map((f, i) => (
             <Row
               key={f.id}
@@ -253,10 +282,10 @@ function FollowUpForm({
           </AddButton>
         </Card>
       </div>
-      <PlanUpdates
+      <TrackableUpdates
         menteeId={menteeId}
-        values={planValues}
-        onChange={setPlanValues}
+        values={trackableValues}
+        onChange={setTrackableValues}
         upcoming={upcoming}
       />
 

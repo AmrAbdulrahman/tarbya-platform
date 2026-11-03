@@ -9,13 +9,13 @@ import {
   type JourneyDto,
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
-import { daysSince, formatDate } from '@tarbya/shared';
+import { formatDate } from '@tarbya/shared';
 import { Button } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FeedList, feedQueryKey } from '../../../components/feed/feed-list';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
-import { PlanCard } from '../../../components/plans/plan-card';
+import { TrackableCard } from '../../../components/trackables/trackable-card';
 
 /** US-5.1 · design/screens/MyJourney.dc.html */
 export const Route = createFileRoute('/_app/my/')({
@@ -42,8 +42,9 @@ function JourneyPage() {
       </p>
     );
   }
-  const { mentor, tasks, plans, upcoming } = journey.data;
-  const due = plans.filter((p) => p.checkInDue);
+  const { mentor, tasks, trackables, upcoming } = journey.data;
+  // BR-TRK-4: anything with a cycle waiting to be logged.
+  const due = trackables.filter((x) => x.openCycles.length > 0);
 
   return (
     <>
@@ -88,25 +89,17 @@ function JourneyPage() {
           <p className="text-ink-subtle">{t('journey.noActions')}</p>
         )}
         <ul className="flex flex-col divide-y divide-border">
-          {due.map((plan) => (
+          {due.map((x) => (
             <ActionRow
-              key={plan.id}
+              key={x.id}
               icon={<TrendingUp className="size-4" />}
               iconClass="bg-amber-50 text-warn"
-              title={t('journey.reportDue', { plan: plan.name })}
-              meta={
-                plan.latestAt
-                  ? t('journey.lastUpdate', {
-                      when: t('mentoring.log.daysAgo', {
-                        count: daysSince(new Date(plan.latestAt), new Date()),
-                      }),
-                    })
-                  : t('journey.noReports')
-              }
+              title={t('trackables.logName', { name: x.name })}
+              meta={t('trackables.waiting', { count: x.openCycles.length })}
             >
               <Button asChild size="sm">
-                <Link to="/plans/$id" params={{ id: plan.id }}>
-                  {t('plans.report')}
+                <Link to="/trackables/$id" params={{ id: x.id }}>
+                  {t('trackables.log')}
                 </Link>
               </Button>
             </ActionRow>
@@ -118,13 +111,13 @@ function JourneyPage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold text-navy">{t('plans.mine')}</h2>
-        {plans.length === 0 ? (
-          <p className="text-ink-subtle">{t('plans.none')}</p>
+        <h2 className="text-xl font-bold text-navy">{t('trackables.mine')}</h2>
+        {trackables.length === 0 ? (
+          <p className="text-ink-subtle">{t('trackables.none')}</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {plans.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} />
+            {trackables.map((x) => (
+              <TrackableCard key={x.id} trackable={x} />
             ))}
           </div>
         )}

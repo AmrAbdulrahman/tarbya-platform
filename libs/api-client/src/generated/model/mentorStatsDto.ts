@@ -10,7 +10,7 @@ export interface MentorStatsDto {
   needContact: number;
   monthFollowUps: number;
   monthActivities: number;
-  openPlans: number;
+  activeTrackables: number;
   improving: number;
   steady: number;
   worse: number;

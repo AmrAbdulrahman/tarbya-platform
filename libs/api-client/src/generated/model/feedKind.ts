@@ -11,6 +11,6 @@ export type FeedKind = typeof FeedKind[keyof typeof FeedKind];
 export const FeedKind = {
   FOLLOW_UP: 'FOLLOW_UP',
   ACTIVITY: 'ACTIVITY',
-  CHECK_IN: 'CHECK_IN',
+  ENTRY: 'ENTRY',
   REPLY: 'REPLY',
 } as const;

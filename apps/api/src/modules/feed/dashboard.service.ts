@@ -4,8 +4,8 @@ import { fromZoned, toZoned } from '@tarbya/shared';
 import { taskSelect, toTaskDto } from '../interactions/interactions.service';
 import { ContactService } from '../mentorships/contact.service';
 import { MentorshipsService } from '../mentorships/mentorships.service';
-import type { PlanSummaryDto } from '../plans/plans.dto';
-import { PlansService } from '../plans/plans.service';
+import type { TrackableSummaryDto } from '../trackables/trackables.dto';
+import { TrackablesService } from '../trackables/trackables.service';
 import type {
   DashboardMenteeDto,
   JourneyDto,
@@ -21,33 +21,46 @@ export class DashboardService {
     private readonly prisma: PrismaService,
     private readonly mentorships: MentorshipsService,
     private readonly contact: ContactService,
-    private readonly plans: PlansService,
+    private readonly trackables: TrackablesService,
     private readonly feed: FeedService,
   ) {}
 
   async mentor(userId: string): Promise<MentorDashboardDto> {
     const mine = await this.mentorships.mine(userId);
-    const [plans, month, upcoming, mentor] = await Promise.all([
-      this.plans.openPlansOf(mine.mentees.map((m) => m.mentee.id)),
-      this.monthCounts(userId),
-      this.feed.upcoming(userId, 5),
-      this.myMentor(userId),
-    ]);
-    const plansOf = new Map<string, PlanSummaryDto[]>();
-    for (const p of plans) {
-      plansOf.set(p.menteeId, [...(plansOf.get(p.menteeId) ?? []), p]);
+    const menteeIds = mine.mentees.map((m) => m.mentee.id);
+    const [trackables, challenges, month, upcoming, mentor] = await Promise.all(
+      [
+        this.trackables.activeOf(menteeIds),
+        this.prisma.challenge.groupBy({
+          by: ['menteeId'],
+          where: { menteeId: { in: menteeIds }, resolvedAt: null },
+          _count: true,
+        }),
+        this.monthCounts(userId),
+        this.feed.upcoming(userId, 5),
+        this.myMentor(userId),
+      ],
+    );
+    const trackablesOf = new Map<string, TrackableSummaryDto[]>();
+    for (const t of trackables) {
+      trackablesOf.set(t.menteeId, [
+        ...(trackablesOf.get(t.menteeId) ?? []),
+        t,
+      ]);
     }
+    const challengesOf = new Map(challenges.map((c) => [c.menteeId, c._count]));
     const mentees: DashboardMenteeDto[] = mine.mentees.map((m) => {
-      const own = plansOf.get(m.mentee.id) ?? [];
+      const own = trackablesOf.get(m.mentee.id) ?? [];
       return {
         ...m,
-        mainPlan: mainPlan(own),
-        openPlans: own.length,
-        worseningPlans: own.filter((p) => p.trend === 'WORSE').length,
+        mainTrackable: mainTrackable(own),
+        activeTrackables: own.length,
+        worseningTrackables: own.filter((t) => t.trend === 'WORSE').length,
+        openChallenges: challengesOf.get(m.mentee.id) ?? 0,
       };
     });
-    const count = (trend: PlanSummaryDto['trend']) =>
-      plans.filter((p) => p.trend === trend).length;
+    const count = (trend: TrackableSummaryDto['trend']) =>
+      trackables.filter((t) => t.trend === trend).length;
     return {
       stats: {
         mentees: mentees.length,
@@ -55,7 +68,7 @@ export class DashboardService {
           .length,
         monthFollowUps: month.FOLLOW_UP,
         monthActivities: month.ACTIVITY,
-        openPlans: plans.length,
+        activeTrackables: trackables.length,
         improving: count('IMPROVING'),
         steady: count('STEADY'),
         worse: count('WORSE'),
@@ -67,7 +80,7 @@ export class DashboardService {
   }
 
   async journey(userId: string): Promise<JourneyDto> {
-    const [mentorship, tasks, plans, upcoming] = await Promise.all([
+    const [mentorship, tasks, trackables, upcoming] = await Promise.all([
       this.prisma.mentorship.findFirst({
         where: { menteeId: userId, endedAt: null },
         select: { mentor: { select: { id: true, name: true } } },
@@ -80,13 +93,13 @@ export class DashboardService {
           { createdAt: 'asc' },
         ],
       }),
-      this.plans.openPlansOf([userId]),
+      this.trackables.activeOf([userId]),
       this.feed.upcoming(userId, 6),
     ]);
     return {
       mentor: mentorship?.mentor ?? null,
       tasks: tasks.map(toTaskDto),
-      plans,
+      trackables,
       upcoming,
     };
   }
@@ -119,27 +132,31 @@ export class DashboardService {
       },
     });
     if (!ms) return null;
-    const [contacts, openPlans] = await Promise.all([
+    const [contacts, activeTrackables] = await Promise.all([
       this.contact.lastContacts(ms.mentorId),
-      this.prisma.developmentPlan.count({
-        where: { menteeId: userId, closedAt: null },
+      this.prisma.trackable.count({
+        where: { menteeId: userId, archivedAt: null },
       }),
     ]);
     return {
       user: ms.mentor,
       lastContactAt: contacts.get(ms.id)?.at.toISOString() ?? null,
-      openPlans,
+      activeTrackables,
     };
   }
 }
 
-/** The open plan with the latest reading, else the newest one (they come newest first). */
-function mainPlan(plans: PlanSummaryDto[]): PlanSummaryDto | null {
+/** The active trackable logged most recently, else the newest one (they come newest first). */
+function mainTrackable(
+  trackables: TrackableSummaryDto[],
+): TrackableSummaryDto | null {
   return (
-    plans
-      .filter((p) => p.latestAt)
-      .sort((a, b) => (b.latestAt ?? '').localeCompare(a.latestAt ?? ''))[0] ??
-    plans[0] ??
+    trackables
+      .filter((t) => t.latestCycle)
+      .sort((a, b) =>
+        (b.latestCycle ?? '').localeCompare(a.latestCycle ?? ''),
+      )[0] ??
+    trackables[0] ??
     null
   );
 }

@@ -10,5 +10,5 @@ export interface MyMentorDto {
   user: UserRefDto;
   /** @nullable */
   lastContactAt: string | null;
-  openPlans: number;
+  activeTrackables: number;
 }

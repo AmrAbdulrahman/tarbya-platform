@@ -1,13 +1,13 @@
-/** BR-PLAN-4: every plan shows whether it is improving, getting worse or holding steady. */
+/** BR-TRK-5: every trackable shows whether it is improving, getting worse or holding steady. */
 export type Trend = 'IMPROVING' | 'STEADY' | 'WORSE' | 'NEW';
 
 export interface TrendOptions {
-  /** Readings in each half of the comparison (setting plans.trendWindow). */
+  /** Values in each half of the comparison (setting trackables.trendWindow). */
   window: number;
-  /** A change smaller than this share of the plan's scale counts as steady (plans.trendSteadyBand). */
+  /** A change smaller than this share of the scale counts as steady (trackables.trendSteadyBand). */
   steadyBand: number;
   higherIsBetter: boolean;
-  /** The plan's target, which sets its scale. */
+  /** The target, which sets the scale. */
   target: number;
 }
 
@@ -24,10 +24,7 @@ const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
  * (up to `window` each). Fewer than two readings is NEW: nothing to compare yet.
  * Values are in the order they were recorded.
  */
-export function planTrend(
-  values: number[],
-  options: TrendOptions,
-): TrendResult {
+export function trend(values: number[], options: TrendOptions): TrendResult {
   const k = Math.min(options.window, Math.floor(values.length / 2));
   if (k < 1) return { trend: 'NEW', change: 0 };
   const recent = mean(values.slice(-k));

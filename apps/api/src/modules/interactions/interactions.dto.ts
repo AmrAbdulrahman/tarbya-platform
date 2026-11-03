@@ -48,15 +48,15 @@ export class NewTaskDto {
   dueOn?: string | null;
 }
 
-/** A reading for one of the mentee's plans, recorded at the follow-up (BR-PLAN-3). */
-export class PlanUpdateDto {
+/** The cycle's value for one of the mentee's trackables, logged at the follow-up (BR-TRK-3). */
+export class TrackableUpdateDto {
   @ApiProperty({ format: 'uuid' })
   @IsUUID()
-  planId!: string;
+  trackableId!: string;
 
   @ApiProperty()
   @IsNumber()
-  @Min(-1_000_000)
+  @Min(0)
   @Max(1_000_000)
   value!: number;
 
@@ -66,6 +66,29 @@ export class PlanUpdateDto {
   @IsString()
   @MaxLength(2000)
   note?: string | null;
+}
+
+/** Following up an open challenge in a follow-up: a comment, resolving it, or both (BR-CHL-2). */
+export class ChallengeNoteDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  challengeId!: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 2000 })
+  @IsOptional()
+  @Transform(trimOrNull)
+  @IsString()
+  @MaxLength(2000)
+  comment?: string | null;
+
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() resolve?: boolean;
+}
+
+/** A task added on its own, outside a follow-up (BR-FU-4). */
+export class CreateTaskDto extends NewTaskDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  assigneeId!: string;
 }
 
 class InteractionFields {
@@ -101,6 +124,7 @@ export class CreateFollowUpDto extends InteractionFields {
   @IsUUID()
   menteeId!: string;
 
+  /** New challenges raised in this follow-up (BR-CHL-1). */
   @ApiPropertyOptional({ type: String, isArray: true, maxItems: 20 })
   @IsOptional()
   @Transform(trimList)
@@ -110,6 +134,14 @@ export class CreateFollowUpDto extends InteractionFields {
   @MaxLength(300, { each: true })
   challenges?: string[];
 
+  @ApiPropertyOptional({ type: ChallengeNoteDto, isArray: true, maxItems: 50 })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => ChallengeNoteDto)
+  challengeNotes?: ChallengeNoteDto[];
+
   @ApiPropertyOptional({ type: NewTaskDto, isArray: true, maxItems: 20 })
   @IsOptional()
   @IsArray()
@@ -118,13 +150,17 @@ export class CreateFollowUpDto extends InteractionFields {
   @Type(() => NewTaskDto)
   tasks?: NewTaskDto[];
 
-  @ApiPropertyOptional({ type: PlanUpdateDto, isArray: true, maxItems: 20 })
+  @ApiPropertyOptional({
+    type: TrackableUpdateDto,
+    isArray: true,
+    maxItems: 20,
+  })
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(20)
   @ValidateNested({ each: true })
-  @Type(() => PlanUpdateDto)
-  planUpdates?: PlanUpdateDto[];
+  @Type(() => TrackableUpdateDto)
+  trackableUpdates?: TrackableUpdateDto[];
 }
 
 /** US-4.4 */
@@ -201,6 +237,7 @@ export class InteractionDto {
   @ApiProperty({ type: String, nullable: true }) sharedNotes!: string | null;
   /** Null for anyone but the creator and moderators, who are the only ones it's read for. */
   @ApiProperty({ type: String, nullable: true }) privateNotes!: string | null;
+  /** Challenges raised in this follow-up. */
   @ApiProperty({ type: String, isArray: true }) challenges!: string[];
   @ApiProperty({ type: UserRefDto }) createdBy!: UserRefDto;
   /** The super admin who logged it while impersonating `createdBy` (BR-ADM-5). */

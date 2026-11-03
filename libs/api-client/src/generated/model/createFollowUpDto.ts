@@ -4,8 +4,9 @@
  * Tarbya API
  * OpenAPI spec version: 0.1.0
  */
+import type { ChallengeNoteDto } from './challengeNoteDto.js';
 import type { NewTaskDto } from './newTaskDto.js';
-import type { PlanUpdateDto } from './planUpdateDto.js';
+import type { TrackableUpdateDto } from './trackableUpdateDto.js';
 
 export interface CreateFollowUpDto {
   startsAt: string;
@@ -27,8 +28,10 @@ export interface CreateFollowUpDto {
   menteeId: string;
   /** @maxItems 20 */
   challenges?: string[];
+  /** @maxItems 50 */
+  challengeNotes?: ChallengeNoteDto[];
   /** @maxItems 20 */
   tasks?: NewTaskDto[];
   /** @maxItems 20 */
-  planUpdates?: PlanUpdateDto[];
+  trackableUpdates?: TrackableUpdateDto[];
 }

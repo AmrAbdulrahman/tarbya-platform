@@ -24,9 +24,10 @@ describe('admin', () => {
     for (const res of [
       await s.get('/api/users'),
       await s.get('/api/settings'),
-      await s.post('/api/lookups/tracking-methods', {
+      await s.post('/api/lookups/activity-types', {
         nameAr: 'س',
         nameEn: 'x',
+        scope: 'INDIVIDUAL',
       }),
     ]) {
       expect(res.status).toBe(403);
@@ -301,12 +302,6 @@ describe('admin', () => {
         scope: 'NOPE',
       });
       expect(bad.status).toBe(400);
-
-      const method = await s.post('/api/lookups/tracking-methods', {
-        nameAr: 'دقائق',
-        nameEn: 'e2e Minutes',
-      });
-      expect(method.data.active).toBe(true);
     });
   });
 });

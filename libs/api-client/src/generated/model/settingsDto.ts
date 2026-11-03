@@ -38,9 +38,4 @@ export interface SettingsDto {
      * @maximum 0.5
      */
   trendSteadyBand: number;
-  /**
-     * @minimum 1
-     * @maximum 90
-     */
-  checkInDays: number;
 }
