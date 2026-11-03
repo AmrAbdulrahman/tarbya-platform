@@ -130,7 +130,7 @@ describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
     ]);
     expect(res.data.items[2]).toMatchObject({
       planUpdates: 1,
-      challenges: 1,
+      challenges: ['exams'],
       tasks: 1,
     });
     // BR-NOTE-1: the feed never carries private notes, whoever reads it.

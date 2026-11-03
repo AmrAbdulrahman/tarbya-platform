@@ -1,3 +1,4 @@
+export * from './audit/audit.js';
 export * from './auth/auth.js';
 export * from './feed/feed.js';
 export * from './files/files.js';

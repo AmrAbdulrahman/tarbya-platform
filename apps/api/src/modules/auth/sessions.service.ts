@@ -24,8 +24,17 @@ export interface IssuedTokens {
 }
 
 export interface AccessClaims {
+  /** Whose app this is: the signed-in user, or the one being impersonated. */
   sub: string;
   sid: string;
+  /** Set while the session's owner (the super admin) impersonates `sub`. */
+  act?: string;
+}
+
+interface SessionRef {
+  id: string;
+  userId: string;
+  impersonatedUserId: string | null;
 }
 
 /** Sessions and their tokens (US-1.3). */
@@ -49,7 +58,7 @@ export class SessionsService {
     });
     return {
       userId,
-      accessToken: this.accessToken(userId, session.id),
+      accessToken: this.accessToken(session),
       refreshToken: formatRefreshToken(session.id, secret),
     };
   }
@@ -81,10 +90,23 @@ export class SessionsService {
       await this.revoke(session.id);
       return undefined;
     }
+    if (
+      session.impersonatedUserId &&
+      !(await this.prisma.user.count({
+        where: { id: session.impersonatedUserId, deactivatedAt: null },
+      }))
+    ) {
+      // The impersonated user was deactivated: back to the owner's own view.
+      session.impersonatedUserId = null;
+      await this.prisma.session.update({
+        where: { id: session.id },
+        data: { impersonatedUserId: null },
+      });
+    }
     if (decision === 'grace') {
       return {
         userId: session.userId,
-        accessToken: this.accessToken(session.userId, session.id),
+        accessToken: this.accessToken(session),
       };
     }
 
@@ -102,7 +124,7 @@ export class SessionsService {
     if (count === 0) return undefined;
     return {
       userId: session.userId,
-      accessToken: this.accessToken(session.userId, session.id),
+      accessToken: this.accessToken(session),
       refreshToken: formatRefreshToken(session.id, secret),
     };
   }
@@ -119,13 +141,18 @@ export class SessionsService {
       return undefined;
     }
     // Checked on every request so sign-out and deactivation apply at once.
+    // The token must match the session's current impersonation, so stopping it applies at once.
     const live = await this.prisma.session.count({
       where: {
         id: claims.sid,
-        userId: claims.sub,
+        userId: claims.act ?? claims.sub,
+        impersonatedUserId: claims.act ? claims.sub : null,
         revokedAt: null,
         expiresAt: { gt: new Date() },
         user: { deactivatedAt: null },
+        ...(claims.act && {
+          impersonatedUser: { is: { deactivatedAt: null } },
+        }),
       },
     });
     return live ? claims : undefined;
@@ -152,13 +179,34 @@ export class SessionsService {
     });
   }
 
+  /**
+   * Starts (a user id) or stops (null) impersonating in this session and
+   * returns the access token for the new view. The refresh token is unchanged.
+   */
+  async impersonate(
+    sessionId: string,
+    impersonatedUserId: string | null,
+  ): Promise<IssuedTokens> {
+    const session = await this.prisma.session.update({
+      where: { id: sessionId },
+      data: { impersonatedUserId },
+    });
+    return { userId: session.userId, accessToken: this.accessToken(session) };
+  }
+
   /** The session a refresh token names, if it parses; used to sign out without a valid access token. */
   sessionIdOf(refreshToken: string | undefined): string | undefined {
     return parseRefreshToken(refreshToken)?.sessionId;
   }
 
-  private accessToken(userId: string, sessionId: string): string {
-    const claims: AccessClaims = { sub: userId, sid: sessionId };
+  private accessToken(session: SessionRef): string {
+    const claims: AccessClaims = session.impersonatedUserId
+      ? {
+          sub: session.impersonatedUserId,
+          sid: session.id,
+          act: session.userId,
+        }
+      : { sub: session.userId, sid: session.id };
     return this.jwt.sign(claims, { expiresIn: ACCESS_TOKEN_TTL_SECONDS });
   }
 }

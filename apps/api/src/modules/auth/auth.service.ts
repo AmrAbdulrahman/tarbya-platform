@@ -4,10 +4,15 @@ import { PrismaService, type User } from '@tarbya/db';
 import { canSignIn } from '@tarbya/shared';
 import * as argon2 from 'argon2';
 import type { Env } from '../../config/env';
+import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
+import type { AuthContext } from '../../common/auth-context';
+import { AuditService } from '../audit/audit.service';
+import { AvatarsService } from '../files/avatars.service';
 import { MailService } from '../mail/mail.service';
 import { SettingsService } from '../settings/settings.service';
 import { RolesService } from '../users/roles.service';
+import type { MeDto } from './auth.dto';
 import { signInCodeMail } from './mail-templates';
 import {
   SessionsService,
@@ -51,6 +56,7 @@ export class AuthService {
     private readonly roles: RolesService,
     private readonly settings: SettingsService,
     private readonly mail: MailService,
+    private readonly audit: AuditService,
     config: ConfigService<Env, true>,
   ) {
     this.codeKey = config.get('JWT_SECRET', { infer: true });
@@ -179,5 +185,83 @@ export class AuthService {
         title: 'Sign-in is not open to your role yet',
       });
     }
+  }
+
+  /** The signed-in user, and the super admin behind them while impersonating. */
+  async me(userId: string, impersonatorId?: string): Promise<MeDto> {
+    const [user, roles, impersonator] = await Promise.all([
+      this.prisma.user.findUniqueOrThrow({ where: { id: userId } }),
+      this.roles.rolesOf(userId),
+      impersonatorId
+        ? this.prisma.user.findUniqueOrThrow({
+            where: { id: impersonatorId },
+            select: { id: true, name: true },
+          })
+        : null,
+    ]);
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      locale: user.locale,
+      calendar: user.calendar,
+      roles,
+      avatarUrl: AvatarsService.url(user.id, user.avatarFileId),
+      impersonator,
+    };
+  }
+
+  /**
+   * The super admin views the app as an active user, in this session only.
+   * Starting again while impersonating switches to the new user.
+   */
+  async impersonate(auth: AuthContext, userId: string): Promise<IssuedTokens> {
+    const adminId = auth.impersonatorId ?? auth.userId;
+    if (!(await this.roles.isSuperAdminUser(adminId))) throw forbidden();
+    const target = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!target) {
+      throw new AppException(404, {
+        code: 'NOT_FOUND',
+        title: 'User not found',
+      });
+    }
+    if (target.id === adminId) {
+      throw new AppException(409, {
+        code: 'SELF_ACTION',
+        title: "You can't impersonate yourself",
+      });
+    }
+    if (this.roles.isSuperAdmin(target.email)) {
+      throw new AppException(409, {
+        code: 'SUPER_ADMIN_LOCKED',
+        title: "The super admin can't be impersonated",
+      });
+    }
+    if (target.deactivatedAt) {
+      throw new AppException(409, {
+        code: 'USER_INACTIVE',
+        title: "A deactivated user can't be impersonated",
+      });
+    }
+    const tokens = await this.sessions.impersonate(auth.sessionId, target.id);
+    await this.audit.record({
+      actorId: adminId,
+      action: 'user.impersonate.start',
+      entity: 'User',
+      entityId: target.id,
+    });
+    return tokens;
+  }
+
+  async stopImpersonating(auth: AuthContext): Promise<IssuedTokens> {
+    if (!auth.impersonatorId) throw forbidden();
+    const tokens = await this.sessions.impersonate(auth.sessionId, null);
+    await this.audit.record({
+      actorId: auth.impersonatorId,
+      action: 'user.impersonate.stop',
+      entity: 'User',
+      entityId: auth.userId,
+    });
+    return tokens;
   }
 }

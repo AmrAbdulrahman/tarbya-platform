@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Post,
@@ -10,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  ApiConflictResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiTags,
@@ -17,16 +20,15 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { PrismaService } from '@tarbya/db';
 import type { Request, Response } from 'express';
 import type { Env } from '../../config/env';
+import { NotWhileImpersonating } from '../../common/access';
 import { unauthenticated } from '../../common/app-exception';
 import { CurrentAuth, type AuthContext } from '../../common/auth-context';
 import { Public } from '../../common/public.decorator';
-import { AvatarsService } from '../files/avatars.service';
-import { RolesService } from '../users/roles.service';
 import {
   CodeSignInDto,
+  ImpersonateDto,
   MeDto,
   PasswordSignInDto,
   RequestCodeDto,
@@ -45,8 +47,6 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly sessions: SessionsService,
-    private readonly roles: RolesService,
-    private readonly prisma: PrismaService,
     config: ConfigService<Env, true>,
   ) {
     this.secureCookies =
@@ -72,7 +72,7 @@ export class AuthController {
       meta(req),
     );
     setAuthCookies(res, tokens, this.secureCookies);
-    return this.me(tokens.userId);
+    return this.auth.me(tokens.userId);
   }
 
   /** US-1.2: always 204, whether or not the email belongs to someone who can sign in. */
@@ -103,7 +103,7 @@ export class AuthController {
       meta(req),
     );
     setAuthCookies(res, tokens, this.secureCookies);
-    return this.me(tokens.userId);
+    return this.auth.me(tokens.userId);
   }
 
   /** US-1.3: swaps the refresh cookie for new tokens. */
@@ -142,6 +142,7 @@ export class AuthController {
   }
 
   /** Ends every session of the signed-in user. */
+  @NotWhileImpersonating()
   @Post('sign-out/everywhere')
   @HttpCode(204)
   @ApiNoContentResponse()
@@ -157,23 +158,37 @@ export class AuthController {
   @ApiOkResponse({ type: MeDto })
   @ApiUnauthorizedResponse({ description: 'AUTH_UNAUTHENTICATED' })
   getMe(@CurrentAuth() auth: AuthContext): Promise<MeDto> {
-    return this.me(auth.userId);
+    return this.auth.me(auth.userId, auth.impersonatorId);
   }
 
-  private async me(userId: string): Promise<MeDto> {
-    const [user, roles] = await Promise.all([
-      this.prisma.user.findUniqueOrThrow({ where: { id: userId } }),
-      this.roles.rolesOf(userId),
-    ]);
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      locale: user.locale,
-      calendar: user.calendar,
-      roles,
-      avatarUrl: AvatarsService.url(user.id, user.avatarFileId),
-    };
+  /** The super admin views the app as another user, in this session only. */
+  @Post('impersonation')
+  @HttpCode(200)
+  @ApiOkResponse({ type: MeDto })
+  @ApiForbiddenResponse({ description: 'FORBIDDEN' })
+  @ApiConflictResponse({
+    description: 'SELF_ACTION, SUPER_ADMIN_LOCKED, USER_INACTIVE',
+  })
+  async impersonate(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: ImpersonateDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<MeDto> {
+    const tokens = await this.auth.impersonate(auth, body.userId);
+    setAuthCookies(res, tokens, this.secureCookies);
+    return this.auth.me(body.userId, tokens.userId);
+  }
+
+  /** Back to the super admin's own view. */
+  @Delete('impersonation')
+  @ApiOkResponse({ type: MeDto })
+  async stopImpersonating(
+    @CurrentAuth() auth: AuthContext,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<MeDto> {
+    const tokens = await this.auth.stopImpersonating(auth);
+    setAuthCookies(res, tokens, this.secureCookies);
+    return this.auth.me(tokens.userId);
   }
 }
 

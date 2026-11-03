@@ -29,6 +29,9 @@ export class AdminNoteDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() body!: string;
   @ApiProperty({ type: UserRefDto }) author!: UserRefDto;
+  /** The super admin who wrote this while impersonating the author (BR-ADM-5). */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
   @ApiProperty({ format: 'date-time' }) createdAt!: string;
   @ApiProperty({ format: 'date-time' }) updatedAt!: string;
   /** Only the author edits a note. */

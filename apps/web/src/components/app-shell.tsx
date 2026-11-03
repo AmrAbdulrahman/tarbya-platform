@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@tarbya/ui';
 import { useMe, useSignOut } from '../auth/session';
+import { ImpersonateButton, ImpersonationBanner } from './impersonation';
 import { LanguageSwitch } from './language-switch';
 import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
@@ -74,33 +75,41 @@ export function AppShell() {
       </nav>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-10 backdrop-blur">
-          <label className="relative flex-[0_1_380px]">
-            <span className="sr-only">{t('header.search')}</span>
-            <input
-              type="search"
-              placeholder={t('header.search')}
-              className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
-            />
-            <Search
-              className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
-              aria-hidden
-            />
-          </label>
-          <div className="flex-1" />
-          <LanguageSwitch />
-          <Button variant="ghost" size="icon" aria-label={t('header.messages')}>
-            <MessageSquare />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={t('header.notifications')}
-          >
-            <Bell />
-          </Button>
-          <AccountMenu />
-        </header>
+        <div className="sticky top-0 z-20">
+          <ImpersonationBanner />
+          <header className="flex h-16 items-center gap-3 border-b border-border bg-card/95 px-10 backdrop-blur">
+            <label className="relative flex-[0_1_380px]">
+              <span className="sr-only">{t('header.search')}</span>
+              <input
+                type="search"
+                placeholder={t('header.search')}
+                className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
+              />
+              <Search
+                className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
+                aria-hidden
+              />
+            </label>
+            <div className="flex-1" />
+            <ImpersonateButton />
+            <LanguageSwitch />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t('header.messages')}
+            >
+              <MessageSquare />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t('header.notifications')}
+            >
+              <Bell />
+            </Button>
+            <AccountMenu />
+          </header>
+        </div>
         <main className="flex flex-col gap-7 px-10 pb-12 pt-8">
           <Outlet />
         </main>
@@ -145,10 +154,13 @@ function AccountMenu() {
           <LogOut aria-hidden />
           {t('account.signOut')}
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => signOutEverywhere.mutate()}>
-          <MonitorX aria-hidden />
-          {t('account.signOutEverywhere')}
-        </DropdownMenuItem>
+        {/* Not while impersonating: those sessions belong to the super admin. */}
+        {!me.impersonator && (
+          <DropdownMenuItem onSelect={() => signOutEverywhere.mutate()}>
+            <MonitorX aria-hidden />
+            {t('account.signOutEverywhere')}
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

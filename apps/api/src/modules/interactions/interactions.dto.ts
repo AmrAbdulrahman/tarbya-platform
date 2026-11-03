@@ -203,6 +203,9 @@ export class InteractionDto {
   @ApiProperty({ type: String, nullable: true }) privateNotes!: string | null;
   @ApiProperty({ type: String, isArray: true }) challenges!: string[];
   @ApiProperty({ type: UserRefDto }) createdBy!: UserRefDto;
+  /** The super admin who logged it while impersonating `createdBy` (BR-ADM-5). */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
   @ApiProperty({ type: UserRefDto, isArray: true }) participants!: UserRefDto[];
   @ApiProperty({ type: TaskDto, isArray: true }) tasks!: TaskDto[];
 }

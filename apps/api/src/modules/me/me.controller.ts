@@ -18,6 +18,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { NotWhileImpersonating } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { CurrentAuth, type AuthContext } from '../../common/auth-context';
 import { AVATAR_MAX_BYTES, AvatarsService } from '../files/avatars.service';
@@ -91,6 +92,7 @@ export class MeController {
   }
 
   /** US-2.2 */
+  @NotWhileImpersonating()
   @Post('contact')
   @HttpCode(204)
   @ApiNoContentResponse()
@@ -101,6 +103,7 @@ export class MeController {
     return this.me.requestContactChange(auth.userId, body.kind, body.value);
   }
 
+  @NotWhileImpersonating()
   @Post('contact/confirm')
   @HttpCode(200)
   @ApiOkResponse({ type: MyProfileDto })
@@ -112,6 +115,7 @@ export class MeController {
   }
 
   /** US-2.3 */
+  @NotWhileImpersonating()
   @Put('password')
   @HttpCode(204)
   @ApiNoContentResponse()

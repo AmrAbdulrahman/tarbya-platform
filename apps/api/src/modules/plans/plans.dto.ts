@@ -62,6 +62,9 @@ export class PlanReplyDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() body!: string;
   @ApiProperty({ type: UserRefDto }) author!: UserRefDto;
+  /** The super admin who wrote this while impersonating the author (BR-ADM-5). */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
   @ApiProperty({ format: 'date-time' }) createdAt!: string;
 }
 
@@ -74,6 +77,9 @@ export class PlanReadingDto {
   @ApiProperty() needsHelp!: boolean;
   @ApiProperty({ format: 'date-time' }) recordedAt!: string;
   @ApiProperty({ type: UserRefDto }) author!: UserRefDto;
+  /** The super admin who wrote this while impersonating the author (BR-ADM-5). */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
   @ApiProperty({ type: PlanReplyDto, isArray: true }) replies!: PlanReplyDto[];
 }
 

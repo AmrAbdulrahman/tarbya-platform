@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService, type Prisma } from '@tarbya/db';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
+import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
 import { RolesService } from '../users/roles.service';
 import type { CreateNoteDto, NoteDto, UpdateNoteDto } from './notes.dto';
@@ -13,6 +14,7 @@ const noteSelect = {
   createdAt: true,
   updatedAt: true,
   author: { select: { id: true, name: true } },
+  impersonator: { select: { id: true, name: true } },
 } satisfies Prisma.NoteSelect;
 
 const toDto = (
@@ -67,6 +69,7 @@ export class NotesService {
           authorId: actorId,
           visibility: dto.visibility,
           body: dto.body,
+          ...impersonation(),
         },
         select: noteSelect,
       }),

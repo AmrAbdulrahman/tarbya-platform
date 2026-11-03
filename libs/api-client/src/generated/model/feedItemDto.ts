@@ -15,13 +15,15 @@ export interface FeedItemDto {
   at: string;
   actor: UserRefDto;
   /** @nullable */
+  impersonator: UserRefDto | null;
+  /** @nullable */
   interactionId: string | null;
   /** @nullable */
   title: string | null;
   /** @nullable */
   activityType: ActivityTypeRefDto | null;
   planUpdates: number;
-  challenges: number;
+  challenges: string[];
   tasks: number;
   participants: number;
   /** @nullable */

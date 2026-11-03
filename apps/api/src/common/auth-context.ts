@@ -3,8 +3,11 @@ import type { Request } from 'express';
 
 /** What the auth guard attaches to each signed-in request. */
 export interface AuthContext {
+  /** Whose app this is; while impersonating, the impersonated user. */
   userId: string;
   sessionId: string;
+  /** The super admin, while they impersonate `userId`. */
+  impersonatorId?: string;
 }
 
 declare module 'express' {

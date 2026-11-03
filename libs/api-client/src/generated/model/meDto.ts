@@ -7,6 +7,7 @@
 import type { CalendarPreference } from './calendarPreference.js';
 import type { Locale } from './locale.js';
 import type { Role } from './role.js';
+import type { UserRefDto } from './userRefDto.js';
 
 export interface MeDto {
   id: string;
@@ -18,4 +19,6 @@ export interface MeDto {
   roles: Role[];
   /** @nullable */
   avatarUrl: string | null;
+  /** @nullable */
+  impersonator: UserRefDto | null;
 }

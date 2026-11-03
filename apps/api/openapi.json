@@ -22,6 +22,46 @@
         ]
       }
     },
+    "/api/audit": {
+      "get": {
+        "operationId": "AuditController_list",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "audit"
+        ]
+      }
+    },
     "/api/hierarchy/management": {
       "get": {
         "operationId": "HierarchyController_management",
@@ -610,6 +650,62 @@
           },
           "401": {
             "description": "AUTH_UNAUTHENTICATED"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/impersonation": {
+      "post": {
+        "operationId": "AuthController_impersonate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpersonateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN"
+          },
+          "409": {
+            "description": "SELF_ACTION, SUPER_ADMIN_LOCKED, USER_INACTIVE"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      },
+      "delete": {
+        "operationId": "AuthController_stopImpersonating",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1937,6 +2033,110 @@
           "status"
         ]
       },
+      "AuditAction": {
+        "type": "string",
+        "enum": [
+          "user.create",
+          "user.update",
+          "user.deactivate",
+          "user.reactivate",
+          "user.manager.set",
+          "user.moderator.set",
+          "settings.update",
+          "mentorship.start",
+          "mentorship.end",
+          "user.impersonate.start",
+          "user.impersonate.stop"
+        ]
+      },
+      "UserRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ChangeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AuditAction"
+              }
+            ]
+          },
+          "actor": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "onBehalfOf": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "actor",
+          "onBehalfOf",
+          "fields",
+          "createdAt"
+        ]
+      },
+      "ChangePageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangeDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
       "ManagementNodeDto": {
         "type": "object",
         "properties": {
@@ -2097,22 +2297,6 @@
           "GROUP_MODERATOR",
           "MENTOR",
           "MENTEE"
-        ]
-      },
-      "UserRefDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name"
         ]
       },
       "UserDto": {
@@ -2373,6 +2557,15 @@
           "avatarUrl": {
             "type": "string",
             "nullable": true
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
           }
         },
         "required": [
@@ -2382,7 +2575,8 @@
           "locale",
           "calendar",
           "roles",
-          "avatarUrl"
+          "avatarUrl",
+          "impersonator"
         ]
       },
       "RequestCodeDto": {
@@ -2413,6 +2607,18 @@
         "required": [
           "email",
           "code"
+        ]
+      },
+      "ImpersonateDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "userId"
         ]
       },
       "ActivityScope": {
@@ -2973,6 +3179,15 @@
           "createdBy": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
           "participants": {
             "type": "array",
             "items": {
@@ -2999,6 +3214,7 @@
           "privateNotes",
           "challenges",
           "createdBy",
+          "impersonator",
           "participants",
           "tasks"
         ]
@@ -3206,6 +3422,15 @@
           "author": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3220,6 +3445,7 @@
           "visibility",
           "body",
           "author",
+          "impersonator",
           "createdAt",
           "updatedAt"
         ]
@@ -3358,6 +3584,15 @@
           "author": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3374,6 +3609,7 @@
           "id",
           "body",
           "author",
+          "impersonator",
           "createdAt",
           "updatedAt",
           "canEdit"
@@ -3668,6 +3904,15 @@
           "author": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3677,6 +3922,7 @@
           "id",
           "body",
           "author",
+          "impersonator",
           "createdAt"
         ]
       },
@@ -3711,6 +3957,15 @@
           "author": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
           "replies": {
             "type": "array",
             "items": {
@@ -3726,6 +3981,7 @@
           "needsHelp",
           "recordedAt",
           "author",
+          "impersonator",
           "replies"
         ]
       },
@@ -3979,6 +4235,15 @@
           "actor": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
           "interactionId": {
             "type": "string",
             "format": "uuid",
@@ -4001,7 +4266,10 @@
             "type": "number"
           },
           "challenges": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "tasks": {
             "type": "number"
@@ -4032,6 +4300,7 @@
           "kind",
           "at",
           "actor",
+          "impersonator",
           "interactionId",
           "title",
           "activityType",

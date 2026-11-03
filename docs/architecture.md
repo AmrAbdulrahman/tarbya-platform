@@ -93,6 +93,7 @@ Private notes are excluded at the query level for anyone who isn't the mentor or
 - Refresh token: opaque random value, 30 days, stored hashed in `Session`, rotated on every use; reuse of an old one revokes the session family.
 - Sign-in allowed if the user is active, has an email, and holds a role listed in the `auth.signInRoles` setting (super admin always).
 - CSRF: same-site cookies plus a required custom header (`X-Requested-With`) on mutating requests.
+- Impersonation (BR-ADM-5): the super admin's session stores `impersonatedUserId`; its access tokens then carry the user as `sub` and the super admin as `act`, and every request checks them against the session, so stopping takes effect at once. The audit service records changes made meanwhile with `actorId` = super admin and `onBehalfOfId` = the user. Records written meanwhile (interactions, tasks, notes, admin notes, plans, readings, replies) store `impersonatorId`, returned as `impersonator` next to the author. `GET /audit?userId=` gives admins a member's change log. Routes marked `@NotWhileImpersonating()` (password, email/phone, sign out everywhere) refuse with `IMPERSONATION_RESTRICTED`.
 - v2 acting on behalf: a short-lived access token with an `act` claim (`{ sub: member, act: { sub: manager } }`); the audit context records both; a separate allow-list defines which endpoints accept it.
 
 ## Data model (first cut)

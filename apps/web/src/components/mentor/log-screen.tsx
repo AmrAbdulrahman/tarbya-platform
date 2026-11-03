@@ -154,7 +154,7 @@ export function LogScreen({
             </section>
             <div className="flex min-w-0 flex-[2_1_300px] flex-col gap-6">
               <Progress menteeId={selected.mentee.id} />
-              <TasksPanel menteeId={selected.mentee.id} openOnly />
+              <TasksPanel menteeId={selected.mentee.id} />
             </div>
           </div>
         </>

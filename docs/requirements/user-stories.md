@@ -120,6 +120,17 @@ As someone who manages or mentors a member (or a moderator), I want to keep note
 - Only the author edits a note.
 - Refs: BR-NOTE-3
 
+### US-3.8 View the app as a user — v1
+
+As the super admin, I want to pick a user from the header and see the app as they do, so that I can check what they see and help them.
+
+- A banner shows whose view this is and has a button back to my account.
+- Starting and stopping are audited; changes I make meanwhile are recorded as mine on their behalf.
+- Follow-ups, activities, notes, plans, reports and replies I write meanwhile show "X on behalf of Y" wherever their author is shown.
+- Admins see a change log on each member's profile, with entries made while impersonating marked.
+- Their password, email, phone and sessions can't be changed while impersonating.
+- Refs: BR-ADM-5, BR-ADM-4
+
 ### US-3.5 Manage lookups — v1
 
 As a moderator, I want to manage activity types, gathering types and plan tracking methods.

@@ -32,6 +32,9 @@ export class FeedItemDto {
   @ApiProperty({ format: 'date-time' }) at!: string;
   /** Who logged the follow-up or activity, checked in, or replied. */
   @ApiProperty({ type: UserRefDto }) actor!: UserRefDto;
+  /** The super admin who did it while impersonating the actor (BR-ADM-5). */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
 
   /** Follow-ups and activities. */
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
@@ -40,7 +43,8 @@ export class FeedItemDto {
   @ApiProperty({ type: ActivityTypeRefDto, nullable: true })
   activityType!: ActivityTypeRefDto | null;
   @ApiProperty() planUpdates!: number;
-  @ApiProperty() challenges!: number;
+  /** The follow-up's challenges, as written. */
+  @ApiProperty({ type: String, isArray: true }) challenges!: string[];
   @ApiProperty() tasks!: number;
   @ApiProperty() participants!: number;
 

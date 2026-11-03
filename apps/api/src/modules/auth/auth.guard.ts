@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { unauthenticated } from '../../common/app-exception';
 import { IS_PUBLIC } from '../../common/public.decorator';
+import { requestContext } from '../../common/request-context';
 import { ACCESS_COOKIE } from './cookies';
 import { SessionsService } from './sessions.service';
 
@@ -26,7 +27,13 @@ export class AuthGuard implements CanActivate {
       req.cookies?.[ACCESS_COOKIE],
     );
     if (!claims) throw unauthenticated();
-    req.auth = { userId: claims.sub, sessionId: claims.sid };
+    req.auth = {
+      userId: claims.sub,
+      sessionId: claims.sid,
+      impersonatorId: claims.act,
+    };
+    const state = requestContext.getStore();
+    if (state) state.impersonatorId = claims.act;
     return true;
   }
 }

@@ -25,6 +25,7 @@ import type {
 
 import type {
   CodeSignInDto,
+  ImpersonateDto,
   MeDto,
   PasswordSignInDto,
   RequestCodeDto
@@ -711,3 +712,187 @@ export function useAuthControllerGetMe<TData = Awaited<ReturnType<typeof authCon
 
 
 
+export type authControllerImpersonateResponse200 = {
+  data: MeDto
+  status: 200
+}
+
+export type authControllerImpersonateResponse403 = {
+  data: void
+  status: 403
+}
+
+export type authControllerImpersonateResponse409 = {
+  data: void
+  status: 409
+}
+
+export type authControllerImpersonateResponseSuccess = (authControllerImpersonateResponse200) & {
+  headers: Headers;
+};
+export type authControllerImpersonateResponseError = (authControllerImpersonateResponse403 | authControllerImpersonateResponse409) & {
+  headers: Headers;
+};
+
+export type authControllerImpersonateResponse = (authControllerImpersonateResponseSuccess | authControllerImpersonateResponseError)
+
+export const getAuthControllerImpersonateUrl = () => {
+
+
+
+
+  return `/api/auth/impersonation`
+}
+
+export const authControllerImpersonate = async (impersonateDto: ImpersonateDto, options?: Parameters<typeof apiFetch>[1]): Promise<authControllerImpersonateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<authControllerImpersonateResponse>(getAuthControllerImpersonateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(impersonateDto)
+  }
+);}
+
+
+
+
+
+export const getAuthControllerImpersonateMutationKey = () => ['authControllerImpersonate'] as const;
+
+export const getAuthControllerImpersonateMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerImpersonate>>, TError,AuthControllerImpersonateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof authControllerImpersonate>>, TError,AuthControllerImpersonateMutationVariables, TContext> => {
+
+const mutationKey = getAuthControllerImpersonateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerImpersonate>>, AuthControllerImpersonateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  authControllerImpersonate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthControllerImpersonateMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerImpersonate>>>
+    export type AuthControllerImpersonateMutationBody = ImpersonateDto
+    export type AuthControllerImpersonateMutationError = void
+    export type AuthControllerImpersonateMutationVariables = {data: ImpersonateDto}
+
+    export const useAuthControllerImpersonate = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerImpersonate>>, TError,AuthControllerImpersonateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authControllerImpersonate>>,
+        TError,
+        AuthControllerImpersonateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAuthControllerImpersonateMutationOptions(options), queryClient);
+    }
+    export type authControllerStopImpersonatingResponse200 = {
+  data: MeDto
+  status: 200
+}
+
+export type authControllerStopImpersonatingResponseSuccess = (authControllerStopImpersonatingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type authControllerStopImpersonatingResponse = (authControllerStopImpersonatingResponseSuccess)
+
+export const getAuthControllerStopImpersonatingUrl = () => {
+
+
+
+
+  return `/api/auth/impersonation`
+}
+
+export const authControllerStopImpersonating = async ( options?: Parameters<typeof apiFetch>[1]): Promise<authControllerStopImpersonatingResponse> => {
+
+  return apiFetch<authControllerStopImpersonatingResponse>(getAuthControllerStopImpersonatingUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getAuthControllerStopImpersonatingMutationKey = () => ['authControllerStopImpersonating'] as const;
+
+export const getAuthControllerStopImpersonatingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerStopImpersonating>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof authControllerStopImpersonating>>, TError,void, TContext> => {
+
+const mutationKey = getAuthControllerStopImpersonatingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerStopImpersonating>>, void> = () => {
+
+
+          return  authControllerStopImpersonating(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthControllerStopImpersonatingMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerStopImpersonating>>>
+
+    export type AuthControllerStopImpersonatingMutationError = unknown
+
+
+    export const useAuthControllerStopImpersonating = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerStopImpersonating>>, TError,void, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authControllerStopImpersonating>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getAuthControllerStopImpersonatingMutationOptions(options), queryClient);
+    }
