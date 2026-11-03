@@ -1,44 +1,35 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { CircleCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 import {
   trackablesControllerCreate,
   trackablesControllerUpdate,
+  trackableTemplatesControllerList,
+  trackableTemplatesControllerUpdate,
   type TrackableDetailDto,
+  type TrackableTemplateDto,
 } from '@tarbya/api-client';
-import { toZoned } from '@tarbya/shared';
-import { Button, Dialog, DialogContent, Input, Select } from '@tarbya/ui';
+import { Button, Dialog, DialogContent, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
-import { Field, FormError } from '../login/fields';
-
-const TYPES = ['COUNT', 'BOOLEAN', 'PERCENTAGE'] as const;
-const CYCLES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
-
-const schema = z.object({
-  name: z.string().trim().min(1, 'validation.required').max(120),
-  goal: z.string().trim().max(300),
-  type: z.enum(TYPES),
-  cycle: z.enum(CYCLES),
-  higherIsBetter: z.enum(['yes', 'no']),
-  // Empty means no target.
-  target: z
-    .string()
-    .refine((v) => v.trim() === '' || Number(v) >= 0, 'validation.number'),
-  startsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.date'),
-});
-type Values = z.infer<typeof schema>;
+import {
+  AssignForm,
+  LibraryPicker,
+  SaveAsTemplate,
+  templatesQueryKey,
+  useRefreshTrackables,
+} from './library';
+import { sharedFields, TrackableForm } from './trackable-form';
 
 interface Props {
   menteeId: string;
-  /** Absent to create. */
+  /** Absent to add one. */
   trackable?: TrackableDetailDto;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-/** US-4.5: create or edit a trackable (BR-TRK-1). */
+/** US-4.5, US-4.9: add a trackable (from the library or new), or edit one. */
 export function TrackableDialog({
   menteeId,
   trackable,
@@ -46,200 +37,267 @@ export function TrackableDialog({
   onOpenChange,
 }: Props) {
   const { t } = useTranslation();
+  const [title, setTitle] = useState('');
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        title={trackable ? t('trackables.editTitle') : t('trackables.newTitle')}
+        title={trackable ? t('trackables.editTitle') : title}
         closeLabel={t('admin.common.close')}
       >
-        <TrackableForm
-          key={trackable?.id ?? 'new'}
-          menteeId={menteeId}
-          trackable={trackable}
-          onDone={() => onOpenChange(false)}
-        />
+        {trackable ? (
+          <EditTrackable
+            key={trackable.id}
+            trackable={trackable}
+            onDone={() => onOpenChange(false)}
+          />
+        ) : (
+          open && (
+            <AddTrackable
+              menteeId={menteeId}
+              onTitle={setTitle}
+              onDone={() => onOpenChange(false)}
+            />
+          )
+        )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function TrackableForm({
+type Step =
+  | { kind: 'library' }
+  | { kind: 'form' }
+  | { kind: 'assign'; template: TrackableTemplateDto }
+  | { kind: 'created'; trackable: TrackableDetailDto };
+
+/**
+ * With nothing in the library the form opens straight away; otherwise the
+ * library comes first, with "create new" beside it. A new trackable can then
+ * be saved as a template.
+ */
+function AddTrackable({
   menteeId,
-  trackable,
+  onTitle,
   onDone,
 }: {
   menteeId: string;
-  trackable?: TrackableDetailDto;
+  onTitle: (title: string) => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const form = useForm<Values>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      name: trackable?.name ?? '',
-      goal: trackable?.goal ?? '',
-      type: trackable?.type ?? 'COUNT',
-      cycle: trackable?.cycle ?? 'WEEKLY',
-      higherIsBetter: trackable?.higherIsBetter === false ? 'no' : 'yes',
-      target:
-        trackable?.target === null || !trackable
-          ? ''
-          : String(trackable.target),
-      startsOn: trackable?.startsOn ?? toZoned(new Date()).date,
+  const toast = useToast();
+  const refresh = useRefreshTrackables();
+  const templates = useQuery({
+    queryKey: templatesQueryKey(menteeId),
+    queryFn: async ({ signal }) =>
+      (await trackableTemplatesControllerList({ menteeId }, { signal }))
+        .data as TrackableTemplateDto[],
+  });
+  const [chosen, setStep] = useState<Step | null>(null);
+  const hasLibrary = !!templates.data?.length;
+  const step: Step | null =
+    chosen ??
+    (templates.data ? { kind: hasLibrary ? 'library' : 'form' } : null);
+  const create = useMutation({
+    mutationFn: async (v: Parameters<typeof sharedFields>[0]) =>
+      (
+        await trackablesControllerCreate({
+          ...sharedFields(v),
+          menteeId,
+          type: v.type,
+          cycle: v.cycle,
+          startsOn: v.startsOn,
+        })
+      ).data as TrackableDetailDto,
+    onSuccess: async (trackable) => {
+      await refresh();
+      setStep({ kind: 'created', trackable });
     },
   });
-  const { errors } = form.formState;
-  const type = form.watch('type');
+  const added = (name: string) => {
+    toast(t('trackables.library.added', { name }));
+    onDone();
+  };
+
+  const titles = {
+    library: t('trackables.library.title'),
+    form: t('trackables.newTitle'),
+    assign: t('trackables.library.assignTitle'),
+    created: t('trackables.library.createdTitle'),
+  };
+  const title = step ? titles[step.kind] : t('trackables.newTitle');
+  useEffect(() => onTitle(title), [onTitle, title]);
+
+  if (!step) {
+    return (
+      <p className="text-sm text-ink-subtle">
+        {templates.isError
+          ? errorMessage(t, templates.error)
+          : t('admin.common.loading')}
+      </p>
+    );
+  }
+  switch (step.kind) {
+    case 'library':
+      return (
+        <LibraryPicker
+          templates={templates.data ?? []}
+          onPick={(template) => setStep({ kind: 'assign', template })}
+          onCreate={() => setStep({ kind: 'form' })}
+        />
+      );
+    case 'assign':
+      return (
+        <AssignForm
+          template={step.template}
+          menteeId={menteeId}
+          onBack={() => setStep({ kind: 'library' })}
+          onDone={(tr) => added(tr.name)}
+        />
+      );
+    case 'form':
+      return (
+        <TrackableForm
+          showStart
+          pending={create.isPending}
+          error={create.isError ? errorMessage(t, create.error) : undefined}
+          onSubmit={(v) => create.mutate(v)}
+          onCancel={() =>
+            hasLibrary ? setStep({ kind: 'library' }) : onDone()
+          }
+        />
+      );
+    case 'created':
+      return (
+        <div className="flex flex-col gap-4">
+          <p className="flex items-start gap-2 text-[15px]">
+            <CircleCheck
+              className="mt-0.5 size-5 shrink-0 text-trend-up"
+              aria-hidden
+            />
+            <span>
+              {t('trackables.library.createdBody', {
+                name: step.trackable.name,
+              })}
+            </span>
+          </p>
+          <p className="text-[13px] text-ink-subtle">
+            {t('trackables.library.saveHint')}
+          </p>
+          <SaveAsTemplate
+            trackableId={step.trackable.id}
+            onSaved={() => {
+              toast(t('trackables.library.savedToast'));
+              onDone();
+            }}
+            extra={
+              <Button variant="outline" onClick={onDone}>
+                {t('trackables.library.notNow')}
+              </Button>
+            }
+          />
+        </div>
+      );
+  }
+}
+
+/** A trackable that follows a template only changes its target and start here. */
+function EditTrackable({
+  trackable,
+  onDone,
+}: {
+  trackable: TrackableDetailDto;
+  onDone: () => void;
+}) {
+  const { t } = useTranslation();
+  const refresh = useRefreshTrackables();
   // Type, cycle and start are fixed once something is logged (BR-TRK-1).
-  const reshapable = !trackable || trackable.logged === 0;
+  const reshapable = trackable.logged === 0;
+  const fromTemplate = !!trackable.template;
   const save = useMutation({
-    mutationFn: (v: Values) => {
-      const shared = {
-        name: v.name,
-        goal: v.goal || null,
-        higherIsBetter: v.higherIsBetter === 'yes',
-        target:
-          v.type === 'BOOLEAN' || v.target.trim() === ''
-            ? null
-            : Number(v.target),
-      };
-      return trackable
-        ? trackablesControllerUpdate(trackable.id, {
-            ...shared,
-            ...(reshapable && {
-              type: v.type,
-              cycle: v.cycle,
-              startsOn: v.startsOn,
-            }),
-          })
-        : trackablesControllerCreate({
-            ...shared,
-            menteeId,
-            type: v.type,
-            cycle: v.cycle,
-            startsOn: v.startsOn,
-          });
+    mutationFn: (v: Parameters<typeof sharedFields>[0]) => {
+      const shared = sharedFields(v);
+      return trackablesControllerUpdate(trackable.id, {
+        ...(fromTemplate ? { target: shared.target } : shared),
+        ...(reshapable && {
+          startsOn: v.startsOn,
+          ...(!fromTemplate && { type: v.type, cycle: v.cycle }),
+        }),
+      });
     },
     onSuccess: async () => {
-      await Promise.all(
-        [['trackables'], ['dashboard']].map((queryKey) =>
-          queryClient.invalidateQueries({ queryKey }),
-        ),
-      );
+      await refresh();
       onDone();
     },
   });
-  const err = (name: keyof Values) =>
-    errors[name]?.message
-      ? t(errors[name]?.message as 'validation.required')
-      : undefined;
-
   return (
-    <form
-      noValidate
-      onSubmit={form.handleSubmit((v) => save.mutate(v))}
-      className="flex flex-col gap-4"
-    >
-      <Field id="trk-name" label={t('trackables.name')} error={err('name')}>
-        <Input
-          id="trk-name"
-          className="h-11 text-[15px]"
-          aria-invalid={!!errors.name}
-          {...form.register('name')}
-        />
-      </Field>
-      <Field id="trk-goal" label={t('trackables.goal')}>
-        <Input
-          id="trk-goal"
-          className="h-11 text-[15px]"
-          {...form.register('goal')}
-        />
-      </Field>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="trk-type" label={t('trackables.type')}>
-          <Select
-            id="trk-type"
-            disabled={!reshapable}
-            {...form.register('type')}
-          >
-            {TYPES.map((x) => (
-              <option key={x} value={x}>
-                {t(`trackables.types.${x}`)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field id="trk-cycle" label={t('trackables.cycle')}>
-          <Select
-            id="trk-cycle"
-            disabled={!reshapable}
-            {...form.register('cycle')}
-          >
-            {CYCLES.map((x) => (
-              <option key={x} value={x}>
-                {t(`trackables.cycles.${x}`)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field id="trk-direction" label={t('trackables.direction')}>
-          <Select id="trk-direction" {...form.register('higherIsBetter')}>
-            <option value="yes">{t('trackables.higherBetter')}</option>
-            <option value="no">{t('trackables.lowerBetter')}</option>
-          </Select>
-        </Field>
-        {type !== 'BOOLEAN' && (
-          <Field
-            id="trk-target"
-            label={t('trackables.target')}
-            error={err('target')}
-          >
-            <Input
-              id="trk-target"
-              type="number"
-              min={0}
-              max={type === 'PERCENTAGE' ? 100 : undefined}
-              step="any"
-              dir="ltr"
-              className="h-11 font-figures text-[15px]"
-              aria-invalid={!!errors.target}
-              {...form.register('target')}
-            />
-          </Field>
-        )}
-        {reshapable && (
-          <Field
-            id="trk-starts"
-            label={t('trackables.startsOn')}
-            error={err('startsOn')}
-          >
-            <Input
-              id="trk-starts"
-              type="date"
-              max={toZoned(new Date()).date}
-              className="h-11 text-[15px]"
-              {...form.register('startsOn')}
-            />
-          </Field>
-        )}
-      </div>
-      {!reshapable && (
+    <TrackableForm
+      initial={trackable}
+      lockShape={!reshapable}
+      lockShared={fromTemplate}
+      showStart={reshapable}
+      notice={
         <p className="text-[13px] text-ink-subtle">
-          {t('trackables.fixedHint')}
+          {fromTemplate
+            ? t('trackables.library.followsHint')
+            : !reshapable && t('trackables.fixedHint')}
         </p>
-      )}
-      <FormError
-        message={save.isError ? errorMessage(t, save.error) : undefined}
-      />
-      <div className="flex gap-2">
-        <Button type="submit" disabled={save.isPending}>
-          {t('admin.common.save')}
-        </Button>
-        <Button type="button" variant="outline" onClick={onDone}>
-          {t('admin.common.cancel')}
-        </Button>
-      </div>
-    </form>
+      }
+      pending={save.isPending}
+      error={save.isError ? errorMessage(t, save.error) : undefined}
+      onSubmit={(v) => save.mutate(v)}
+      onCancel={onDone}
+    />
+  );
+}
+
+/** Edits a library template; the change reaches every trackable that follows it. */
+export function TemplateDialog({
+  template,
+  open,
+  onOpenChange,
+}: {
+  template: TrackableTemplateDto;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  const refresh = useRefreshTrackables();
+  const save = useMutation({
+    mutationFn: (v: Parameters<typeof sharedFields>[0]) =>
+      trackableTemplatesControllerUpdate(template.id, {
+        ...sharedFields(v),
+        isPublic: v.isPublic,
+        ...(template.reshapable && { type: v.type, cycle: v.cycle }),
+      }),
+    onSuccess: async () => {
+      await refresh();
+      onOpenChange(false);
+    },
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        title={t('trackables.library.editTitle')}
+        closeLabel={t('admin.common.close')}
+      >
+        {open && (
+          <TrackableForm
+            initial={template}
+            lockShape={!template.reshapable}
+            showPublic
+            notice={
+              <p className="rounded-lg bg-amber-50 px-3 py-2 text-[13px] text-warn">
+                {t('trackables.library.editWarning', { count: template.uses })}
+              </p>
+            }
+            pending={save.isPending}
+            error={save.isError ? errorMessage(t, save.error) : undefined}
+            onSubmit={(v) => save.mutate(v)}
+            onCancel={() => onOpenChange(false)}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

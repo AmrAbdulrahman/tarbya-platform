@@ -1306,6 +1306,49 @@
         ]
       }
     },
+    "/api/trackables/{id}/template": {
+      "post": {
+        "operationId": "TrackablesController_saveAsTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAsTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "TRACKABLE_FROM_TEMPLATE"
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
     "/api/trackables/{id}/entries/{periodStart}": {
       "put": {
         "operationId": "TrackablesController_log",
@@ -1390,6 +1433,147 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackable-templates": {
+      "get": {
+        "operationId": "TrackableTemplatesController_list",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrackableTemplateDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackable-templates/{id}": {
+      "patch": {
+        "operationId": "TrackableTemplatesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableTemplateDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "TRACKABLE_HAS_ENTRIES"
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      },
+      "delete": {
+        "operationId": "TrackableTemplatesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "trackables"
+        ]
+      }
+    },
+    "/api/trackable-templates/{id}/assign": {
+      "post": {
+        "operationId": "TrackableTemplatesController_assign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackableDetailDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "TEMPLATE_ALREADY_ASSIGNED"
           }
         },
         "tags": [
@@ -3603,6 +3787,86 @@
           "points"
         ]
       },
+      "TrackableTemplateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
+          },
+          "higherIsBetter": {
+            "type": "boolean"
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "isPublic": {
+            "type": "boolean"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserRefDto"
+          },
+          "impersonator": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "uses": {
+            "type": "number"
+          },
+          "canEdit": {
+            "type": "boolean"
+          },
+          "reshapable": {
+            "type": "boolean"
+          },
+          "assigned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "goal",
+          "type",
+          "cycle",
+          "higherIsBetter",
+          "target",
+          "isPublic",
+          "author",
+          "impersonator",
+          "uses",
+          "canEdit",
+          "reshapable",
+          "assigned"
+        ]
+      },
       "EntrySource": {
         "type": "string",
         "enum": [
@@ -3806,6 +4070,15 @@
           "mentee": {
             "$ref": "#/components/schemas/UserRefDto"
           },
+          "template": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableTemplateDto"
+              }
+            ]
+          },
           "entries": {
             "type": "array",
             "items": {
@@ -3841,6 +4114,7 @@
           "change",
           "points",
           "mentee",
+          "template",
           "entries",
           "canManage",
           "canLog"
@@ -3939,6 +4213,15 @@
           }
         }
       },
+      "SaveAsTemplateDto": {
+        "type": "object",
+        "properties": {
+          "isPublic": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
       "LogEntryDto": {
         "type": "object",
         "properties": {
@@ -3968,6 +4251,65 @@
         },
         "required": [
           "body"
+        ]
+      },
+      "UpdateTemplateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "goal": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackableType"
+              }
+            ]
+          },
+          "cycle": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TrackingCycle"
+              }
+            ]
+          },
+          "higherIsBetter": {
+            "type": "boolean",
+            "default": true
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "isPublic": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AssignTemplateDto": {
+        "type": "object",
+        "properties": {
+          "menteeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target": {
+            "type": "number",
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "menteeId"
         ]
       },
       "NoteVisibility": {

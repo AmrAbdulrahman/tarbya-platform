@@ -92,8 +92,39 @@ export class TrackableEntryDto {
   replies!: TrackableReplyDto[];
 }
 
+/** A library template (BR-TRK-7…9). */
+export class TrackableTemplateDto {
+  @ApiProperty({ format: 'uuid' }) id!: string;
+  @ApiProperty() name!: string;
+  @ApiProperty({ type: String, nullable: true }) goal!: string | null;
+  @ApiProperty({ enum: TYPES, enumName: 'TrackableType' })
+  type!: TrackableType;
+  @ApiProperty({ enum: CYCLES, enumName: 'TrackingCycle' })
+  cycle!: Cycle;
+  @ApiProperty() higherIsBetter!: boolean;
+  /** Suggested target per cycle. */
+  @ApiProperty({ type: Number, nullable: true }) target!: number | null;
+  /** Offered to every mentor. */
+  @ApiProperty() isPublic!: boolean;
+  @ApiProperty({ type: UserRefDto }) author!: UserRefDto;
+  /** The super admin who wrote this while impersonating the author (BR-ADM-5). */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  impersonator!: UserRefDto | null;
+  /** Active trackables that follow it, across all mentees. */
+  @ApiProperty() uses!: number;
+  /** The viewer is the author or an admin. */
+  @ApiProperty() canEdit!: boolean;
+  /** Type and cycle can still change: nothing is logged on any linked trackable. */
+  @ApiProperty() reshapable!: boolean;
+  /** The mentee asked about already has an active trackable from it. */
+  @ApiProperty() assigned!: boolean;
+}
+
 export class TrackableDetailDto extends TrackableSummaryDto {
   @ApiProperty({ type: UserRefDto }) mentee!: UserRefDto;
+  /** The library template it follows (BR-TRK-8). */
+  @ApiProperty({ type: TrackableTemplateDto, nullable: true })
+  template!: TrackableTemplateDto | null;
   /** Newest cycle first. */
   @ApiProperty({ type: TrackableEntryDto, isArray: true })
   entries!: TrackableEntryDto[];

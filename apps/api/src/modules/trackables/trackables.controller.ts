@@ -22,11 +22,16 @@ import {
   UpdateTrackableDto,
 } from './trackables.dto';
 import { TrackablesService } from './trackables.service';
+import { SaveAsTemplateDto } from './templates.dto';
+import { TrackableTemplatesService } from './templates.service';
 
 @ApiTags('trackables')
 @Controller('trackables')
 export class TrackablesController {
-  constructor(private readonly trackables: TrackablesService) {}
+  constructor(
+    private readonly trackables: TrackablesService,
+    private readonly templates: TrackableTemplatesService,
+  ) {}
 
   @Get()
   @ApiOkResponse({ type: TrackableSummaryDto, isArray: true })
@@ -65,6 +70,19 @@ export class TrackablesController {
     @Body() body: UpdateTrackableDto,
   ): Promise<TrackableDetailDto> {
     return this.trackables.update(auth.userId, id, body);
+  }
+
+  /** US-4.9: save to the library; the trackable then follows the template. */
+  @Post(':id/template')
+  @HttpCode(200)
+  @ApiOkResponse({ type: TrackableDetailDto })
+  @ApiConflictResponse({ description: 'TRACKABLE_FROM_TEMPLATE' })
+  saveAsTemplate(
+    @CurrentAuth() auth: AuthContext,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: SaveAsTemplateDto,
+  ): Promise<TrackableDetailDto> {
+    return this.templates.saveFromTrackable(auth.userId, id, !!body.isPublic);
   }
 
   /** US-5.2: log (or replace) the cycle starting on `periodStart`. */

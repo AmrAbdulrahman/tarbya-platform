@@ -102,6 +102,9 @@ export const en: Messages = {
     CYCLE_OUT_OF_RANGE: 'That cycle can no longer be logged.',
     TRACKABLE_HAS_ENTRIES:
       'Type, cycle and start date are fixed once something is logged.',
+    TRACKABLE_FROM_TEMPLATE:
+      'This trackable follows a library template. Change it in the template.',
+    TEMPLATE_ALREADY_ASSIGNED: 'This mentee already tracks that template.',
     VALIDATION_FAILED: 'Check the fields and try again.',
     FORBIDDEN: "You don't have permission to do that.",
     NOT_FOUND: "We couldn't find that.",
@@ -694,6 +697,63 @@ export const en: Messages = {
     waiting_few: '{{count}} cycles waiting',
     waiting_many: '{{count}} cycles waiting',
     waiting_other: '{{count}} cycles waiting',
+    library: {
+      title: 'Add a trackable',
+      cardTitle: 'Library',
+      search: 'Search the library',
+      filter: 'Show',
+      filters: { all: 'All', mine: 'Mine', shared: 'Shared by others' },
+      createNew: 'Create new',
+      noMatch: 'Nothing in the library matches.',
+      assigned: 'Already tracked',
+      byYou: 'By you',
+      by: 'By {{name}}',
+      public: 'Shared with all mentors',
+      private: 'Only you',
+      uses_zero: 'Not in use',
+      uses_one: 'Used for 1 mentee',
+      uses_two: 'Used for 2 mentees',
+      uses_few: 'Used for {{count}} mentees',
+      uses_many: 'Used for {{count}} mentees',
+      uses_other: 'Used for {{count}} mentees',
+      assignTitle: 'Track from the library',
+      assign: 'Add trackable',
+      back: 'Back to the library',
+      followsHint:
+        'Name, goal, type, cycle and direction come from the library template, and change when it changes. The target and start date are this mentee’s own.',
+      follows: 'This trackable follows a library template.',
+      added: '“{{name}}” added.',
+      createdTitle: 'Trackable added',
+      createdBody: '“{{name}}” is now being tracked.',
+      saveHint:
+        'Save it as a template to reuse it with other mentees. Changes to the template reach every mentee who follows it.',
+      save: 'Save as template',
+      notNow: 'Not now',
+      shareLabel: 'Share with all mentors',
+      shareHint:
+        'Other mentors can use it; only you and moderators can change it.',
+      savedToast: 'Saved to the library.',
+      edit: 'Edit template',
+      editTitle: 'Edit library template',
+      editWarning_zero: 'No mentee follows this template yet.',
+      editWarning_one:
+        'Changes apply to the 1 mentee who follows this template.',
+      editWarning_two:
+        'Changes apply to the 2 mentees who follow this template.',
+      editWarning_few:
+        'Changes apply to the {{count}} mentees who follow this template.',
+      editWarning_many:
+        'Changes apply to the {{count}} mentees who follow this template.',
+      editWarning_other:
+        'Changes apply to the {{count}} mentees who follow this template.',
+      makePublic: 'Share with all mentors',
+      makePrivate: 'Stop sharing',
+      remove: 'Remove from library',
+      confirmRemove: 'Yes, remove it',
+      removeHint:
+        'Trackables that follow it keep their name and settings and become independent. Logged cycles stay.',
+      removedToast: 'Removed from the library.',
+    },
   },
   challenges: {
     title: 'Challenges',

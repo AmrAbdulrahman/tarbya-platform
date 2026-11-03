@@ -14,6 +14,11 @@ import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
 import { SettingsService } from '../settings/settings.service';
 import { RolesService } from '../users/roles.service';
+import {
+  describeTemplates,
+  templateSelect,
+  type TemplateRow,
+} from './template-view';
 import type {
   CreateTrackableDto,
   LogEntryDto,
@@ -56,6 +61,11 @@ const archived = () =>
   new AppException(409, {
     code: 'TRACKABLE_ARCHIVED',
     title: 'Restore the trackable first',
+  });
+const fromTemplate = () =>
+  new AppException(409, {
+    code: 'TRACKABLE_FROM_TEMPLATE',
+    title: 'This trackable follows a template; change it there',
   });
 const outOfRange = () =>
   new AppException(409, {
@@ -114,12 +124,17 @@ export class TrackablesService {
   async get(viewerId: string, id: string): Promise<TrackableDetailDto> {
     const row = await this.prisma.trackable.findUnique({
       where: { id },
-      select: { ...trackableSelect, mentee: ref },
+      select: {
+        ...trackableSelect,
+        mentee: ref,
+        template: { select: templateSelect },
+      },
     });
     if (!row) throw notFound();
     await this.access.assertCanView(viewerId, row.menteeId);
-    const [canManage, entries] = await Promise.all([
+    const [canManage, template, entries] = await Promise.all([
       this.canManage(viewerId, row.menteeId),
+      this.template(viewerId, row.template),
       this.prisma.trackableEntry.findMany({
         where: { trackableId: id },
         select: {
@@ -149,6 +164,7 @@ export class TrackablesService {
     return {
       ...this.summary(row, await this.trendOptions()),
       mentee: row.mentee,
+      template,
       entries: entries.map((e): TrackableEntryDto => ({
         ...e,
         periodStart: day(e.periodStart),
@@ -163,9 +179,11 @@ export class TrackablesService {
     };
   }
 
+  /** `templateId` when it's assigned from the library (BR-TRK-8). */
   async create(
     actorId: string,
     dto: CreateTrackableDto,
+    templateId?: string,
   ): Promise<TrackableDetailDto> {
     await this.assertCanManage(actorId, dto.menteeId);
     const today = toZoned(new Date()).date;
@@ -181,6 +199,7 @@ export class TrackablesService {
         menteeId: dto.menteeId,
         createdById: actorId,
         ...impersonation(),
+        templateId,
         name: dto.name,
         goal: dto.goal ?? null,
         type: dto.type,
@@ -205,6 +224,18 @@ export class TrackablesService {
     });
     if (!row) throw notFound();
     await this.assertCanManage(actorId, row.menteeId);
+    // Following a template, only the target, start and archiving are its own (BR-TRK-8).
+    if (
+      row.templateId &&
+      ((dto.name !== undefined && dto.name !== row.name) ||
+        (dto.goal !== undefined && (dto.goal ?? null) !== row.goal) ||
+        (dto.type !== undefined && dto.type !== row.type) ||
+        (dto.cycle !== undefined && dto.cycle !== row.cycle) ||
+        (dto.higherIsBetter !== undefined &&
+          dto.higherIsBetter !== row.higherIsBetter))
+    ) {
+      throw fromTemplate();
+    }
     const reshaping =
       (dto.type && dto.type !== row.type) ||
       (dto.cycle && dto.cycle !== row.cycle) ||
@@ -409,6 +440,16 @@ export class TrackablesService {
     };
   }
 
+  /** The template it follows, as the viewer sees it. */
+  private async template(viewerId: string, row: TemplateRow | null) {
+    if (!row) return null;
+    const [dto] = await describeTemplates(this.prisma, [row], {
+      id: viewerId,
+      isAdmin: await this.roles.isAdmin(viewerId),
+    });
+    return dto;
+  }
+
   private async trendOptions() {
     const [window, steadyBand] = await Promise.all([
       this.settings.get('trackables.trendWindow'),
@@ -425,7 +466,7 @@ export class TrackablesService {
     );
   }
 
-  private async assertCanManage(viewerId: string, menteeId: string) {
+  async assertCanManage(viewerId: string, menteeId: string) {
     if (!(await this.canManage(viewerId, menteeId))) throw forbidden();
   }
 }

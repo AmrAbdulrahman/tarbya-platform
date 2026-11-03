@@ -67,6 +67,8 @@ model User {
   notesInImpersonation      Note[]                   @relation("NoteImpersonator")
   adminNotesInImpersonation AdminNote[]              @relation("AdminNoteImpersonator")
   trackablesInImpersonation Trackable[]              @relation("TrackableImpersonator")
+  trackableTemplates        TrackableTemplate[]      @relation("TemplateAuthor")
+  templatesInImpersonation  TrackableTemplate[]      @relation("TemplateImpersonator")
   entriesInImpersonation    TrackableEntry[]         @relation("EntryImpersonator")
   repliesInImpersonation    TrackableReply[]         @relation("ReplyImpersonator")
   challengesInImpersonation Challenge[]              @relation("ChallengeImpersonator")
@@ -406,6 +408,10 @@ model Trackable {
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
   impersonatorId String?       @db.Uuid
   impersonator   User?         @relation("TrackableImpersonator", fields: [impersonatorId], references: [id])
+  /// The library template it follows (BR-TRK-7). Its name, goal, type, cycle
+  /// and direction mirror the template's and change only through it.
+  templateId     String?            @db.Uuid
+  template       TrackableTemplate? @relation(fields: [templateId], references: [id])
   name           String
   goal           String?
   type           TrackableType
@@ -423,6 +429,36 @@ model Trackable {
   entries TrackableEntry[]
 
   @@index([menteeId, archivedAt])
+  @@index([templateId])
+}
+
+/// A reusable trackable in the library (BR-TRK-7…9). Mentees' trackables link
+/// to it; editing it updates every linked trackable.
+model TrackableTemplate {
+  id             String        @id @default(uuid()) @db.Uuid
+  authorId       String        @db.Uuid
+  author         User          @relation("TemplateAuthor", fields: [authorId], references: [id])
+  /// The super admin who wrote this while impersonating the author (BR-ADM-5).
+  impersonatorId String?       @db.Uuid
+  impersonator   User?         @relation("TemplateImpersonator", fields: [impersonatorId], references: [id])
+  name           String
+  goal           String?
+  type           TrackableType
+  cycle          TrackingCycle
+  higherIsBetter Boolean       @default(true)
+  /// Suggested target per cycle; each mentee's trackable keeps its own.
+  target         Float?
+  /// Offered to every mentor, not just the author.
+  isPublic       Boolean       @default(false)
+  /// Taken out of the library; linked trackables were detached.
+  removedAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  trackables Trackable[]
+
+  @@index([authorId])
+  @@index([isPublic])
 }
 
 /// One cycle's value. Logging the same cycle again replaces it.

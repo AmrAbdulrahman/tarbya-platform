@@ -17,7 +17,7 @@ async function signIn(page: Page) {
 
 /** The super admin mentors a fresh e2e member; the teardown removes both. */
 async function newMentee(page: Page) {
-  const tag = Date.now().toString(36);
+  const tag = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   const name = `يوسف ${tag}`;
   const me = await (await page.request.get('/api/auth/me')).json();
   const mentee = await (
@@ -32,6 +32,18 @@ async function newMentee(page: Page) {
   });
   expect(assigned.ok(), await assigned.text()).toBe(true);
   return { id: mentee.id as string, name };
+}
+
+/** Opens "new trackable" on the form, past the library when it has templates (US-4.9). */
+async function newTrackableForm(page: Page) {
+  await page.getByRole('button', { name: 'مؤشر جديد' }).click();
+  const dialog = page.getByRole('dialog');
+  const createNew = dialog.getByRole('button', { name: 'إنشاء جديد' });
+  const nameField = dialog.getByLabel('الاسم');
+  await expect(createNew.or(nameField)).toBeVisible();
+  if (await createNew.isVisible()) await createNew.click();
+  await expect(page.getByRole('dialog', { name: 'مؤشر جديد' })).toBeVisible();
+  return dialog;
 }
 
 test('the mentor finds a mentee on the dashboard and shares a note with them (US-4.1, US-4.2, US-4.6)', async ({
@@ -98,12 +110,12 @@ test('creates a trackable, logs this cycle, and resolves a challenge (US-4.5, US
 
   await page.goto(`/people/${id}`);
   await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
-  await page.getByRole('button', { name: 'مؤشر جديد' }).click();
-  const dialog = page.getByRole('dialog', { name: 'مؤشر جديد' });
+  const dialog = await newTrackableForm(page);
   await dialog.getByLabel('الاسم').fill('صلاة الفجر في المسجد');
   await dialog.getByLabel('النوع').selectOption('BOOLEAN');
   await dialog.getByLabel('يُقاس').selectOption('DAILY');
   await dialog.getByRole('button', { name: 'حفظ' }).click();
+  await dialog.getByRole('button', { name: 'ليس الآن' }).click();
   await expect(dialog).toBeHidden();
 
   await page.getByRole('link', { name: /صلاة الفجر في المسجد/ }).click();
@@ -127,4 +139,46 @@ test('creates a trackable, logs this cycle, and resolves a challenge (US-4.5, US
     .filter({ hasText: 'ضغط الاختبارات' });
   await item.getByRole('button', { name: 'تم تجاوزه' }).click();
   await expect(item.getByRole('button', { name: 'إعادة فتح' })).toBeVisible();
+});
+
+test('saves a trackable as a template and reuses it from the library for another mentee (US-4.9)', async ({
+  page,
+}) => {
+  await signIn(page);
+  const first = await newMentee(page);
+  const second = await newMentee(page);
+  const name = `e2e الفجر ${Date.now().toString(36)}`;
+
+  await page.goto(`/people/${first.id}`);
+  const dialog = await newTrackableForm(page);
+  await dialog.getByLabel('الاسم').fill(name);
+  await dialog.getByLabel('النوع').selectOption('BOOLEAN');
+  await dialog.getByLabel('يُقاس').selectOption('DAILY');
+  await dialog.getByRole('button', { name: 'حفظ' }).click();
+
+  await expect(
+    page.getByRole('dialog', { name: 'أُضيف المؤشر' }),
+  ).toBeVisible();
+  await dialog.getByLabel('مشاركته مع كل المرشدين').check();
+  await dialog.getByRole('button', { name: 'حفظ كقالب' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText('حُفظ في المكتبة.')).toBeVisible();
+
+  await page.goto(`/people/${second.id}`);
+  await page.getByRole('button', { name: 'مؤشر جديد' }).click();
+  await expect(page.getByRole('dialog', { name: 'إضافة مؤشر' })).toBeVisible();
+  await dialog.getByRole('searchbox', { name: 'ابحث في المكتبة' }).fill(name);
+  const item = dialog.getByRole('button').filter({ hasText: name });
+  await expect(item).toContainText('من إعدادك');
+  await expect(item).toContainText('متاح لكل المرشدين');
+  await item.click();
+  await dialog.getByRole('button', { name: 'إضافة المؤشر' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole('link', { name })).toBeVisible();
+
+  // Its page says it follows the template, used by both mentees.
+  await page.getByRole('link', { name }).click();
+  const library = page.getByRole('region', { name: 'المكتبة' });
+  await expect(library).toContainText('هذا المؤشر يتبع قالبًا من المكتبة.');
+  await expect(library).toContainText('مستخدم مع مسترشدَين');
 });

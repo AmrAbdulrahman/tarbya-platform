@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { TrackableEntryDto } from './trackableEntryDto.js';
+import type { TrackableTemplateDto } from './trackableTemplateDto.js';
 import type { TrackableType } from './trackableType.js';
 import type { TrackingCycle } from './trackingCycle.js';
 import type { Trend } from './trend.js';
@@ -38,6 +39,8 @@ export interface TrackableDetailDto {
   change: number;
   points: number[];
   mentee: UserRefDto;
+  /** @nullable */
+  template: TrackableTemplateDto | null;
   entries: TrackableEntryDto[];
   canManage: boolean;
   canLog: boolean;

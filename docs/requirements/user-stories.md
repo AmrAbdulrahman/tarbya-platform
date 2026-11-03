@@ -192,6 +192,17 @@ As a mentor, I want to create, edit, archive and restore a mentee's trackables.
 - Type, cycle and start change only until something is logged.
 - Refs: BR-TRK-1, BR-TRK-6 · `Mentee.dc.html`
 
+### US-4.9 Reuse trackables from the library — v1
+
+As a mentor, I want to reuse a trackable I made for one mentee with others, and use the ones other mentors share.
+
+- "New trackable" opens the form when the library has nothing for me; otherwise it shows the library (mine and shared) with search and a mine/shared filter, and "create new".
+- Picking a template asks only for the target and start day; templates the mentee already follows are marked and can't be picked again.
+- After creating a trackable, and later on its page, I can save it as a template and choose to share it with all mentors.
+- Each template shows its author, whether it's shared, and how many mentees follow it.
+- The author (or an admin) edits the template, with a warning that changes reach every mentee who follows it, toggles sharing, or removes it from the library.
+- Refs: BR-TRK-7…9
+
 ### US-4.8 Follow a mentee's challenges — v1
 
 As a mentor, I want to raise challenges for a mentee, discuss them with the mentee, and mark them resolved.

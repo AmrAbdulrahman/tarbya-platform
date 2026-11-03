@@ -37,6 +37,7 @@ import {
   useCycleLabel,
   useFormatValue,
 } from '../../../components/trackables/format';
+import { TemplateCard } from '../../../components/trackables/template-card';
 import { TrackableDialog } from '../../../components/trackables/trackable-dialog';
 import { Sparkline, TrendBadge } from '../../../components/trackables/trend';
 
@@ -240,6 +241,7 @@ function TrackablePage() {
           ))}
         </ol>
       </section>
+      {tr.canManage && <TemplateCard trackable={tr} />}
       {tr.canManage && (
         <TrackableDialog
           menteeId={tr.menteeId}

@@ -24,12 +24,17 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AssignTemplateDto,
   CreateTrackableDto,
   LogEntryDto,
   ReplyBodyDto,
+  SaveAsTemplateDto,
   TrackableDetailDto,
   TrackableSummaryDto,
+  TrackableTemplateDto,
+  TrackableTemplatesControllerListParams,
   TrackablesControllerListParams,
+  UpdateTemplateDto,
   UpdateTrackableDto
 } from '../../model';
 
@@ -465,6 +470,107 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getTrackablesControllerUpdateMutationOptions(options), queryClient);
     }
+    export type trackablesControllerSaveAsTemplateResponse200 = {
+  data: TrackableDetailDto
+  status: 200
+}
+
+export type trackablesControllerSaveAsTemplateResponse409 = {
+  data: void
+  status: 409
+}
+
+export type trackablesControllerSaveAsTemplateResponseSuccess = (trackablesControllerSaveAsTemplateResponse200) & {
+  headers: Headers;
+};
+export type trackablesControllerSaveAsTemplateResponseError = (trackablesControllerSaveAsTemplateResponse409) & {
+  headers: Headers;
+};
+
+export type trackablesControllerSaveAsTemplateResponse = (trackablesControllerSaveAsTemplateResponseSuccess | trackablesControllerSaveAsTemplateResponseError)
+
+export const getTrackablesControllerSaveAsTemplateUrl = (id: string,) => {
+
+
+
+
+  return `/api/trackables/${id}/template`
+}
+
+export const trackablesControllerSaveAsTemplate = async (id: string,
+    saveAsTemplateDto: SaveAsTemplateDto, options?: Parameters<typeof apiFetch>[1]): Promise<trackablesControllerSaveAsTemplateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<trackablesControllerSaveAsTemplateResponse>(getTrackablesControllerSaveAsTemplateUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(saveAsTemplateDto)
+  }
+);}
+
+
+
+
+
+export const getTrackablesControllerSaveAsTemplateMutationKey = () => ['trackablesControllerSaveAsTemplate'] as const;
+
+export const getTrackablesControllerSaveAsTemplateMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackablesControllerSaveAsTemplate>>, TError,TrackablesControllerSaveAsTemplateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackablesControllerSaveAsTemplate>>, TError,TrackablesControllerSaveAsTemplateMutationVariables, TContext> => {
+
+const mutationKey = getTrackablesControllerSaveAsTemplateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackablesControllerSaveAsTemplate>>, TrackablesControllerSaveAsTemplateMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  trackablesControllerSaveAsTemplate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackablesControllerSaveAsTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof trackablesControllerSaveAsTemplate>>>
+    export type TrackablesControllerSaveAsTemplateMutationBody = SaveAsTemplateDto
+    export type TrackablesControllerSaveAsTemplateMutationError = void
+    export type TrackablesControllerSaveAsTemplateMutationVariables = {id: string;data: SaveAsTemplateDto}
+
+    export const useTrackablesControllerSaveAsTemplate = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackablesControllerSaveAsTemplate>>, TError,TrackablesControllerSaveAsTemplateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof trackablesControllerSaveAsTemplate>>,
+        TError,
+        TrackablesControllerSaveAsTemplateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTrackablesControllerSaveAsTemplateMutationOptions(options), queryClient);
+    }
     export type trackablesControllerLogResponse200 = {
   data: TrackableDetailDto
   status: 200
@@ -661,4 +767,398 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getTrackablesControllerReplyMutationOptions(options), queryClient);
+    }
+    export type trackableTemplatesControllerListResponse200 = {
+  data: TrackableTemplateDto[]
+  status: 200
+}
+
+export type trackableTemplatesControllerListResponseSuccess = (trackableTemplatesControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type trackableTemplatesControllerListResponse = (trackableTemplatesControllerListResponseSuccess)
+
+export const getTrackableTemplatesControllerListUrl = (params?: TrackableTemplatesControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/trackable-templates?${stringifiedParams}` : `/api/trackable-templates`
+}
+
+export const trackableTemplatesControllerList = async (params?: TrackableTemplatesControllerListParams, options?: Parameters<typeof apiFetch>[1]): Promise<trackableTemplatesControllerListResponse> => {
+
+  return apiFetch<trackableTemplatesControllerListResponse>(getTrackableTemplatesControllerListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackableTemplatesControllerListQueryKey = (params?: TrackableTemplatesControllerListParams,) => {
+    return [
+    `/api/trackable-templates`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getTrackableTemplatesControllerListQueryOptions = <TData = Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError = unknown>(params?: TrackableTemplatesControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTrackableTemplatesControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof trackableTemplatesControllerList>>> = ({ signal }) => trackableTemplatesControllerList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TrackableTemplatesControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof trackableTemplatesControllerList>>>
+export type TrackableTemplatesControllerListQueryError = unknown
+
+
+export function useTrackableTemplatesControllerList<TData = Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError = unknown>(
+ params: undefined |  TrackableTemplatesControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof trackableTemplatesControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof trackableTemplatesControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTrackableTemplatesControllerList<TData = Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError = unknown>(
+ params?: TrackableTemplatesControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof trackableTemplatesControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof trackableTemplatesControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTrackableTemplatesControllerList<TData = Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError = unknown>(
+ params?: TrackableTemplatesControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useTrackableTemplatesControllerList<TData = Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError = unknown>(
+ params?: TrackableTemplatesControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof trackableTemplatesControllerList>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTrackableTemplatesControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type trackableTemplatesControllerUpdateResponse200 = {
+  data: TrackableTemplateDto
+  status: 200
+}
+
+export type trackableTemplatesControllerUpdateResponse409 = {
+  data: void
+  status: 409
+}
+
+export type trackableTemplatesControllerUpdateResponseSuccess = (trackableTemplatesControllerUpdateResponse200) & {
+  headers: Headers;
+};
+export type trackableTemplatesControllerUpdateResponseError = (trackableTemplatesControllerUpdateResponse409) & {
+  headers: Headers;
+};
+
+export type trackableTemplatesControllerUpdateResponse = (trackableTemplatesControllerUpdateResponseSuccess | trackableTemplatesControllerUpdateResponseError)
+
+export const getTrackableTemplatesControllerUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/trackable-templates/${id}`
+}
+
+export const trackableTemplatesControllerUpdate = async (id: string,
+    updateTemplateDto: UpdateTemplateDto, options?: Parameters<typeof apiFetch>[1]): Promise<trackableTemplatesControllerUpdateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<trackableTemplatesControllerUpdateResponse>(getTrackableTemplatesControllerUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateTemplateDto)
+  }
+);}
+
+
+
+
+
+export const getTrackableTemplatesControllerUpdateMutationKey = () => ['trackableTemplatesControllerUpdate'] as const;
+
+export const getTrackableTemplatesControllerUpdateMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerUpdate>>, TError,TrackableTemplatesControllerUpdateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerUpdate>>, TError,TrackableTemplatesControllerUpdateMutationVariables, TContext> => {
+
+const mutationKey = getTrackableTemplatesControllerUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackableTemplatesControllerUpdate>>, TrackableTemplatesControllerUpdateMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  trackableTemplatesControllerUpdate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackableTemplatesControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof trackableTemplatesControllerUpdate>>>
+    export type TrackableTemplatesControllerUpdateMutationBody = UpdateTemplateDto
+    export type TrackableTemplatesControllerUpdateMutationError = void
+    export type TrackableTemplatesControllerUpdateMutationVariables = {id: string;data: UpdateTemplateDto}
+
+    export const useTrackableTemplatesControllerUpdate = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerUpdate>>, TError,TrackableTemplatesControllerUpdateMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof trackableTemplatesControllerUpdate>>,
+        TError,
+        TrackableTemplatesControllerUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTrackableTemplatesControllerUpdateMutationOptions(options), queryClient);
+    }
+    export type trackableTemplatesControllerRemoveResponse204 = {
+  data: void
+  status: 204
+}
+
+export type trackableTemplatesControllerRemoveResponseSuccess = (trackableTemplatesControllerRemoveResponse204) & {
+  headers: Headers;
+};
+;
+
+export type trackableTemplatesControllerRemoveResponse = (trackableTemplatesControllerRemoveResponseSuccess)
+
+export const getTrackableTemplatesControllerRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/trackable-templates/${id}`
+}
+
+export const trackableTemplatesControllerRemove = async (id: string, options?: Parameters<typeof apiFetch>[1]): Promise<trackableTemplatesControllerRemoveResponse> => {
+
+  return apiFetch<trackableTemplatesControllerRemoveResponse>(getTrackableTemplatesControllerRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackableTemplatesControllerRemoveMutationKey = () => ['trackableTemplatesControllerRemove'] as const;
+
+export const getTrackableTemplatesControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerRemove>>, TError,TrackableTemplatesControllerRemoveMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerRemove>>, TError,TrackableTemplatesControllerRemoveMutationVariables, TContext> => {
+
+const mutationKey = getTrackableTemplatesControllerRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackableTemplatesControllerRemove>>, TrackableTemplatesControllerRemoveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  trackableTemplatesControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackableTemplatesControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof trackableTemplatesControllerRemove>>>
+
+    export type TrackableTemplatesControllerRemoveMutationError = unknown
+    export type TrackableTemplatesControllerRemoveMutationVariables = {id: string}
+
+    export const useTrackableTemplatesControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerRemove>>, TError,TrackableTemplatesControllerRemoveMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof trackableTemplatesControllerRemove>>,
+        TError,
+        TrackableTemplatesControllerRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTrackableTemplatesControllerRemoveMutationOptions(options), queryClient);
+    }
+    export type trackableTemplatesControllerAssignResponse200 = {
+  data: TrackableDetailDto
+  status: 200
+}
+
+export type trackableTemplatesControllerAssignResponse409 = {
+  data: void
+  status: 409
+}
+
+export type trackableTemplatesControllerAssignResponseSuccess = (trackableTemplatesControllerAssignResponse200) & {
+  headers: Headers;
+};
+export type trackableTemplatesControllerAssignResponseError = (trackableTemplatesControllerAssignResponse409) & {
+  headers: Headers;
+};
+
+export type trackableTemplatesControllerAssignResponse = (trackableTemplatesControllerAssignResponseSuccess | trackableTemplatesControllerAssignResponseError)
+
+export const getTrackableTemplatesControllerAssignUrl = (id: string,) => {
+
+
+
+
+  return `/api/trackable-templates/${id}/assign`
+}
+
+export const trackableTemplatesControllerAssign = async (id: string,
+    assignTemplateDto: AssignTemplateDto, options?: Parameters<typeof apiFetch>[1]): Promise<trackableTemplatesControllerAssignResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<trackableTemplatesControllerAssignResponse>(getTrackableTemplatesControllerAssignUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assignTemplateDto)
+  }
+);}
+
+
+
+
+
+export const getTrackableTemplatesControllerAssignMutationKey = () => ['trackableTemplatesControllerAssign'] as const;
+
+export const getTrackableTemplatesControllerAssignMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerAssign>>, TError,TrackableTemplatesControllerAssignMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerAssign>>, TError,TrackableTemplatesControllerAssignMutationVariables, TContext> => {
+
+const mutationKey = getTrackableTemplatesControllerAssignMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackableTemplatesControllerAssign>>, TrackableTemplatesControllerAssignMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  trackableTemplatesControllerAssign(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackableTemplatesControllerAssignMutationResult = NonNullable<Awaited<ReturnType<typeof trackableTemplatesControllerAssign>>>
+    export type TrackableTemplatesControllerAssignMutationBody = AssignTemplateDto
+    export type TrackableTemplatesControllerAssignMutationError = void
+    export type TrackableTemplatesControllerAssignMutationVariables = {id: string;data: AssignTemplateDto}
+
+    export const useTrackableTemplatesControllerAssign = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackableTemplatesControllerAssign>>, TError,TrackableTemplatesControllerAssignMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof trackableTemplatesControllerAssign>>,
+        TError,
+        TrackableTemplatesControllerAssignMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTrackableTemplatesControllerAssignMutationOptions(options), queryClient);
     }
