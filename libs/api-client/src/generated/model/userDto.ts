@@ -13,6 +13,8 @@ export interface UserDto {
   id: string;
   name: string;
   /** @nullable */
+  avatarUrl: string | null;
+  /** @nullable */
   email: string | null;
   /** @nullable */
   phone: string | null;

@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Plus } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,11 +9,13 @@ import {
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
 import { daysSince, formatDate } from '@tarbya/shared';
-import { Badge, Button, cn } from '@tarbya/ui';
+import { Badge, cn } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
-import { Sparkline, TrendBadge } from '../../../components/plans/trend';
+import { useLogDialog } from '../../../components/mentor/log-dialog';
+import { useCycleLabel } from '../../../components/trackables/format';
+import { Sparkline, TrendBadge } from '../../../components/trackables/trend';
 
 /** US-4.1 · design/screens/Main.dc.html */
 export const Route = createFileRoute('/_app/mentor/')({
@@ -55,16 +56,10 @@ function MentorDashboard() {
             calendar: me.calendar,
           })}
         </span>
-        <h1 className="text-3xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy">
           {t('dashboard.greeting', { name: me.name.split(' ')[0] })}
         </h1>
       </div>
-      <Button asChild>
-        <Link to="/mentor/log">
-          <Plus aria-hidden />
-          {t('dashboard.newFollowUp')}
-        </Link>
-      </Button>
     </header>
   );
 
@@ -85,7 +80,7 @@ function MentorDashboard() {
     filter === 'contact'
       ? m.contactStatus !== 'REGULAR'
       : filter === 'worse'
-        ? m.worseningPlans > 0
+        ? m.worseningTrackables > 0
         : true,
   );
 
@@ -124,7 +119,7 @@ function MentorDashboard() {
             <>
               {stats.improving}
               <span className="text-lg text-ink-subtle">
-                /{stats.openPlans}
+                /{stats.activeTrackables}
               </span>
             </>
           }
@@ -135,10 +130,10 @@ function MentorDashboard() {
         />
       </section>
 
-      <div className="flex flex-wrap items-start gap-6">
+      <div className="flex flex-wrap items-start gap-4">
         <section className="flex min-w-0 flex-[2_1_620px] flex-col overflow-hidden rounded-card border border-border bg-card">
           <div className="flex flex-wrap items-center gap-3 border-b border-border px-6 py-4">
-            <h2 className="flex-1 text-lg font-bold text-navy">
+            <h2 className="flex-1 text-base font-bold text-navy">
               {t('dashboard.mentees')}
             </h2>
             <div
@@ -206,7 +201,7 @@ function MentorDashboard() {
           )}
         </section>
 
-        <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-6">
+        <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-4">
           <Panel title={t('dashboard.upcoming')}>
             <UpcomingList items={upcoming} />
           </Panel>
@@ -239,7 +234,9 @@ function MentorDashboard() {
                     })}{' '}
                     ·{' '}
                     <Link to="/my" className="text-primary hover:underline">
-                      {t('dashboard.mentorPlans', { count: mentor.openPlans })}
+                      {t('dashboard.mentorPlans', {
+                        count: mentor.activeTrackables,
+                      })}
                     </Link>
                   </span>
                 </div>
@@ -254,7 +251,9 @@ function MentorDashboard() {
 
 function MenteeRow({ row }: { row: DashboardMenteeDto }) {
   const { t } = useTranslation();
-  const plan = row.mainPlan;
+  const openLog = useLogDialog();
+  const trackable = row.mainTrackable;
+  const cycleLabel = useCycleLabel();
   return (
     <tr>
       <td className="px-6 py-3.5">
@@ -265,13 +264,20 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
           >
             {row.mentee.name.charAt(0)}
           </span>
-          <Link
-            to="/people/$id"
-            params={{ id: row.mentee.id }}
-            className="font-semibold text-navy hover:text-primary"
-          >
-            {row.mentee.name}
-          </Link>
+          <span className="flex flex-col">
+            <Link
+              to="/people/$id"
+              params={{ id: row.mentee.id }}
+              className="font-semibold text-navy hover:text-primary"
+            >
+              {row.mentee.name}
+            </Link>
+            {row.openChallenges > 0 && (
+              <span className="text-[13px] text-warn">
+                {t('dashboard.openChallenges', { count: row.openChallenges })}
+              </span>
+            )}
+          </span>
         </span>
       </td>
       <td className="px-3 py-3.5">
@@ -300,21 +306,23 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
         </span>
       </td>
       <td className="px-3 py-3.5">
-        {plan ? (
+        {trackable ? (
           <span className="flex flex-col gap-0.5">
             <Link
-              to="/plans/$id"
-              params={{ id: plan.id }}
+              to="/trackables/$id"
+              params={{ id: trackable.id }}
               className="font-medium text-navy hover:text-primary"
             >
-              {plan.name}
+              {trackable.name}
             </Link>
             <span className="text-[13px] text-ink-subtle">
-              {plan.latestAt
+              {trackable.latestCycle
                 ? t('dashboard.updated', {
-                    when: t('mentoring.log.daysAgo', {
-                      count: daysSince(new Date(plan.latestAt), new Date()),
-                    }),
+                    when: cycleLabel(
+                      trackable.latestCycle,
+                      trackable.cycle,
+                      trackable.weekday,
+                    ),
                   })
                 : t('dashboard.noReadings')}
             </span>
@@ -324,34 +332,34 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
         )}
       </td>
       <td className="px-3 py-3.5">
-        {plan && (
+        {trackable && (
           <span className="flex items-center gap-3">
-            {plan.points.length > 1 && (
+            {trackable.points.length > 1 && (
               <span className="w-24">
                 <Sparkline
-                  points={plan.points}
-                  target={plan.target}
-                  trend={plan.trend}
+                  points={trackable.points}
+                  target={trackable.target}
+                  trend={trackable.trend}
                   height={32}
-                  label={t('plans.chart', {
-                    trend: t(`plans.trend.${plan.trend}`),
+                  label={t('trackables.chart', {
+                    trend: t(`trackables.trend.${trackable.trend}`),
                   })}
                 />
               </span>
             )}
-            <TrendBadge trend={plan.trend} />
+            <TrendBadge trend={trackable.trend} />
           </span>
         )}
       </td>
       <td className="px-6 py-3.5 text-end">
-        <Link
-          to="/mentor/log"
-          search={{ menteeId: row.mentee.id }}
+        <button
+          type="button"
+          onClick={() => openLog('follow-up', row.mentee.id)}
           aria-label={t('dashboard.contactWith', { name: row.mentee.name })}
           className="whitespace-nowrap text-sm font-semibold text-primary hover:text-primary-hover"
         >
           {t('dashboard.contact')}
-        </Link>
+        </button>
       </td>
     </tr>
   );
@@ -391,9 +399,9 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
       <div className="flex items-center gap-2">
-        <h2 className="flex-1 text-lg font-bold text-navy">{title}</h2>
+        <h2 className="flex-1 text-base font-bold text-navy">{title}</h2>
         {aside}
       </div>
       {children}

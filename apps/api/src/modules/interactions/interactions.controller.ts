@@ -14,6 +14,7 @@ import { CurrentAuth, type AuthContext } from '../../common/auth-context';
 import {
   CreateActivityDto,
   CreateFollowUpDto,
+  CreateTaskDto,
   InteractionDto,
   InteractionPageDto,
   TaskDto,
@@ -75,6 +76,17 @@ export class InteractionsController {
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasks: TasksService) {}
+
+  /** BR-FU-4 */
+  @Post()
+  @HttpCode(200)
+  @ApiOkResponse({ type: TaskDto })
+  create(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: CreateTaskDto,
+  ): Promise<TaskDto> {
+    return this.tasks.create(auth.userId, body);
+  }
 
   @Get()
   @ApiOkResponse({ type: TaskDto, isArray: true })

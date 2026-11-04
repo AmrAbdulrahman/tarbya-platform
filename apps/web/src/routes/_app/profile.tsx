@@ -9,6 +9,7 @@ import { NotificationsSection } from '../../components/profile/notifications-sec
 import { PasswordSection } from '../../components/profile/password-section';
 import { PictureSection } from '../../components/profile/picture-section';
 import { PreferencesSection } from '../../components/profile/preferences-section';
+import { Breadcrumbs } from '../../components/breadcrumbs';
 
 /** E2: US-2.1 … US-2.4 · design/screens/Profile.dc.html */
 export const Route = createFileRoute('/_app/profile')({
@@ -68,8 +69,9 @@ function ProfilePage() {
           </Link>
         ))}
       </nav>
-      <div className="flex min-w-0 max-w-3xl flex-[1_1_560px] flex-col gap-6">
-        <h1 className="text-3xl font-bold text-navy">{t('me.title')}</h1>
+      <div className="flex min-w-0 max-w-3xl flex-[1_1_560px] flex-col gap-4">
+        <Breadcrumbs items={[{ label: t('me.title') }]} />
+        <h1 className="text-2xl font-bold text-navy">{t('me.title')}</h1>
         <PictureSection profile={p} onSaved={onSaved} />
         <PreferencesSection profile={p} onSaved={onSaved} />
         <ContactSection profile={p} onSaved={onSaved} />

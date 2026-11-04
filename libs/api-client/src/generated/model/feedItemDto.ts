@@ -6,7 +6,7 @@
  */
 import type { ActivityTypeRefDto } from './activityTypeRefDto.js';
 import type { FeedKind } from './feedKind.js';
-import type { PlanRefDto } from './planRefDto.js';
+import type { TrackableRefDto } from './trackableRefDto.js';
 import type { UserRefDto } from './userRefDto.js';
 
 export interface FeedItemDto {
@@ -22,12 +22,14 @@ export interface FeedItemDto {
   title: string | null;
   /** @nullable */
   activityType: ActivityTypeRefDto | null;
-  planUpdates: number;
+  trackableUpdates: number;
   challenges: string[];
   tasks: number;
   participants: number;
   /** @nullable */
-  plan: PlanRefDto | null;
+  trackable: TrackableRefDto | null;
+  /** @nullable */
+  cycle: string | null;
   /** @nullable */
   value: number | null;
   /** @nullable */

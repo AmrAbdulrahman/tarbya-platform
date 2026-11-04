@@ -17,11 +17,12 @@ const blank = {
   interactionId: null,
   title: null,
   activityType: null,
-  planUpdates: 0,
+  trackableUpdates: 0,
   challenges: [],
   tasks: 0,
   participants: 0,
-  plan: null,
+  trackable: null,
+  cycle: null,
   value: null,
   text: null,
 } satisfies Partial<FeedItemDto>;
@@ -48,9 +49,12 @@ export class FeedService {
         ? new Date(query.before)
         : now;
     const take = limit + 1;
-    const menteePlan = { plan: { menteeId: query.userId } };
+    const ofMentee = { trackable: { menteeId: query.userId } };
+    const trackableRef = {
+      select: { id: true, name: true, type: true, cycle: true },
+    } as const;
 
-    const [interactions, checkIns, replies] = await Promise.all([
+    const [interactions, entries, replies] = await Promise.all([
       this.prisma.interaction.findMany({
         where: {
           participants: { some: { userId: query.userId } },
@@ -61,44 +65,49 @@ export class FeedService {
           kind: true,
           title: true,
           startsAt: true,
-          challenges: true,
+          challenges: {
+            select: { title: true },
+            orderBy: { createdAt: 'asc' },
+          },
           createdBy: ref,
           impersonator: ref,
           activityType: typeRef,
           _count: {
-            select: { readings: true, tasks: true, participants: true },
+            select: { entries: true, tasks: true, participants: true },
           },
         },
         orderBy: { startsAt: 'desc' },
         take,
       }),
-      this.prisma.planReading.findMany({
+      // What the mentee logged; the mentor's entries show with their follow-up.
+      this.prisma.trackableEntry.findMany({
         where: {
-          ...menteePlan,
-          source: 'CHECK_IN',
+          ...ofMentee,
+          source: 'MENTEE',
           recordedAt: { lt: before },
         },
         select: {
           id: true,
           value: true,
           note: true,
+          periodStart: true,
           recordedAt: true,
           author: ref,
           impersonator: ref,
-          plan: { select: { id: true, name: true } },
+          trackable: trackableRef,
         },
         orderBy: { recordedAt: 'desc' },
         take,
       }),
-      this.prisma.planReply.findMany({
-        where: { reading: menteePlan, createdAt: { lt: before } },
+      this.prisma.trackableReply.findMany({
+        where: { entry: ofMentee, createdAt: { lt: before } },
         select: {
           id: true,
           body: true,
           createdAt: true,
           author: ref,
           impersonator: ref,
-          reading: { select: { plan: { select: { id: true, name: true } } } },
+          entry: { select: { periodStart: true, trackable: trackableRef } },
         },
         orderBy: { createdAt: 'desc' },
         take,
@@ -116,19 +125,20 @@ export class FeedService {
         interactionId: i.id,
         title: i.title,
         activityType: i.activityType,
-        planUpdates: i._count.readings,
-        challenges: i.challenges,
+        trackableUpdates: i._count.entries,
+        challenges: i.challenges.map((c) => c.title),
         tasks: i._count.tasks,
         participants: i._count.participants,
       })),
-      ...checkIns.map((r) => ({
+      ...entries.map((r) => ({
         ...blank,
-        key: `CHECK_IN:${r.id}`,
-        kind: 'CHECK_IN' as const,
+        key: `ENTRY:${r.id}`,
+        kind: 'ENTRY' as const,
         at: r.recordedAt.toISOString(),
         actor: r.author,
         impersonator: r.impersonator,
-        plan: r.plan,
+        trackable: r.trackable,
+        cycle: r.periodStart.toISOString().slice(0, 10),
         value: r.value,
         text: r.note,
       })),
@@ -139,7 +149,8 @@ export class FeedService {
         at: r.createdAt.toISOString(),
         actor: r.author,
         impersonator: r.impersonator,
-        plan: r.reading.plan,
+        trackable: r.entry.trackable,
+        cycle: r.entry.periodStart.toISOString().slice(0, 10),
         text: r.body,
       })),
     ].sort((a, b) => b.at.localeCompare(a.at));

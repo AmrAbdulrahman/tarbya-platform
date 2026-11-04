@@ -1,5 +1,4 @@
 import {
-  backdatePlan,
   closeDb,
   createMentorship,
   createUser,
@@ -13,17 +12,10 @@ const minutesFromNow = (n: number) =>
   new Date(Date.now() + n * 60_000).toISOString();
 
 let admin: Session;
-let methodId: string;
 let outingId: string;
 
 beforeAll(async () => {
   admin = await signedIn((await createUser({ moderator: true })).id);
-  methodId = (
-    await admin.post('/api/lookups/tracking-methods', {
-      nameAr: 'عدد',
-      nameEn: 'e2e Pages',
-    })
-  ).data.id;
   outingId = (
     await admin.post('/api/lookups/activity-types', {
       nameAr: 'نزهة',
@@ -33,7 +25,19 @@ beforeAll(async () => {
   ).data.id;
 });
 
-/** A mentor and mentee with a plan, a done follow-up, a check-in, a reply and an upcoming activity. */
+/** Yesterday in the organisation zone. */
+const yesterday = () => {
+  const d = new Date(
+    `${new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(new Date())}T00:00:00Z`,
+  );
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+};
+
+/**
+ * A mentor and mentee with a daily trackable: the mentee logged yesterday and
+ * got a reply, a done follow-up logged today, plus an upcoming activity.
+ */
 async function story() {
   const mentor = await createUser();
   const mentee = await createUser();
@@ -44,34 +48,34 @@ async function story() {
   );
   const asMentor = await signedIn(mentor.id);
   const asMentee = await signedIn(mentee.id);
-  const plan = (
-    await asMentor.post('/api/plans', {
+  const trackable = (
+    await asMentor.post('/api/trackables', {
       menteeId: mentee.id,
       name: 'Read daily',
-      goal: '20 pages',
-      trackingMethodId: methodId,
+      type: 'COUNT',
+      cycle: 'DAILY',
       target: 20,
+      startsOn: yesterday(),
     })
   ).data;
+  const entry = (
+    await asMentee.put(
+      `/api/trackables/${trackable.id}/entries/${yesterday()}`,
+      { value: 12, note: 'Better day' },
+    )
+  ).data.entries[0];
+  await asMentor.post(`/api/trackables/entries/${entry.id}/replies`, {
+    body: 'Keep going',
+  });
   const followUp = await asMentor.post('/api/interactions/follow-ups', {
     menteeId: mentee.id,
-    startsAt: minutesFromNow(-5),
+    startsAt: minutesFromNow(-1),
     privateNotes: 'e2e secret mentor note',
     challenges: ['exams'],
     tasks: [{ title: 'Summarise a chapter' }],
-    planUpdates: [{ planId: plan.id, value: 8 }],
+    trackableUpdates: [{ trackableId: trackable.id, value: 8 }],
   });
   expect(followUp.status).toBe(200);
-  const checkIn = await asMentee.post(`/api/plans/${plan.id}/check-ins`, {
-    value: 12,
-    note: 'Better week',
-  });
-  const reading = checkIn.data.readings.find(
-    (r: { source: string }) => r.source === 'CHECK_IN',
-  );
-  await asMentor.post(`/api/plans/readings/${reading.id}/replies`, {
-    body: 'Keep going',
-  });
   const outing = await asMentor.post('/api/interactions/activities', {
     activityTypeId: outingId,
     title: 'Football',
@@ -79,18 +83,18 @@ async function story() {
     startsAt: minutesFromNow(60 * 24),
   });
   expect(outing.status).toBe(200);
-  return { mentor, mentee, asMentor, asMentee, plan, outing: outing.data };
+  return { mentor, mentee, asMentor, asMentee, trackable, outing: outing.data };
 }
 
 describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
-  it('gives the mentor their mentees, stats, upcoming items and plans', async () => {
-    const { mentee, asMentor, plan, outing } = await story();
+  it('gives the mentor their mentees, stats, upcoming items and trackables', async () => {
+    const { mentee, asMentor, trackable, outing } = await story();
     const res = await asMentor.get('/api/dashboard/mentor');
     expect(res.status).toBe(200);
     expect(res.data.stats).toMatchObject({
       mentees: 1,
       needContact: 0,
-      openPlans: 1,
+      activeTrackables: 1,
     });
     expect(res.data.stats.monthFollowUps).toBeGreaterThanOrEqual(1);
     expect(res.data.mentees[0]).toMatchObject({
@@ -98,8 +102,9 @@ describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
       contactStatus: 'REGULAR',
       lastContactKind: 'FOLLOW_UP',
       openTasks: 1,
-      openPlans: 1,
-      mainPlan: { id: plan.id, latest: 12, points: [8, 12] },
+      activeTrackables: 1,
+      openChallenges: 1,
+      mainTrackable: { id: trackable.id, latest: 8, points: [12, 8] },
     });
     expect(res.data.upcoming.map((u: { id: string }) => u.id)).toContain(
       outing.id,
@@ -115,7 +120,7 @@ describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
     expect(res.data.mentor).toMatchObject({
       user: { id: above.id },
       lastContactAt: null,
-      openPlans: 0,
+      activeTrackables: 0,
     });
   });
 
@@ -125,11 +130,11 @@ describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
     expect(res.status).toBe(200);
     expect(res.data.items.map((i: { kind: string }) => i.kind)).toEqual([
       'REPLY',
-      'CHECK_IN',
+      'ENTRY',
       'FOLLOW_UP',
     ]);
     expect(res.data.items[2]).toMatchObject({
-      planUpdates: 1,
+      trackableUpdates: 1,
       challenges: ['exams'],
       tasks: 1,
     });
@@ -160,18 +165,14 @@ describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
     );
   });
 
-  it("gives the mentee their tasks, plans, due check-ins and what's coming", async () => {
+  it("gives the mentee their tasks, trackables, cycles to log and what's coming", async () => {
     const { mentor, mentee, asMentor, asMentee, outing } = await story();
-    const quiet = (
-      await asMentor.post('/api/plans', {
-        menteeId: mentee.id,
-        name: 'Morning walk',
-        goal: '5 a week',
-        trackingMethodId: methodId,
-        target: 5,
-      })
-    ).data;
-    await backdatePlan(quiet.id, 20);
+    await asMentor.post('/api/trackables', {
+      menteeId: mentee.id,
+      name: 'Morning walk',
+      type: 'BOOLEAN',
+      cycle: 'DAILY',
+    });
 
     const res = await asMentee.get('/api/dashboard/journey');
     expect(res.status).toBe(200);
@@ -179,13 +180,14 @@ describe('feed and dashboards (US-4.1, US-4.2, US-5.1)', () => {
     expect(res.data.tasks.map((t: { title: string }) => t.title)).toEqual([
       'Summarise a chapter',
     ]);
-    const due = Object.fromEntries(
-      res.data.plans.map((p: { name: string; checkInDue: boolean }) => [
-        p.name,
-        p.checkInDue,
+    const waiting = Object.fromEntries(
+      res.data.trackables.map((x: { name: string; openCycles: string[] }) => [
+        x.name,
+        x.openCycles.length,
       ]),
     );
-    expect(due).toEqual({ 'Read daily': false, 'Morning walk': true });
+    // Both days of "Read daily" are logged; today's walk isn't yet.
+    expect(waiting).toEqual({ 'Read daily': 0, 'Morning walk': 1 });
     expect(res.data.upcoming).toEqual([
       expect.objectContaining({ id: outing.id, title: 'Football' }),
     ]);

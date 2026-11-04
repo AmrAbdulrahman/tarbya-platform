@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { TrackablesModule } from '../trackables/trackables.module';
 import {
   InteractionsController,
   TasksController,
@@ -7,6 +8,7 @@ import { InteractionsService } from './interactions.service';
 import { TasksService } from './tasks.service';
 
 @Module({
+  imports: [TrackablesModule],
   controllers: [InteractionsController, TasksController],
   providers: [InteractionsService, TasksService],
 })

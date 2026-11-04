@@ -4,10 +4,7 @@ import { AppException } from '../../common/app-exception';
 import type {
   ActivityTypeDto,
   CreateActivityTypeDto,
-  CreateTrackingMethodDto,
-  TrackingMethodDto,
   UpdateActivityTypeDto,
-  UpdateTrackingMethodDto,
 } from './lookups.dto';
 
 const notFound = () =>
@@ -23,13 +20,6 @@ const activityTypeSelect = {
   tracksAttendance: true,
   showInFeed: true,
   reminder: true,
-  active: true,
-} as const;
-
-const trackingMethodSelect = {
-  id: true,
-  nameAr: true,
-  nameEn: true,
   active: true,
 } as const;
 
@@ -65,35 +55,6 @@ export class LookupsService {
       where: { id },
       data: dto,
       select: activityTypeSelect,
-    });
-  }
-
-  trackingMethods(): Promise<TrackingMethodDto[]> {
-    return this.prisma.trackingMethod.findMany({
-      select: trackingMethodSelect,
-      orderBy: { nameEn: 'asc' },
-    });
-  }
-
-  createTrackingMethod(
-    dto: CreateTrackingMethodDto,
-  ): Promise<TrackingMethodDto> {
-    return this.prisma.trackingMethod.create({
-      data: dto,
-      select: trackingMethodSelect,
-    });
-  }
-
-  async updateTrackingMethod(
-    id: string,
-    dto: UpdateTrackingMethodDto,
-  ): Promise<TrackingMethodDto> {
-    if (!(await this.prisma.trackingMethod.count({ where: { id } })))
-      throw notFound();
-    return this.prisma.trackingMethod.update({
-      where: { id },
-      data: dto,
-      select: trackingMethodSelect,
     });
   }
 }

@@ -20,12 +20,11 @@ import { Route as AppAdminMentorshipsRouteImport } from './routes/_app/admin/men
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppMentorIndexRouteImport } from './routes/_app/mentor/index'
-import { Route as AppMentorActivityRouteImport } from './routes/_app/mentor/activity'
-import { Route as AppMentorLogRouteImport } from './routes/_app/mentor/log'
 import { Route as AppMyIndexRouteImport } from './routes/_app/my/index'
-import { Route as AppMyPlansRouteImport } from './routes/_app/my/plans'
+import { Route as AppMyTrackablesRouteImport } from './routes/_app/my/trackables'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people/$id'
-import { Route as AppPlansIdRouteImport } from './routes/_app/plans/$id'
+import { Route as AppTrackablesIdRouteImport } from './routes/_app/trackables/$id'
+import { Route as AppTrackablesLibraryRouteImport } from './routes/_app/trackables/library'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -81,24 +80,14 @@ const AppMentorIndexRoute = AppMentorIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppMentorRoute,
 } as any)
-const AppMentorActivityRoute = AppMentorActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => AppMentorRoute,
-} as any)
-const AppMentorLogRoute = AppMentorLogRouteImport.update({
-  id: '/log',
-  path: '/log',
-  getParentRoute: () => AppMentorRoute,
-} as any)
 const AppMyIndexRoute = AppMyIndexRouteImport.update({
   id: '/my/',
   path: '/my/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMyPlansRoute = AppMyPlansRouteImport.update({
-  id: '/my/plans',
-  path: '/my/plans',
+const AppMyTrackablesRoute = AppMyTrackablesRouteImport.update({
+  id: '/my/trackables',
+  path: '/my/trackables',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
@@ -106,9 +95,14 @@ const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
   path: '/people/$id',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPlansIdRoute = AppPlansIdRouteImport.update({
-  id: '/plans/$id',
-  path: '/plans/$id',
+const AppTrackablesIdRoute = AppTrackablesIdRouteImport.update({
+  id: '/trackables/$id',
+  path: '/trackables/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTrackablesLibraryRoute = AppTrackablesLibraryRouteImport.update({
+  id: '/trackables/library',
+  path: '/trackables/library',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -122,11 +116,10 @@ export interface FileRoutesByFullPath {
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
-  '/mentor/activity': typeof AppMentorActivityRoute
-  '/mentor/log': typeof AppMentorLogRoute
-  '/my/plans': typeof AppMyPlansRoute
+  '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
-  '/plans/$id': typeof AppPlansIdRoute
+  '/trackables/$id': typeof AppTrackablesIdRoute
+  '/trackables/library': typeof AppTrackablesLibraryRoute
   '/mentor/': typeof AppMentorIndexRoute
   '/my/': typeof AppMyIndexRoute
 }
@@ -139,11 +132,10 @@ export interface FileRoutesByTo {
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
-  '/mentor/activity': typeof AppMentorActivityRoute
-  '/mentor/log': typeof AppMentorLogRoute
-  '/my/plans': typeof AppMyPlansRoute
+  '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
-  '/plans/$id': typeof AppPlansIdRoute
+  '/trackables/$id': typeof AppTrackablesIdRoute
+  '/trackables/library': typeof AppTrackablesLibraryRoute
   '/mentor': typeof AppMentorIndexRoute
   '/my': typeof AppMyIndexRoute
 }
@@ -159,11 +151,10 @@ export interface FileRoutesById {
   '/_app/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
-  '/_app/mentor/activity': typeof AppMentorActivityRoute
-  '/_app/mentor/log': typeof AppMentorLogRoute
-  '/_app/my/plans': typeof AppMyPlansRoute
+  '/_app/my/trackables': typeof AppMyTrackablesRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
-  '/_app/plans/$id': typeof AppPlansIdRoute
+  '/_app/trackables/$id': typeof AppTrackablesIdRoute
+  '/_app/trackables/library': typeof AppTrackablesLibraryRoute
   '/_app/mentor/': typeof AppMentorIndexRoute
   '/_app/my/': typeof AppMyIndexRoute
 }
@@ -179,11 +170,10 @@ export interface FileRouteTypes {
     | '/admin/mentorships'
     | '/admin/settings'
     | '/admin/users'
-    | '/mentor/activity'
-    | '/mentor/log'
-    | '/my/plans'
+    | '/my/trackables'
     | '/people/$id'
-    | '/plans/$id'
+    | '/trackables/$id'
+    | '/trackables/library'
     | '/mentor/'
     | '/my/'
   fileRoutesByTo: FileRoutesByTo
@@ -196,11 +186,10 @@ export interface FileRouteTypes {
     | '/admin/mentorships'
     | '/admin/settings'
     | '/admin/users'
-    | '/mentor/activity'
-    | '/mentor/log'
-    | '/my/plans'
+    | '/my/trackables'
     | '/people/$id'
-    | '/plans/$id'
+    | '/trackables/$id'
+    | '/trackables/library'
     | '/mentor'
     | '/my'
   id:
@@ -215,11 +204,10 @@ export interface FileRouteTypes {
     | '/_app/admin/mentorships'
     | '/_app/admin/settings'
     | '/_app/admin/users'
-    | '/_app/mentor/activity'
-    | '/_app/mentor/log'
-    | '/_app/my/plans'
+    | '/_app/my/trackables'
     | '/_app/people/$id'
-    | '/_app/plans/$id'
+    | '/_app/trackables/$id'
+    | '/_app/trackables/library'
     | '/_app/mentor/'
     | '/_app/my/'
   fileRoutesById: FileRoutesById
@@ -308,20 +296,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMentorIndexRouteImport
       parentRoute: typeof AppMentorRoute
     }
-    '/_app/mentor/activity': {
-      id: '/_app/mentor/activity'
-      path: '/activity'
-      fullPath: '/mentor/activity'
-      preLoaderRoute: typeof AppMentorActivityRouteImport
-      parentRoute: typeof AppMentorRoute
-    }
-    '/_app/mentor/log': {
-      id: '/_app/mentor/log'
-      path: '/log'
-      fullPath: '/mentor/log'
-      preLoaderRoute: typeof AppMentorLogRouteImport
-      parentRoute: typeof AppMentorRoute
-    }
     '/_app/my/': {
       id: '/_app/my/'
       path: '/my'
@@ -329,11 +303,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMyIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/my/plans': {
-      id: '/_app/my/plans'
-      path: '/my/plans'
-      fullPath: '/my/plans'
-      preLoaderRoute: typeof AppMyPlansRouteImport
+    '/_app/my/trackables': {
+      id: '/_app/my/trackables'
+      path: '/my/trackables'
+      fullPath: '/my/trackables'
+      preLoaderRoute: typeof AppMyTrackablesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/people/$id': {
@@ -343,11 +317,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeopleIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/plans/$id': {
-      id: '/_app/plans/$id'
-      path: '/plans/$id'
-      fullPath: '/plans/$id'
-      preLoaderRoute: typeof AppPlansIdRouteImport
+    '/_app/trackables/$id': {
+      id: '/_app/trackables/$id'
+      path: '/trackables/$id'
+      fullPath: '/trackables/$id'
+      preLoaderRoute: typeof AppTrackablesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/trackables/library': {
+      id: '/_app/trackables/library'
+      path: '/trackables/library'
+      fullPath: '/trackables/library'
+      preLoaderRoute: typeof AppTrackablesLibraryRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -372,14 +353,10 @@ const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
 )
 
 interface AppMentorRouteChildren {
-  AppMentorActivityRoute: typeof AppMentorActivityRoute
-  AppMentorLogRoute: typeof AppMentorLogRoute
   AppMentorIndexRoute: typeof AppMentorIndexRoute
 }
 
 const AppMentorRouteChildren: AppMentorRouteChildren = {
-  AppMentorActivityRoute: AppMentorActivityRoute,
-  AppMentorLogRoute: AppMentorLogRoute,
   AppMentorIndexRoute: AppMentorIndexRoute,
 }
 
@@ -392,9 +369,10 @@ interface AppRouteChildren {
   AppMentorRoute: typeof AppMentorRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppMyPlansRoute: typeof AppMyPlansRoute
+  AppMyTrackablesRoute: typeof AppMyTrackablesRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
-  AppPlansIdRoute: typeof AppPlansIdRoute
+  AppTrackablesIdRoute: typeof AppTrackablesIdRoute
+  AppTrackablesLibraryRoute: typeof AppTrackablesLibraryRoute
   AppMyIndexRoute: typeof AppMyIndexRoute
 }
 
@@ -403,9 +381,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppMentorRoute: AppMentorRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
-  AppMyPlansRoute: AppMyPlansRoute,
+  AppMyTrackablesRoute: AppMyTrackablesRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,
-  AppPlansIdRoute: AppPlansIdRoute,
+  AppTrackablesIdRoute: AppTrackablesIdRoute,
+  AppTrackablesLibraryRoute: AppTrackablesLibraryRoute,
   AppMyIndexRoute: AppMyIndexRoute,
 }
 

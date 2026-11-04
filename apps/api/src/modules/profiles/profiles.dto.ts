@@ -17,10 +17,10 @@ export class ProfileDto {
   deactivatedAt!: string | null;
   /** The viewer manages, mentors or administers this user (never true for the user themself). */
   @ApiProperty() canSeeAdminNotes!: boolean;
-  /** The member themself, their current mentor, or an admin. */
-  @ApiProperty() canSeePlans!: boolean;
-  /** Their current mentor or an admin (BR-PLAN-2). */
-  @ApiProperty() canManagePlans!: boolean;
+  /** The member themself, their current mentor, or an admin: trackables, challenges, tasks, history. */
+  @ApiProperty() canSeeMentoring!: boolean;
+  /** Their current mentor or an admin: creates trackables, challenges and tasks (BR-TRK-6). */
+  @ApiProperty() canManageMentoring!: boolean;
   /** The viewer is their current mentor: logs follow-ups and writes notes (US-4.3, US-4.6). */
   @ApiProperty() isMentor!: boolean;
 }

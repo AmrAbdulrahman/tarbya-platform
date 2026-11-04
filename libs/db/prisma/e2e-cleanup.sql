@@ -1,7 +1,7 @@
 -- Removes everything the e2e suites create, and nothing else:
 -- users with an @tarbya.test email (a reserved test domain) with all their rows,
 -- sessions the suites open for the super admin (both mark their user agent "tarbya-e2e"),
--- and lookups whose English name starts with "e2e ".
+-- and lookups and trackable templates whose (English) name starts with "e2e ".
 -- Run with `pnpm nx run db:e2e-cleanup`; both e2e suites run it when they finish.
 BEGIN;
 
@@ -16,13 +16,23 @@ UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_us
 DELETE FROM "AdminNote"
   WHERE "subjectId" IN (SELECT id FROM e2e_users)
      OR "authorId" IN (SELECT id FROM e2e_users);
--- Replies go with their reading (ON DELETE CASCADE).
-DELETE FROM "PlanReading"
+-- Replies go with their entry, comments with their challenge (ON DELETE CASCADE).
+DELETE FROM "TrackableEntry"
   WHERE "authorId" IN (SELECT id FROM e2e_users)
-     OR "planId" IN (SELECT id FROM "DevelopmentPlan" WHERE "menteeId" IN (SELECT id FROM e2e_users) OR "createdById" IN (SELECT id FROM e2e_users));
-DELETE FROM "PlanReply" WHERE "authorId" IN (SELECT id FROM e2e_users);
-DELETE FROM "DevelopmentPlan"
+     OR "trackableId" IN (SELECT id FROM "Trackable" WHERE "menteeId" IN (SELECT id FROM e2e_users) OR "createdById" IN (SELECT id FROM e2e_users));
+DELETE FROM "TrackableReply" WHERE "authorId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Trackable"
   WHERE "menteeId" IN (SELECT id FROM e2e_users) OR "createdById" IN (SELECT id FROM e2e_users);
+-- Templates the super admin saves in the web suite are named "e2e …".
+UPDATE "Trackable" SET "templateId" = NULL
+  WHERE "templateId" IN (SELECT id FROM "TrackableTemplate" WHERE name LIKE 'e2e %');
+DELETE FROM "TrackableTemplate"
+  WHERE "authorId" IN (SELECT id FROM e2e_users) OR name LIKE 'e2e %';
+DELETE FROM "ChallengeComment" WHERE "authorId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Challenge"
+  WHERE "menteeId" IN (SELECT id FROM e2e_users)
+     OR "createdById" IN (SELECT id FROM e2e_users)
+     OR "resolvedById" IN (SELECT id FROM e2e_users);
 DELETE FROM "Note"
   WHERE "mentorshipId" IN (SELECT id FROM e2e_mentorships)
      OR "authorId" IN (SELECT id FROM e2e_users);
@@ -53,6 +63,5 @@ DELETE FROM "User" WHERE id IN (SELECT id FROM e2e_users);
 DELETE FROM "FileObject" WHERE id IN (SELECT id FROM e2e_files);
 
 DELETE FROM "ActivityType" WHERE "nameEn" LIKE 'e2e %';
-DELETE FROM "TrackingMethod" WHERE "nameEn" LIKE 'e2e %';
 
 COMMIT;

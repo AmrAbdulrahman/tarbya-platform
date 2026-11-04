@@ -9,6 +9,12 @@ describe('canSignIn', () => {
     expect(canSignIn(['MENTEE', 'MENTOR'], ['MODERATOR', 'MENTOR'])).toBe(true);
   });
 
+  it('lets in someone who is a mentor, moderator and mentee at once', () => {
+    expect(
+      canSignIn(['MENTOR', 'MODERATOR', 'MENTEE'], ['MODERATOR', 'MENTOR']),
+    ).toBe(true);
+  });
+
   it('refuses a user whose roles are all outside the setting', () => {
     expect(canSignIn(['MENTEE'], ['MODERATOR', 'MENTOR'])).toBe(false);
     expect(canSignIn([], ['MODERATOR', 'MENTOR'])).toBe(false);

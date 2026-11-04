@@ -7,6 +7,7 @@ import {
   Search,
   UserRound,
 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -20,6 +21,7 @@ import {
 import { useMe, useSignOut } from '../auth/session';
 import { ImpersonateButton, ImpersonationBanner } from './impersonation';
 import { LanguageSwitch } from './language-switch';
+import { LogProvider } from './mentor/log-dialog';
 import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
 
@@ -27,95 +29,125 @@ import { sectionsFor } from './nav';
 export function AppShell() {
   const { t } = useTranslation();
   const me = useMe();
+  const top = useStickyHeight();
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface md:flex-row">
-      <nav
-        aria-label={t('app.name')}
-        // From md up the sidebar stays put and scrolls on its own; below that it stacks above the page.
-        className="flex flex-col gap-6 border-e border-border bg-card px-4 py-6 md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto"
-      >
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="grid size-9 place-items-center rounded-card bg-primary text-lg font-bold text-primary-foreground">
-            ت
+    <LogProvider>
+      <div className="flex min-h-screen flex-col bg-surface md:flex-row">
+        <nav
+          aria-label={t('app.name')}
+          // From md up the sidebar stays put and scrolls on its own; below that it stacks above the page.
+          className="flex flex-col gap-4 border-e border-border bg-card px-4 py-6 md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto"
+        >
+          <div className="flex items-center gap-2.5 px-2">
+            <div className="grid size-9 place-items-center rounded-card bg-primary text-lg font-bold text-primary-foreground">
+              ت
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-bold text-navy">
+                {t('app.name')}
+              </span>
+              <span className="text-xs text-ink-subtle">
+                {t('app.tagline')}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-lg font-bold text-navy">{t('app.name')}</span>
-            <span className="text-xs text-ink-subtle">{t('app.tagline')}</span>
-          </div>
-        </div>
-        {sectionsFor(me.roles).map((section, i) => (
-          <div
-            key={section.title}
-            className={
-              i
-                ? 'flex flex-col gap-1 border-t border-divider pt-4'
-                : 'flex flex-col gap-1'
-            }
-          >
-            <span className="px-3.5 pb-1 text-xs font-semibold text-ink-subtle">
-              {t(section.title)}
-            </span>
-            {section.items.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                className="flex min-h-11 items-center gap-3 rounded-lg px-3.5 text-[15px] font-medium text-ink hover:bg-surface hover:text-primary"
-                activeProps={{
-                  className: 'bg-primary-tint text-primary-hover',
-                }}
-                activeOptions={{ exact: true }}
-              >
-                <item.icon className="size-5" aria-hidden />
-                {t(item.label)}
-              </Link>
-            ))}
-          </div>
-        ))}
-      </nav>
+          {sectionsFor(me.roles).map((section, i) => (
+            <div
+              key={section.title}
+              className={
+                i
+                  ? 'flex flex-col gap-1 border-t border-divider pt-4'
+                  : 'flex flex-col gap-1'
+              }
+            >
+              <span className="px-3.5 pb-1 text-xs font-semibold text-ink-subtle">
+                {t(section.title)}
+              </span>
+              {section.items.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="flex min-h-11 items-center gap-3 rounded-lg px-3.5 text-[15px] font-medium text-ink hover:bg-surface hover:text-primary"
+                  activeProps={{
+                    className: 'bg-primary-tint text-primary-hover',
+                  }}
+                  activeOptions={{ exact: true }}
+                >
+                  <item.icon className="size-5" aria-hidden />
+                  {t(item.label)}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </nav>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-20">
-          <ImpersonationBanner />
-          <header className="flex h-16 items-center gap-3 border-b border-border bg-card/95 px-10 backdrop-blur">
-            <label className="relative flex-[0_1_380px]">
-              <span className="sr-only">{t('header.search')}</span>
-              <input
-                type="search"
-                placeholder={t('header.search')}
-                className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
-              />
-              <Search
-                className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
-                aria-hidden
-              />
-            </label>
-            <div className="flex-1" />
-            <ImpersonateButton />
-            <LanguageSwitch />
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t('header.messages')}
-            >
-              <MessageSquare />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t('header.notifications')}
-            >
-              <Bell />
-            </Button>
-            <AccountMenu />
-          </header>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div ref={top} className="sticky top-0 z-20">
+            <ImpersonationBanner />
+            <header className="flex h-14 items-center gap-3 border-b border-border bg-card/95 px-6 backdrop-blur">
+              <label className="relative flex-[0_1_380px]">
+                <span className="sr-only">{t('header.search')}</span>
+                <input
+                  type="search"
+                  placeholder={t('header.search')}
+                  className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
+                />
+                <Search
+                  className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
+                  aria-hidden
+                />
+              </label>
+              <div className="flex-1" />
+              <ImpersonateButton />
+              <LanguageSwitch />
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={t('header.messages')}
+              >
+                <MessageSquare />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={t('header.notifications')}
+              >
+                <Bell />
+              </Button>
+              <AccountMenu />
+            </header>
+          </div>
+          {/* Room at the bottom for the mentor's "+" button. */}
+          <main className="flex flex-col gap-4 px-6 pb-24 pt-4">
+            <Outlet />
+          </main>
         </div>
-        <main className="flex flex-col gap-7 px-10 pb-12 pt-8">
-          <Outlet />
-        </main>
       </div>
-    </div>
+    </LogProvider>
   );
+}
+
+/**
+ * Keeps `--app-top` at the height of the sticky header (and the impersonation
+ * banner, when shown), so page headers can stick just below it.
+ */
+function useStickyHeight() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() =>
+      root.style.setProperty('--app-top', `${el.offsetHeight}px`),
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--app-top');
+    };
+  }, []);
+  return ref;
 }
 
 function AccountMenu() {

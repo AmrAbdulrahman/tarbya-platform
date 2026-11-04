@@ -13,10 +13,7 @@ import { Requires } from '../../common/access';
 import {
   ActivityTypeDto,
   CreateActivityTypeDto,
-  CreateTrackingMethodDto,
-  TrackingMethodDto,
   UpdateActivityTypeDto,
-  UpdateTrackingMethodDto,
 } from './lookups.dto';
 import { LookupsService } from './lookups.service';
 
@@ -50,31 +47,5 @@ export class LookupsController {
     @Body() body: UpdateActivityTypeDto,
   ): Promise<ActivityTypeDto> {
     return this.lookups.updateActivityType(id, body);
-  }
-
-  @Get('tracking-methods')
-  @ApiOkResponse({ type: TrackingMethodDto, isArray: true })
-  trackingMethods(): Promise<TrackingMethodDto[]> {
-    return this.lookups.trackingMethods();
-  }
-
-  @Post('tracking-methods')
-  @Requires('admin')
-  @HttpCode(200)
-  @ApiOkResponse({ type: TrackingMethodDto })
-  createTrackingMethod(
-    @Body() body: CreateTrackingMethodDto,
-  ): Promise<TrackingMethodDto> {
-    return this.lookups.createTrackingMethod(body);
-  }
-
-  @Patch('tracking-methods/:id')
-  @Requires('admin')
-  @ApiOkResponse({ type: TrackingMethodDto })
-  updateTrackingMethod(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() body: UpdateTrackingMethodDto,
-  ): Promise<TrackingMethodDto> {
-    return this.lookups.updateTrackingMethod(id, body);
   }
 }

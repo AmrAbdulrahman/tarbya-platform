@@ -33,7 +33,13 @@ export class UserRefDto {
   name!: string;
 }
 
-export class UserDto extends UserRefDto {
+/** A member shown with their picture. */
+export class PersonRefDto extends UserRefDto {
+  @ApiProperty({ type: String, nullable: true })
+  avatarUrl!: string | null;
+}
+
+export class UserDto extends PersonRefDto {
   @ApiProperty({ type: String, nullable: true })
   email!: string | null;
 

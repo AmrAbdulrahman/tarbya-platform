@@ -59,13 +59,6 @@ const activityTypes = [
   },
 ] as const;
 
-const trackingMethods = [
-  { nameAr: 'مقياس 1–10', nameEn: 'Scale 1–10' },
-  { nameAr: 'عدد تراكمي', nameEn: 'Running count' },
-  { nameAr: 'مرات أسبوعيًا', nameEn: 'Times per week' },
-  { nameAr: 'نسبة إنجاز', nameEn: 'Completion %' },
-];
-
 async function main() {
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await prisma.setting.upsert({
@@ -77,9 +70,6 @@ async function main() {
 
   if ((await prisma.activityType.count()) === 0) {
     await prisma.activityType.createMany({ data: [...activityTypes] });
-  }
-  if ((await prisma.trackingMethod.count()) === 0) {
-    await prisma.trackingMethod.createMany({ data: trackingMethods });
   }
 
   // The super admin is identified by SUPER_ADMIN_EMAIL (BR-USR-3); make sure the user exists.

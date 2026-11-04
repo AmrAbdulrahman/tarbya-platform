@@ -33,9 +33,6 @@ export class SettingsDto {
 
   @ApiProperty({ minimum: 0, maximum: 0.5 })
   trendSteadyBand!: number;
-
-  @ApiProperty({ minimum: 1, maximum: 90 })
-  checkInDays!: number;
 }
 
 export class UpdateSettingsDto {
@@ -91,13 +88,6 @@ export class UpdateSettingsDto {
   @Min(0)
   @Max(0.5)
   trendSteadyBand?: number;
-
-  @ApiPropertyOptional({ minimum: 1, maximum: 90 })
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(90)
-  checkInDays?: number;
 }
 
 const keyOf = {
@@ -106,9 +96,8 @@ const keyOf = {
   contactLateDays: 'contact.lateDays',
   rsvpRequestHours: 'gatherings.rsvpRequestHours',
   reminderHours: 'gatherings.reminderHours',
-  trendWindow: 'plans.trendWindow',
-  trendSteadyBand: 'plans.trendSteadyBand',
-  checkInDays: 'plans.checkInDays',
+  trendWindow: 'trackables.trendWindow',
+  trendSteadyBand: 'trackables.trendSteadyBand',
 } as const satisfies Record<keyof SettingsDto, keyof Settings>;
 
 export function fromSettings(settings: Settings): SettingsDto {

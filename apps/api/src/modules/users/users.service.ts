@@ -5,6 +5,7 @@ import { canSignIn, type Role } from '@tarbya/shared';
 import { AppException } from '../../common/app-exception';
 import type { Env } from '../../config/env';
 import { AuditService, diffOf } from '../audit/audit.service';
+import { AvatarsService } from '../files/avatars.service';
 import { HierarchyService } from '../hierarchy/hierarchy.service';
 import { SessionsService } from '../auth/sessions.service';
 import { SettingsService } from '../settings/settings.service';
@@ -25,6 +26,7 @@ const userSelect = {
   locale: true,
   calendar: true,
   deactivatedAt: true,
+  avatarFileId: true,
   manager: { select: { id: true, name: true } },
   ...roleFacts,
 } satisfies Prisma.UserSelect;
@@ -294,6 +296,7 @@ export class UsersService {
       isModerator: row.isModerator,
       roles,
       manager: row.manager,
+      avatarUrl: AvatarsService.url(row.id, row.avatarFileId),
       deactivatedAt: row.deactivatedAt?.toISOString() ?? null,
       canSignIn: !row.deactivatedAt && !!row.email && canSignIn(roles, allowed),
     };

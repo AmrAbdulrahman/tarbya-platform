@@ -1,7 +1,7 @@
 import {
+  BookMarked,
   ClipboardList,
   Settings,
-  Calendar,
   Compass,
   CircleDot,
   LayoutDashboard,
@@ -46,7 +46,7 @@ export const navSections: NavSection[] = [
     roles: ['MENTOR'],
     items: [
       { label: 'nav.menteeDashboard', to: '/mentor', icon: LayoutDashboard },
-      { label: 'nav.followUps', to: '/mentor/log', icon: Calendar },
+      { label: 'nav.library', to: '/trackables/library', icon: BookMarked },
     ],
   },
   {
@@ -54,7 +54,7 @@ export const navSections: NavSection[] = [
     roles: ['MENTEE'],
     items: [
       { label: 'nav.journeyOverview', to: '/my', icon: Compass },
-      { label: 'nav.myPlans', to: '/my/plans', icon: TrendingUp },
+      { label: 'nav.myPlans', to: '/my/trackables', icon: TrendingUp },
       { label: 'nav.reportToMentor', to: '/', icon: MessageSquareText },
       { label: 'nav.myGroups', to: '/', icon: Users },
     ],

@@ -47,7 +47,9 @@ test('signs in, returns to the page asked for, and signs out (US-1.1, US-1.3)', 
   await ensureArabic(page);
   await expect(page.locator('h1')).toHaveText('المستخدمون');
   // Other sections depend on whom the dev account mentors, so only this one is checked.
-  await expect(page.getByText('الإدارة')).toBeVisible();
+  await expect(
+    page.getByRole('navigation', { name: 'تربية' }).getByText('الإدارة'),
+  ).toBeVisible();
 
   await page.getByRole('button', { name: 'حسابي' }).click();
   await page

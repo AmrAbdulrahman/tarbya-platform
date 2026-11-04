@@ -126,14 +126,14 @@ As the super admin, I want to pick a user from the header and see the app as the
 
 - A banner shows whose view this is and has a button back to my account.
 - Starting and stopping are audited; changes I make meanwhile are recorded as mine on their behalf.
-- Follow-ups, activities, notes, plans, reports and replies I write meanwhile show "X on behalf of Y" wherever their author is shown.
+- Follow-ups, activities, notes, trackables, entries, challenges and replies I write meanwhile show "X on behalf of Y" wherever their author is shown.
 - Admins see a change log on each member's profile, with entries made while impersonating marked.
 - Their password, email, phone and sessions can't be changed while impersonating.
 - Refs: BR-ADM-5, BR-ADM-4
 
 ### US-3.5 Manage lookups — v1
 
-As a moderator, I want to manage activity types, gathering types and plan tracking methods.
+As a moderator, I want to manage activity types and gathering types.
 
 - Arabic and English names; active flag; colour for activity types; scope (individual or group).
 - Used values can't be deleted, only deactivated.
@@ -154,23 +154,30 @@ As a moderator, I want to edit thresholds and which roles can sign in.
 
 As a mentor, I want to see all my mentees at a glance, so that I know who needs me.
 
-- Headline numbers: mentees, needing contact, follow-ups this month, plans improving.
-- Table: last contact with status (regular / due / late) and type, main plan, trend sparkline with label.
-- Filters: all, needs contact, plans worsening.
+- Headline numbers: mentees, needing contact, follow-ups this month, trackables improving.
+- Table: last contact with status (regular / due / late) and type, open challenges, main trackable, trend sparkline with label.
+- Filters: all, needs contact, trackables getting worse.
 - Side panels: upcoming items, my mentor, latest notifications.
 - Refs: BR-FU-5, BR-PLAN-4 · `Main.dc.html`
 
 ### US-4.2 Mentee profile — v1
 
-As a mentor, I want a mentee's full picture: plans with trend charts, timeline, notes and tasks.
+As a mentor, I want a mentee's full picture: trackables with trend charts, timeline, challenges, tasks and notes.
 
-- Refs: BR-PLAN-4, BR-NOTE-1 · `Mentee.dc.html`
+- The page leads with trackables, action items and challenges; contact details sit in one line under the name, with the last contact and its status (regular / due / late) for the mentee's mentor; the history log is collapsed until opened.
+- A trend card per active trackable (trend, latest value, sparkline) sits above the cycles.
+- Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. This week shows every day in its own column, with the days to come as placeholders; a weekly trackable's log sits under its chosen weekday (the week's first day if none). Clicking a past cycle logs or re-logs it in place, even before the trackable's start (which then moves back); notes and replies show under it.
+- Breadcrumbs above every page lead back to where I came from.
+- Refs: BR-TRK-4, BR-TRK-5, BR-NOTE-1, BR-FU-4 · `Mentee.dc.html`
 
 ### US-4.3 Log a follow-up — v1
 
-As a mentor, I want to record a follow-up with date, time, notes, challenges, one-time tasks and plan updates.
+As a mentor, I want to record a follow-up with date, time, notes, challenges, one-time tasks and trackable updates.
 
-- Plan updates add readings to the mentee's plans.
+- Mentors log from a "+" button on every page, which offers a follow-up or an activity. Both open in a dialog over the page; there is no follow-up page and no switcher between the two. On a mentee's page, that mentee is chosen.
+- The dialog shows the mentee's last contact, then a simple trend card per trackable with this cycle's value to log, challenges, tasks and notes.
+- Trackable updates log the follow-up's cycle for each trackable.
+- New challenges are raised for the mentee; open ones get a comment or are resolved.
 - A future date makes it upcoming and offers notifying the mentee.
 - Refs: BR-FU-1, BR-FU-3, BR-FU-4 · `FollowUp.dc.html`
 
@@ -178,17 +185,38 @@ As a mentor, I want to record a follow-up with date, time, notes, challenges, on
 
 As a mentor, I want to record an outing, trip, sport or meal with one or more people.
 
-- Participant typeahead covers any active user.
+- Opens from the same "+" button in a dialog: activity type, title, participants, dates and notes; no trackables.
+- Participant typeahead covers any active user; on a mentee's page, that mentee starts in the list.
 - Upcoming or done is derived from date and time.
 - Done activities appear in each participant's feed.
 - Refs: BR-FU-2, BR-FU-3 · `Activity.dc.html`
 
-### US-4.5 Create and manage a development plan — v1
+### US-4.5 Create and manage a trackable — v1
 
-As a mentor, I want to create, edit, close and reopen a mentee's plan.
+As a mentor, I want to create, edit, archive and restore a mentee's trackables.
 
-- Fields: name, goal, tracking method, target, optional end date.
-- Refs: BR-PLAN-1, BR-PLAN-2 · `Mentee.dc.html` (create-plan entry point; form still to be designed)
+- Fields: name, optional goal, type (count, done/not done, percentage), cycle (daily, weekly, monthly), whether more is better, optional target (counts only), start day, and for weekly ones an optional weekday the log shows on.
+- Type, cycle and start change only until something is logged.
+- Refs: BR-TRK-1, BR-TRK-6 · `Mentee.dc.html`
+
+### US-4.9 Reuse trackables from the library — v1
+
+As a mentor, I want to reuse a trackable I made for one mentee with others, and use the ones other mentors share.
+
+- "New trackable" opens the form when the library has nothing for me; otherwise it shows the library (mine and shared) with search and a mine/shared filter, and "create new".
+- Picking a template opens its fields, ready to adjust before anything is created. Kept as they are (target and start aside), the trackable follows the template; changing the rest makes it the mentee's own. Templates the mentee already follows are marked and can't be picked again.
+- After creating a trackable, and later on its page, I can save it as a template and choose to share it with all mentors.
+- Each template shows its author, whether it's shared, and how many mentees follow it.
+- A library page lists my templates and shared ones, with the same search and filter.
+- The author (or an admin) edits the template, with a warning that changes reach every mentee who follows it, toggles sharing, or removes it from the library.
+- Refs: BR-TRK-7…9
+
+### US-4.8 Follow a mentee's challenges — v1
+
+As a mentor, I want to raise challenges for a mentee, discuss them with the mentee, and mark them resolved.
+
+- Open challenges first; resolved ones stay visible, struck through, with who resolved them and when.
+- Refs: BR-CHL-1…3
 
 ### US-4.6 Write notes — v1
 
@@ -199,9 +227,9 @@ As a mentor, I want to write shared or private notes on a mentee.
 
 ### US-4.7 Reply to a check-in — v1
 
-As a mentor, I want to reply to a mentee's plan check-in, and be notified when one arrives.
+As a mentor, I want to reply to what a mentee logs on a trackable, and be notified when they log.
 
-- Refs: BR-PLAN-5 · `MyPlan.dc.html`
+- Refs: BR-TRK-6 · `MyPlan.dc.html`
 
 ---
 
@@ -209,17 +237,21 @@ As a mentor, I want to reply to a mentee's plan check-in, and be notified when o
 
 ### US-5.1 My journey — v1
 
-As a mentee, I want a home with my actions, upcoming events, my plans and my feed.
+As a mentee, I want a home with my actions, upcoming events, my trackables and my feed.
 
-- Actions: open tasks, due check-ins, pending RSVPs; I can mark tasks done here.
+- Actions: open tasks, trackable cycles waiting to be logged, pending RSVPs. I mark tasks done and log waiting cycles right here.
+- Done tasks stay listed, struck through, for 7 days.
 - Refs: BR-FU-4, BR-GRP-9 · `MyJourney.dc.html`
 
-### US-5.2 Report progress on a plan — v1
+### US-5.2 Log my trackables — v1
 
-As a mentee, I want to submit a check-in (value + note) and see the trend update.
+As a mentee, I want to log each cycle of my trackables (a count, done/not done, or a percentage, with an optional note) and see the trend update.
 
-- History shows my check-ins and my mentor's replies.
-- Refs: BR-PLAN-3, BR-PLAN-5 · `MyPlan.dc.html`
+- A percentage is set with a slider or typed; a count whose target (or highest value so far) is under 20 offers a button per number.
+
+- I can fill the current cycle and any I missed in the last 30 days; older ones show only if logged.
+- History shows what I logged and my mentor's replies.
+- Refs: BR-TRK-2…5 · `MyPlan.dc.html`
 
 ### US-5.3 See my mentor and shared notes — v1
 

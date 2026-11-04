@@ -12,6 +12,8 @@ import { Badge, Button, Input } from '@tarbya/ui';
 import { UserDialog } from '../../../components/admin/user-dialog';
 import { RoleChips } from '../../../components/role-chips';
 import { useDebounced } from '../../../lib/use-debounced';
+import { Avatar } from '../../../components/profile/avatar';
+import { Breadcrumbs } from '../../../components/breadcrumbs';
 
 /** US-3.1 · design/screens/Admin.dc.html (users table) */
 export const Route = createFileRoute('/_app/admin/users')({
@@ -40,8 +42,11 @@ function UsersPage() {
 
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: t('nav.admin') }, { label: t('nav.users') }]}
+      />
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy">
           {t('admin.users.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">{t('admin.users.lead')}</p>
@@ -138,6 +143,11 @@ function UserRow({ user, onOpen }: { user: UserDto; onOpen: () => void }) {
     <tr className="border-t border-divider hover:bg-slate-50">
       <td className="px-6 py-3.5">
         <span className="flex items-center gap-1">
+          <Avatar
+            name={user.name}
+            url={user.avatarUrl}
+            className="me-2 size-8 text-[13px]"
+          />
           <Link
             to="/people/$id"
             params={{ id: user.id }}

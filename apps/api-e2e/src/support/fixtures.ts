@@ -166,12 +166,11 @@ export async function setPassword(userId: string, password: string) {
   );
 }
 
-/** Moves a plan's creation back, so its check-in falls due (US-5.1). */
-export async function backdatePlan(planId: string, days: number) {
-  await (
-    await db()
-  ).query(
-    `UPDATE "DevelopmentPlan" SET "createdAt" = now() - make_interval(days => $2) WHERE id = $1`,
-    [planId, days],
+/** Backdates when a task was done. */
+export async function markTaskDoneDaysAgo(taskId: string, days: number) {
+  const c = await db();
+  await c.query(
+    `UPDATE "Task" SET "doneAt" = now() - ($2 || ' days')::interval WHERE id = $1`,
+    [taskId, String(days)],
   );
 }

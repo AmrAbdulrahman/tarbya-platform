@@ -52,7 +52,7 @@ Nx module boundaries (enforced with `@nx/enforce-module-boundaries` tags):
 
 One Nest module per domain under `apps/api/src/modules/`:
 
-`auth`, `users`, `settings`, `lookups`, `mentorships`, `hierarchy`, `interactions` (follow-ups and activities), `plans`, `notes`, `tasks`, `groups`, `gatherings`, `notifications`, `messages`, `files`, `audit`, `feed`.
+`auth`, `users`, `settings`, `lookups`, `mentorships`, `hierarchy`, `interactions` (follow-ups and activities), `trackables`, `challenges`, `notes`, `tasks`, `groups`, `gatherings`, `notifications`, `messages`, `files`, `audit`, `feed`.
 
 Cross-cutting pieces in `apps/api/src/common/`: auth guard, `@CurrentUser()`, `@Policy()` decorator, Zod/class-validator pipes, problem-details error filter, request-scoped audit context.
 
@@ -101,10 +101,11 @@ Private notes are excluded at the query level for anyone who isn't the mentor or
 Prisma models, grouped. All have `id` (uuid), `createdAt`, `updatedAt`.
 
 - **People:** `User` (name, email?, phone?, avatarFileId?, locale, calendar, isModerator, managerId?, deactivatedAt?), `PasswordCredential`, `OneTimeCode`, `Session`, `ContactChange`.
-- **Settings & lookups:** `Setting` (key, json value; keys and defaults in `libs/shared/src/lib/settings.ts`), `ActivityType` (nameAr, nameEn, scope INDIVIDUAL | GROUP_RECURRING | GROUP_ONE_OFF, color, requiresRsvp, tracksAttendance, showInFeed, reminder, active; group-specific types get a `groupId` with groups), `TrackingMethod`. Gathering types are the `GROUP_RECURRING` activity types, as in `design/screens/ActivityTypes.dc.html`; there is no separate `GatheringType`.
+- **Settings & lookups:** `Setting` (key, json value; keys and defaults in `libs/shared/src/lib/settings.ts`), `ActivityType` (nameAr, nameEn, scope INDIVIDUAL | GROUP_RECURRING | GROUP_ONE_OFF, color, requiresRsvp, tracksAttendance, showInFeed, reminder, active; group-specific types get a `groupId` with groups), Gathering types are the `GROUP_RECURRING` activity types, as in `design/screens/ActivityTypes.dc.html`; there is no separate `GatheringType`.
 - **Mentoring:** `Mentorship` (mentorId, menteeId, startedAt, endedAt?; partial unique index on menteeId where endedAt is null).
 - **Interactions:** `Interaction` (kind FOLLOW_UP | ACTIVITY, mentorshipId? for follow-ups, activityTypeId? for activities, createdById, title?, startsAt, endsAt? for multi-day activities, place?, sharedNotes?, privateNotes?, challenges text[]), `InteractionParticipant` (the mentee of a follow-up, or each activity participant), `Task` (assigneeId, createdById, interactionId?, title, dueOn? as a date, doneAt?).
-- **Plans:** `DevelopmentPlan` (menteeId, createdById, name, goal, trackingMethodId, target, higherIsBetter, endsOn?, closedAt?) belongs to the mentee, so it survives a change of mentor; `PlanReading` (planId, value, note?, source FOLLOW_UP | CHECK_IN, interactionId?, authorId, needsHelp, recordedAt; follow-up readings are dated at the follow-up), `PlanReply` (readingId, authorId, body). Trend (`libs/shared/src/lib/trend.ts`): the average of the last N readings against the N before (N = `plans.trendWindow`, fewer when there are fewer readings); a change within `plans.trendSteadyBand` of the plan's scale (max of target, the earlier average, 1) is steady; `higherIsBetter` sets which way is improving; under two readings is NEW.
+- **Trackables:** `Trackable` (menteeId, createdById, templateId?, name, goal?, type COUNT | BOOLEAN | PERCENTAGE, cycle DAILY | WEEKLY | MONTHLY, higherIsBetter, target?, startsOn, weekday? (weekly only: 0 Sunday … 6 Saturday, where the log shows; not part of a template), archivedAt?) belongs to the mentee, so it survives a change of mentor; `TrackableEntry` (trackableId, periodStart = the cycle's first day, unique per trackable, value, note?, source MENTEE | MENTOR, interactionId?, authorId, needsHelp), `TrackableReply` (entryId, authorId, body), `TrackableTemplate` (authorId, name, goal?, type, cycle, higherIsBetter, target? as a suggestion, isPublic, removedAt?) — the library. A trackable that follows a template keeps copies of its name, goal, type, cycle and direction, which the template service updates in the same transaction as the template; removing a template sets its trackables' `templateId` to null. Cycle maths and stats in `libs/shared/src/lib/cycles.ts`: weeks start on Saturday; days are organisation-zone calendar days; the mentee may fill cycles that ended within the last 30 days. Trend (`trend.ts`): the average of the last N values against the N before (N = `trackables.trendWindow`); a change within `trackables.trendSteadyBand` of the scale (target, the earlier average, or 1) is steady; missed cycles count as 0 for done/not-done and are skipped otherwise; under two values is NEW.
+- **Challenges:** `Challenge` (menteeId, createdById, interactionId? when raised in a follow-up, title, resolvedAt?, resolvedById?), `ChallengeComment` (challengeId, authorId, interactionId?, body).
 - **Notes:** `Note` (mentorshipId, authorId, visibility SHARED | PRIVATE, body). An interaction's private notes are read in a separate query, only for its creator and admins; mentee notes are filtered by visibility in the `where`.
 - **Groups:** `Group`, `GroupMembership` (role ADMIN | MODERATOR | MEMBER; one ADMIN per group), `GatheringSeries` (groupId, activityTypeId, weekday, time, place, startsOn, endsOn?), `Gathering` (occurrence; seriesId? for one-time activities, startsAt, cancelledAt?), `Rsvp`, `Attendance` (present, note).
 - **Inbox:** `Notification` (userId, type, payload json, readAt?), `NotificationPreference` (userId, type, inApp, email), `Conversation` (kind DIRECT | GROUP | TEAM, groupId?), `ConversationMember` (lastReadAt), `Message`.
@@ -112,7 +113,7 @@ Prisma models, grouped. All have `id` (uuid), `createdAt`, `updatedAt`.
 
 Trend and contact status are computed in `libs/shared` (pure functions, unit-tested) from readings and last-contact dates. The dashboard query returns the raw inputs.
 
-- **Feed and dashboards** (`feed` module): `GET /feed?userId=` merges a member's done follow-ups and activities, plan check-ins and replies, newest first, with a `before` timestamp cursor; it carries counts, never notes. `GET /dashboard/mentor` (US-4.1) and `GET /dashboard/journey` (US-5.1) are built from the mentorship, plan and interaction services. A plan's check-in is due when it has had no reading for `plans.checkInDays` days. Gatherings join the feed in step 8.
+- **Feed and dashboards** (`feed` module): `GET /feed?userId=` merges a member's done follow-ups and activities, their trackable entries and replies, newest first, with a `before` timestamp cursor; it carries counts, never notes. `GET /dashboard/mentor` (US-4.1) and `GET /dashboard/journey` (US-5.1) are built from the mentorship, plan and interaction services. What's waiting to be logged comes from each trackable's open cycles. Gatherings join the feed in step 8.
 
 Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so RSVPs and attendance attach to real rows.
 
@@ -124,7 +125,7 @@ Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so R
 | `gatherings.materialise`                | Daily: create occurrences for the coming weeks                |
 | `gatherings.rsvp-request` / `.reminder` | Scheduled per occurrence from settings lead times             |
 | `contact.overdue-scan`                  | Daily: notify mentors of mentees crossing due/late thresholds |
-| `plans.checkin-due`                     | Daily: remind mentees of due check-ins                        |
+| `trackables.cycle-due`                  | Daily: remind mentees of cycles waiting to be logged          |
 | `auth.cleanup`                          | Hourly: expired codes and sessions                            |
 
 ## Realtime
@@ -155,7 +156,7 @@ On every PR: install with pnpm cache → `nx affected -t lint typecheck test bui
 2. Auth (password + code), sessions, super admin bootstrap, app shell with i18n/RTL.
 3. Users, moderators, manager field, settings, lookups, audit.
 4. Mentorships, interactions (follow-ups, activities), tasks, notes.
-5. Development plans, readings, trend, check-ins, replies.
+5. Trackables (was development plans), entries, trend, replies; challenges.
 6. Mentor dashboard, mentee profile, my journey, feed.
 7. Notifications (in-app, email, preferences, SSE) and jobs.
 8. Groups, gatherings, RSVP, attendance, manager-chain visibility.

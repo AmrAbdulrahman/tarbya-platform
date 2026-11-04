@@ -21,7 +21,7 @@ function Home() {
   const health = useHealthControllerCheck();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <span className="text-sm text-ink-subtle">
           {formatDate(new Date(), {
@@ -29,7 +29,7 @@ function Home() {
             calendar: 'BOTH',
           })}
         </span>
-        <h1 className="text-3xl font-bold text-navy">{t('home.title')}</h1>
+        <h1 className="text-2xl font-bold text-navy">{t('home.title')}</h1>
       </div>
       <section className="flex items-center gap-3 rounded-card border border-border bg-card px-6 py-5">
         <span className="text-sm text-ink-subtle">{t('home.apiStatus')}</span>
