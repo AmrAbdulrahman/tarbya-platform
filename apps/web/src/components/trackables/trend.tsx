@@ -59,25 +59,30 @@ export function Sparkline({
   height?: number;
   label: string;
 }) {
+  const { i18n } = useTranslation();
   const width = 300;
   const pad = 6;
   if (points.length === 0) return null;
+  // Time runs with the reading direction: oldest at the start, latest at the end.
+  const rtl = i18n.dir() === 'rtl';
   const top = Math.max(target ?? 0, ...points);
   const bottom = Math.min(0, ...points);
   const span = top - bottom || 1;
-  const x = (i: number) =>
-    points.length === 1
-      ? width / 2
-      : pad + (i * (width - 2 * pad)) / (points.length - 1);
+  const x = (i: number) => {
+    const at =
+      points.length === 1
+        ? width / 2
+        : pad + (i * (width - 2 * pad)) / (points.length - 1);
+    return rtl ? width - at : at;
+  };
   const y = (v: number) =>
     height - pad - ((v - bottom) / span) * (height - 2 * pad);
   const line = points
     .map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`)
     .join(' ');
   const stroke = tones[trend].stroke;
-  // Charts read left to right in both languages, like the numbers on them.
   return (
-    <div dir="ltr">
+    <div>
       <svg
         role="img"
         aria-label={label}
