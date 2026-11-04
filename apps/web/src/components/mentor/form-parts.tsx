@@ -29,18 +29,27 @@ export function Hint({ children }: { children: ReactNode }) {
   );
 }
 
-/** A titled part of a form in a dialog, set off by a rule above it. */
+/** A titled part of a form in a dialog: set off by a rule, or boxed on grey. */
 export function Section({
   title,
   icon,
+  boxed = false,
   children,
 }: {
   title: string;
   icon?: ReactNode;
+  boxed?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-3 border-t border-divider pt-4">
+    <section
+      className={cn(
+        'flex flex-col gap-3',
+        boxed
+          ? 'rounded-lg border border-border bg-surface p-3'
+          : 'border-t border-divider pt-4',
+      )}
+    >
       <h3 className="flex items-center gap-2 text-[15px] font-bold text-navy [&_svg]:size-4 [&_svg]:text-primary">
         {icon}
         {title}

@@ -53,7 +53,7 @@ export function ChallengeNotes({
         {open.map((c) => (
           <li
             key={c.id}
-            className="flex flex-col gap-1.5 rounded-lg border border-border p-3"
+            className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-3"
           >
             <span className="font-medium text-navy">{c.title}</span>
             <Input

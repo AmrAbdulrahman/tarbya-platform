@@ -173,7 +173,7 @@ export function FollowUpForm({
         />
       </Section>
 
-      <Section title={t('mentoring.log.challenges')} icon={<Mountain />}>
+      <Section boxed title={t('mentoring.log.challenges')} icon={<Mountain />}>
         <ChallengeNotes
           menteeId={menteeId}
           notes={challengeNotes}
@@ -196,7 +196,7 @@ export function FollowUpForm({
         </AddButton>
       </Section>
 
-      <Section title={t('mentoring.log.tasks')} icon={<ListChecks />}>
+      <Section boxed title={t('mentoring.log.tasks')} icon={<ListChecks />}>
         {tasks.fields.map((f, i) => (
           <Row
             key={f.id}
@@ -223,7 +223,7 @@ export function FollowUpForm({
         </AddButton>
       </Section>
 
-      <Section title={t('mentoring.log.notes')} icon={<NotebookPen />}>
+      <Section boxed title={t('mentoring.log.notes')} icon={<NotebookPen />}>
         <Field
           id="fu-shared"
           label={
