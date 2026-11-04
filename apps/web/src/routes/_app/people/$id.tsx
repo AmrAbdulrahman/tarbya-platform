@@ -129,6 +129,7 @@ function ProfilePage() {
             <TrendCards menteeId={p.id} />
             <TrackablesBoard menteeId={p.id} canManage={p.canManageMentoring} />
             <CollapsibleSection
+              defaultOpen
               title={t('feed.title')}
               icon={<History className="size-4 text-primary" aria-hidden />}
             >

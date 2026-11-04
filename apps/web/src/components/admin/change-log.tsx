@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Eye } from 'lucide-react';
+import { Eye, ScrollText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   auditControllerList,
@@ -12,6 +12,7 @@ import { Badge, Button } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
+import { CollapsibleSection } from '../collapsible-section';
 
 // Diff keys worth naming; ids and the like are left out.
 const FIELDS = [
@@ -26,8 +27,23 @@ const FIELDS = [
 ] as const;
 type Field = (typeof FIELDS)[number];
 
-/** Audited changes to a member and their mentorships, for admins (BR-ADM-4, BR-ADM-5). */
+/**
+ * Audited changes to a member and their mentorships, for admins (BR-ADM-4,
+ * BR-ADM-5). Closed until opened, so it loads only when wanted.
+ */
 export function ChangeLog({ userId }: { userId: string }) {
+  const { t } = useTranslation();
+  return (
+    <CollapsibleSection
+      title={t('changes.title')}
+      icon={<ScrollText className="size-4 text-primary" aria-hidden />}
+    >
+      <Changes userId={userId} />
+    </CollapsibleSection>
+  );
+}
+
+function Changes({ userId }: { userId: string }) {
   const { t } = useTranslation();
   const changes = useInfiniteQuery({
     queryKey: ['changes', userId],
@@ -40,16 +56,8 @@ export function ChangeLog({ userId }: { userId: string }) {
   const items = changes.data?.pages.flatMap((p) => p.items) ?? [];
 
   return (
-    <section
-      aria-labelledby="changes-title"
-      className="flex flex-col gap-4 rounded-card border border-border bg-card p-4"
-    >
-      <div className="flex flex-col gap-1">
-        <h2 id="changes-title" className="text-base font-bold text-navy">
-          {t('changes.title')}
-        </h2>
-        <span className="text-[13px] text-ink-subtle">{t('changes.hint')}</span>
-      </div>
+    <div className="flex flex-col gap-4">
+      <span className="text-[13px] text-ink-subtle">{t('changes.hint')}</span>
       {changes.isError && (
         <p className="text-sm text-ink-subtle">
           {errorMessage(t, changes.error)}
@@ -74,7 +82,7 @@ export function ChangeLog({ userId }: { userId: string }) {
           {t('feed.more')}
         </Button>
       )}
-    </section>
+    </div>
   );
 }
 

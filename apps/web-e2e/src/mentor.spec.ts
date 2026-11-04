@@ -105,7 +105,6 @@ test("logs a follow-up and an activity from the + button on a mentee's page (US-
   await dialog.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('حُفظت المتابعة.');
   await expect(dialog).toBeHidden();
-  await page.getByRole('button', { name: 'السجل' }).click();
   await expect(page.getByRole('region', { name: 'السجل' })).toContainText(
     'لقاء متابعة',
   );
