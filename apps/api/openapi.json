@@ -2625,6 +2625,10 @@
           "name": {
             "type": "string"
           },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
           "email": {
             "type": "string",
             "nullable": true
@@ -2677,6 +2681,7 @@
         "required": [
           "id",
           "name",
+          "avatarUrl",
           "email",
           "phone",
           "locale",

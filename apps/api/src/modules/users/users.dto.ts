@@ -39,7 +39,7 @@ export class PersonRefDto extends UserRefDto {
   avatarUrl!: string | null;
 }
 
-export class UserDto extends UserRefDto {
+export class UserDto extends PersonRefDto {
   @ApiProperty({ type: String, nullable: true })
   email!: string | null;
 
