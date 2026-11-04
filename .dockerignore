@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/out-tsc
+**/coverage
+**/test-output
+.nx
+.git
+.claude
+.env
+.env.*
+!.env.example
