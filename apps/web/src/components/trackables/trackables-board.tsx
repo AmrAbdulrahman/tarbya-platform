@@ -30,7 +30,7 @@ import { actedBy } from '../acted-by';
 import { FormError } from '../login/fields';
 import {
   DoneMark,
-  DoneToggle,
+  ValueInput,
   formatNumber,
   useCycleLabel,
   useFormatValue,
@@ -491,26 +491,13 @@ export function QuickLog({
             )}
           </Badge>
         )}
-        {tr.type === 'BOOLEAN' ? (
-          <DoneToggle
-            label={`${label} · ${t('trackables.value')}`}
-            value={value === '1' || value === '0' ? value : ''}
-            onChange={setValue}
-          />
-        ) : (
-          <Input
-            type="number"
-            min={0}
-            max={tr.type === 'PERCENTAGE' ? 100 : undefined}
-            step="any"
-            dir="ltr"
-            autoFocus
-            aria-label={`${label} · ${t('trackables.value')}`}
-            className="h-9 w-24 text-center font-figures text-[15px]"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-        )}
+        <ValueInput
+          trackable={tr}
+          label={`${label} · ${t('trackables.value')}`}
+          autoFocus
+          value={value}
+          onChange={setValue}
+        />
         <Input
           aria-label={`${label} · ${t('trackables.note')}`}
           placeholder={t('trackables.note')}

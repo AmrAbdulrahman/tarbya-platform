@@ -5,6 +5,7 @@ import {
   cycleEnd,
   cycleStart,
   FILL_WINDOW_DAYS,
+  takesTarget,
   toZoned,
   trackableStats,
 } from '@tarbya/shared';
@@ -238,7 +239,7 @@ export class TrackablesService {
         type: dto.type,
         cycle: dto.cycle,
         higherIsBetter: dto.higherIsBetter ?? true,
-        target: dto.target ?? null,
+        target: takesTarget(dto.type) ? (dto.target ?? null) : null,
         startsOn: asDate(dto.startsOn ?? today),
         // A weekday means nothing outside a weekly cycle.
         weekday: dto.cycle === 'WEEKLY' ? (dto.weekday ?? null) : null,
@@ -298,7 +299,7 @@ export class TrackablesService {
         startsOn: dto.startsOn ? asDate(dto.startsOn) : undefined,
         weekday: (dto.cycle ?? row.cycle) === 'WEEKLY' ? dto.weekday : null,
         higherIsBetter: dto.higherIsBetter,
-        target: dto.target,
+        target: takesTarget(dto.type ?? row.type) ? dto.target : null,
         archivedAt:
           dto.archived === undefined
             ? undefined

@@ -195,7 +195,7 @@ As a mentor, I want to record an outing, trip, sport or meal with one or more pe
 
 As a mentor, I want to create, edit, archive and restore a mentee's trackables.
 
-- Fields: name, optional goal, type (count, done/not done, percentage), cycle (daily, weekly, monthly), whether more is better, optional target, start day, and for weekly ones an optional weekday the log shows on.
+- Fields: name, optional goal, type (count, done/not done, percentage), cycle (daily, weekly, monthly), whether more is better, optional target (counts only), start day, and for weekly ones an optional weekday the log shows on.
 - Type, cycle and start change only until something is logged.
 - Refs: BR-TRK-1, BR-TRK-6 · `Mentee.dc.html`
 
@@ -246,6 +246,8 @@ As a mentee, I want a home with my actions, upcoming events, my trackables and m
 ### US-5.2 Log my trackables — v1
 
 As a mentee, I want to log each cycle of my trackables (a count, done/not done, or a percentage, with an optional note) and see the trend update.
+
+- A percentage is set with a slider or typed; a count whose target (or highest value so far) is under 20 offers a button per number.
 
 - I can fill the current cycle and any I missed in the last 30 days; older ones show only if logged.
 - History shows what I logged and my mentor's replies.

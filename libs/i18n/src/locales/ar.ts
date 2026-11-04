@@ -662,6 +662,7 @@ export const ar = {
     thisCycle: 'الدورة الحالية',
     log: 'تسجيل',
     value: 'القيمة',
+    exact: 'القيمة بالضبط',
     note: 'ملاحظة (اختياري)',
     logged: 'سُجّل.',
     history: 'الدورات المسجّلة',

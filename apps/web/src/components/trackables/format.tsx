@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { TrackableType, TrackingCycle } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
 import { formatDate, formatMonth, logDay } from '@tarbya/shared';
-import { cn } from '@tarbya/ui';
+import { cn, Input } from '@tarbya/ui';
 import { useMe } from '../../auth/session';
 
 export function formatNumber(n: number, lang: string) {
@@ -118,6 +118,110 @@ export function DoneToggle({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/** Counts whose scale is below this get a button for each number. */
+const COUNT_BUTTONS_BELOW = 20;
+
+/**
+ * A cycle's value in the way that suits the type: done / not done, a slider
+ * for a percentage, a button per number for a small count, or a number.
+ * `value` is the text of the number; empty means nothing logged.
+ */
+export function ValueInput({
+  trackable: tr,
+  value,
+  onChange,
+  label,
+  clearable = false,
+  autoFocus,
+}: {
+  trackable: { type: TrackableType; target: number | null; points: number[] };
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  clearable?: boolean;
+  autoFocus?: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  if (tr.type === 'BOOLEAN') {
+    return (
+      <DoneToggle
+        label={label}
+        clearable={clearable}
+        value={value === '1' || value === '0' ? value : ''}
+        onChange={onChange}
+      />
+    );
+  }
+  const exact = (className: string, max?: number) => (
+    <Input
+      type="number"
+      min={0}
+      max={max}
+      step="any"
+      dir="ltr"
+      autoFocus={autoFocus}
+      aria-label={label}
+      className={cn('h-9 text-center font-figures text-[15px]', className)}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+  if (tr.type === 'PERCENTAGE') {
+    return (
+      <div className="flex min-w-48 flex-1 items-center gap-2">
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          aria-label={`${label} · %`}
+          className="h-9 min-w-24 flex-1 cursor-pointer accent-primary"
+          value={value === '' ? 0 : Number(value)}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {exact('w-16', 100)}
+      </div>
+    );
+  }
+  // The scale is the target, or the highest value so far without one.
+  const scale = Math.max(tr.target ?? 0, ...tr.points, Number(value) || 0);
+  if (scale <= 0 || scale >= COUNT_BUTTONS_BELOW) return exact('w-24');
+  const picked = value === '' ? null : Number(value);
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      <div role="group" aria-label={label} className="contents">
+        {Array.from({ length: Math.floor(scale) + 1 }, (_, n) => (
+          <button
+            key={n}
+            type="button"
+            aria-pressed={picked === n}
+            onClick={() => onChange(picked === n && clearable ? '' : String(n))}
+            className={cn(
+              'grid h-8 min-w-8 place-items-center rounded-control border px-1.5 font-figures text-[14px] transition-colors',
+              picked === n
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-card text-ink hover:border-primary hover:bg-primary-tint',
+            )}
+          >
+            {formatNumber(n, i18n.language)}
+          </button>
+        ))}
+      </div>
+      <Input
+        type="number"
+        min={0}
+        step="any"
+        dir="ltr"
+        aria-label={`${label} · ${t('trackables.exact')}`}
+        placeholder="…"
+        className="h-8 w-14 px-1 text-center font-figures text-[14px]"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
   );
 }

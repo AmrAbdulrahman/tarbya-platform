@@ -677,6 +677,7 @@ export const en: Messages = {
     thisCycle: 'This cycle',
     log: 'Log',
     value: 'Value',
+    exact: 'Exact value',
     note: 'Note (optional)',
     logged: 'Logged.',
     history: 'Logged cycles',

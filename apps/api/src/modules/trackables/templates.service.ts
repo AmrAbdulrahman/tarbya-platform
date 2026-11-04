@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@tarbya/db';
+import { takesTarget } from '@tarbya/shared';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { impersonation } from '../../common/request-context';
@@ -75,7 +76,7 @@ export class TrackableTemplatesService {
           type: row.type,
           cycle: row.cycle,
           higherIsBetter: row.higherIsBetter,
-          target: row.target,
+          target: takesTarget(row.type) ? row.target : null,
           isPublic,
         },
       });
@@ -119,13 +120,13 @@ export class TrackableTemplatesService {
       cycle: dto.cycle,
       higherIsBetter: dto.higherIsBetter,
     };
-    const boolean = (dto.type ?? row.type) === 'BOOLEAN';
+    const noTarget = !takesTarget(dto.type ?? row.type);
     await this.prisma.$transaction([
       this.prisma.trackableTemplate.update({
         where: { id },
         data: {
           ...shared,
-          target: boolean ? null : dto.target,
+          target: noTarget ? null : dto.target,
           isPublic: dto.isPublic,
         },
       }),
@@ -133,7 +134,7 @@ export class TrackableTemplatesService {
         where: { templateId: id },
         data: {
           ...shared,
-          ...(boolean && { target: null }),
+          ...(noTarget && { target: null }),
           // A weekday means nothing outside a weekly cycle.
           ...(dto.cycle && dto.cycle !== 'WEEKLY' && { weekday: null }),
         },
@@ -190,12 +191,11 @@ export class TrackableTemplatesService {
         type: template.type,
         cycle: template.cycle,
         higherIsBetter: template.higherIsBetter,
-        target:
-          template.type === 'BOOLEAN'
-            ? null
-            : dto.target === undefined
-              ? template.target
-              : dto.target,
+        target: !takesTarget(template.type)
+          ? null
+          : dto.target === undefined
+            ? template.target
+            : dto.target,
         startsOn: dto.startsOn,
         weekday: dto.weekday,
       },

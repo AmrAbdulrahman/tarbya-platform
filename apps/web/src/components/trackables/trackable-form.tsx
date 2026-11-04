@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { toZoned } from '@tarbya/shared';
+import { takesTarget, toZoned } from '@tarbya/shared';
 import { Button, Checkbox, Input, Select } from '@tarbya/ui';
 import { Field, FormError } from '../login/fields';
 
@@ -44,7 +44,7 @@ export function sharedFields(v: TrackableValues) {
     goal: v.goal || null,
     higherIsBetter: v.higherIsBetter === 'yes',
     target:
-      v.type === 'BOOLEAN' || v.target.trim() === '' ? null : Number(v.target),
+      !takesTarget(v.type) || v.target.trim() === '' ? null : Number(v.target),
   };
 }
 
@@ -187,7 +187,7 @@ export function TrackableForm({
             <option value="no">{t('trackables.lowerBetter')}</option>
           </Select>
         </Field>
-        {type !== 'BOOLEAN' && (
+        {takesTarget(type) && (
           <Field
             id="trk-target"
             label={t('trackables.target')}
@@ -197,7 +197,6 @@ export function TrackableForm({
               id="trk-target"
               type="number"
               min={0}
-              max={type === 'PERCENTAGE' ? 100 : undefined}
               step="any"
               dir="ltr"
               className="h-11 font-figures text-[15px]"

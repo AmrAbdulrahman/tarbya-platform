@@ -4,6 +4,9 @@ import { trend, type Trend } from './trend.js';
 export type Cycle = 'DAILY' | 'WEEKLY' | 'MONTHLY';
 export type TrackableType = 'COUNT' | 'BOOLEAN' | 'PERCENTAGE';
 
+/** Only counts take a target; done/not done and percentages have a fixed scale (BR-TRK-1). */
+export const takesTarget = (type: TrackableType) => type === 'COUNT';
+
 /** Weeks run Saturday to Friday, as in the organisation's calendar. */
 export const WEEK_STARTS_ON = 6;
 /** How far back the mentee may fill a cycle they missed (BR-TRK-4). */

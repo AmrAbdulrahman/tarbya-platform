@@ -149,6 +149,22 @@ describe('trackables (BR-TRK-1…6, US-4.5, US-5.2, US-4.7)', () => {
     expect(dailyOne.data.weekday).toBeNull();
   });
 
+  it('keeps a target for counts only; percentages are out of 100 (BR-TRK-1)', async () => {
+    const { mentee, asMentor } = await pair();
+    const pct = await asMentor.post(
+      '/api/trackables',
+      daily(mentee.id, { type: 'PERCENTAGE', target: 80 }),
+    );
+    expect(pct.data.target).toBeNull();
+    const count = await asMentor.post('/api/trackables', daily(mentee.id));
+    expect(count.data.target).toBe(20);
+    const reshaped = await asMentor.patch(`/api/trackables/${count.data.id}`, {
+      type: 'PERCENTAGE',
+      target: 50,
+    });
+    expect(reshaped.data).toMatchObject({ type: 'PERCENTAGE', target: null });
+  });
+
   it('offers the mentee the last 30 days to fill, and counts what they missed', async () => {
     const { mentee, asMentor, asMentee } = await pair();
     const tr = (

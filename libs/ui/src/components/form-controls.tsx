@@ -1,16 +1,27 @@
+import { ChevronDown } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 import { cn } from '../lib/cn.js';
 
-/** Native select styled like Input; native keeps keyboard and screen-reader behaviour for free. */
+/**
+ * Native select styled like Input; native keeps keyboard and screen-reader
+ * behaviour for free. Our own chevron sits as far from the end edge as from
+ * the top and bottom.
+ */
 export function Select({ className, ...props }: ComponentProps<'select'>) {
   return (
-    <select
-      className={cn(
-        'h-11 w-full rounded-control border border-border bg-card px-3 text-[15px] text-ink focus:border-primary focus:outline-2 focus:-outline-offset-1 focus:outline-primary aria-[invalid=true]:border-trend-down disabled:opacity-60',
-        className,
-      )}
-      {...props}
-    />
+    <div className="relative w-full">
+      <select
+        className={cn(
+          'peer h-11 w-full appearance-none rounded-control border border-border bg-card pe-10 ps-3 text-[15px] text-ink focus:border-primary focus:outline-2 focus:-outline-offset-1 focus:outline-primary aria-[invalid=true]:border-trend-down disabled:opacity-60',
+          className,
+        )}
+        {...props}
+      />
+      <ChevronDown
+        aria-hidden
+        className="pointer-events-none absolute end-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-subtle peer-disabled:opacity-60"
+      />
+    </div>
   );
 }
 

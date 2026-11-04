@@ -25,7 +25,7 @@ import { actedBy } from '../../../components/acted-by';
 import { Breadcrumbs } from '../../../components/breadcrumbs';
 import { FormError } from '../../../components/login/fields';
 import {
-  DoneToggle,
+  ValueInput,
   formatNumber,
   useCycleLabel,
   useFormatValue,
@@ -302,25 +302,12 @@ function CycleForm({
             </Badge>
           )}
         </span>
-        {tr.type === 'BOOLEAN' ? (
-          <DoneToggle
-            label={`${label} · ${t('trackables.value')}`}
-            value={value === '1' || value === '0' ? value : ''}
-            onChange={setValue}
-          />
-        ) : (
-          <Input
-            type="number"
-            min={0}
-            max={tr.type === 'PERCENTAGE' ? 100 : undefined}
-            step="any"
-            dir="ltr"
-            aria-label={`${label} · ${t('trackables.value')}`}
-            className="h-10 w-28 text-center font-figures text-[15px]"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-        )}
+        <ValueInput
+          trackable={tr}
+          label={`${label} · ${t('trackables.value')}`}
+          value={value}
+          onChange={setValue}
+        />
         <Input
           aria-label={`${label} · ${t('trackables.note')}`}
           placeholder={t('trackables.note')}
