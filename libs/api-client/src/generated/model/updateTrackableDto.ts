@@ -21,5 +21,11 @@ export interface UpdateTrackableDto {
   /** @nullable */
   target?: number | null;
   startsOn?: string;
+  /**
+     * @minimum 0
+     * @maximum 6
+     * @nullable
+     */
+  weekday?: number | null;
   archived?: boolean;
 }

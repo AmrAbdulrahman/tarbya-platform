@@ -2,6 +2,7 @@ import {
   cycleEnd,
   cycleStart,
   cycleStarts,
+  logDay,
   nextCycleStart,
   trackableStats,
   type TrackableInput,
@@ -15,6 +16,15 @@ describe('cycles', () => {
     expect(cycleStart('2026-10-31', 'WEEKLY')).toBe('2026-10-31');
     expect(cycleStart('2026-11-06', 'WEEKLY')).toBe('2026-10-31');
     expect(cycleStart('2026-11-03', 'MONTHLY')).toBe('2026-11-01');
+  });
+
+  it("puts a weekly cycle's log on its chosen weekday", () => {
+    // The week of Saturday 31 October 2026.
+    expect(logDay('2026-10-31', 'WEEKLY', null)).toBe('2026-10-31');
+    expect(logDay('2026-10-31', 'WEEKLY', 6)).toBe('2026-10-31');
+    expect(logDay('2026-10-31', 'WEEKLY', 0)).toBe('2026-11-01');
+    expect(logDay('2026-10-31', 'WEEKLY', 5)).toBe('2026-11-06');
+    expect(logDay('2026-11-01', 'MONTHLY', 5)).toBe('2026-11-01');
   });
 
   it('steps to the next cycle and knows where one ends', () => {

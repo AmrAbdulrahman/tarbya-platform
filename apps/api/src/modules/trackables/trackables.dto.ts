@@ -8,6 +8,7 @@ import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsIn,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
@@ -42,6 +43,9 @@ export class TrackableSummaryDto {
   /** Per cycle. */
   @ApiProperty({ type: Number, nullable: true }) target!: number | null;
   @ApiProperty({ format: 'date' }) startsOn!: string;
+  /** Weekly only: the weekday (0 Sunday … 6 Saturday) its log shows on. */
+  @ApiProperty({ type: Number, nullable: true, minimum: 0, maximum: 6 })
+  weekday!: number | null;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   archivedAt!: string | null;
   /** The cycle today falls in (its first day). */
@@ -192,6 +196,14 @@ export class CreateTrackableDto {
   @IsOptional()
   @Matches(DAY)
   startsOn?: string;
+
+  /** Weekly only: the weekday (0 Sunday … 6 Saturday) its log shows on; null for the week's first day. */
+  @ApiPropertyOptional({ type: Number, nullable: true, minimum: 0, maximum: 6 })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(6)
+  weekday?: number | null;
 }
 
 /** A trackable stays with its mentee; its type, cycle and start change only until something is logged. */

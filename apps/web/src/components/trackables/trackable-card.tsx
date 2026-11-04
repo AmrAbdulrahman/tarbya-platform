@@ -38,7 +38,7 @@ export function TrackableCard({
         </span>
         {tr.latestCycle && (
           <span className="text-sm text-ink-subtle">
-            {cycleLabel(tr.latestCycle, tr.cycle)}
+            {cycleLabel(tr.latestCycle, tr.cycle, tr.weekday)}
           </span>
         )}
       </div>

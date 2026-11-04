@@ -19,7 +19,9 @@ import {
   FILL_WINDOW_DAYS,
   formatDayTile,
   formatMonth,
+  logDay,
   toZoned,
+  WEEK_STARTS_ON,
 } from '@tarbya/shared';
 import { Badge, Button, cn, Input, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
@@ -198,6 +200,7 @@ export function TrackablesBoard({
             key={x.id}
             trackable={x}
             range={range}
+            byDay={period === 'week'}
             today={today}
             entries={byTrackable.get(x.id) ?? new Map()}
             canLog={canManage || isMentee}
@@ -234,6 +237,7 @@ export function TrackablesBoard({
 function TrackableRow({
   trackable: tr,
   range,
+  byDay,
   today,
   entries,
   canLog,
@@ -241,6 +245,8 @@ function TrackableRow({
 }: {
   trackable: TrackableSummaryDto;
   range: { from: string; to: string };
+  /** One column per day of the week, so a weekly log sits under its weekday. */
+  byDay: boolean;
   today: string;
   entries: Map<string, RangeEntryDto>;
   canLog: boolean;
@@ -295,7 +301,11 @@ function TrackableRow({
           {t('trackables.board.noCycles')}
         </p>
       ) : (
-        <div className="flex flex-wrap gap-1.5">
+        <div
+          className={
+            byDay ? 'grid grid-cols-7 gap-1.5' : 'flex flex-wrap gap-1.5'
+          }
+        >
           {cycles.map((s) => {
             const entry = entries.get(s);
             const canPick = loggable(s);
@@ -308,7 +318,7 @@ function TrackableRow({
                 type="button"
                 disabled={!canPick}
                 aria-pressed={selected === s}
-                aria-label={`${cycleLabel(s, tr.cycle)}: ${
+                aria-label={`${cycleLabel(s, tr.cycle, tr.weekday)}: ${
                   entry
                     ? t('trackables.board.loggedAria')
                     : missed
@@ -318,8 +328,17 @@ function TrackableRow({
                         : t('trackables.board.open')
                 }`}
                 onClick={() => setSelected(selected === s ? null : s)}
+                style={
+                  byDay && tr.weekday !== null
+                    ? {
+                        gridColumnStart:
+                          ((tr.weekday - WEEK_STARTS_ON + 7) % 7) + 1,
+                      }
+                    : undefined
+                }
                 className={cn(
-                  'flex min-w-14 flex-col items-center gap-0.5 rounded-lg border px-2 py-1 text-[12px] leading-tight transition-colors',
+                  byDay ? 'min-w-0' : 'min-w-14',
+                  'flex flex-col items-center gap-0.5 rounded-lg border px-2 py-1 text-[12px] leading-tight transition-colors',
                   entry
                     ? 'border-border bg-surface'
                     : ahead
@@ -334,7 +353,7 @@ function TrackableRow({
                     : 'cursor-default',
                 )}
               >
-                <CycleTile start={s} cycle={tr.cycle} />
+                <CycleTile start={s} cycle={tr.cycle} weekday={tr.weekday} />
                 <span className="flex h-6 items-center font-figures text-[15px] font-semibold text-navy">
                   {entry ? (
                     formatValue(entry.value, tr.type)
@@ -369,7 +388,7 @@ function TrackableRow({
           {notes.map((e) => (
             <li key={e.id} className="text-[13px]">
               <span className="text-ink-subtle">
-                {cycleLabel(e.periodStart, tr.cycle)} ·{' '}
+                {cycleLabel(e.periodStart, tr.cycle, tr.weekday)} ·{' '}
                 {actedBy(t, e.author, e.impersonator)}:
               </span>{' '}
               {e.note}
@@ -390,14 +409,17 @@ function TrackableRow({
 export function CycleTile({
   start,
   cycle,
+  weekday,
 }: {
   start: string;
   cycle: TrackableSummaryDto['cycle'];
+  /** A weekly cycle shows on this weekday when one is chosen. */
+  weekday?: number | null;
 }) {
   const { i18n } = useTranslation();
   const me = useMe();
   const locale = i18n.language as Language;
-  const at = `${start}T12:00:00Z`;
+  const at = `${logDay(start, cycle, weekday)}T12:00:00Z`;
   if (cycle === 'MONTHLY') {
     return (
       <span className="text-ink-subtle">{formatMonth(at, { locale })}</span>
@@ -429,7 +451,7 @@ export function QuickLog({
   const cycleLabel = useCycleLabel();
   const [value, setValue] = useState(entry ? String(entry.value) : '');
   const [note, setNote] = useState(entry?.note ?? '');
-  const label = cycleLabel(periodStart, tr.cycle);
+  const label = cycleLabel(periodStart, tr.cycle, tr.weekday);
   const log = useMutation({
     mutationFn: (v: number) =>
       trackablesControllerLog(tr.id, periodStart, {

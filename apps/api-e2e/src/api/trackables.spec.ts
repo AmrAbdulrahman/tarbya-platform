@@ -117,6 +117,38 @@ describe('trackables (BR-TRK-1…6, US-4.5, US-5.2, US-4.7)', () => {
     expect(restored.data.archivedAt).toBeNull();
   });
 
+  it('shows a weekly log on a chosen weekday, changeable after logging (BR-TRK-1)', async () => {
+    const { mentee, asMentor } = await pair();
+    const created = await asMentor.post(
+      '/api/trackables',
+      daily(mentee.id, { cycle: 'WEEKLY', weekday: 5 }),
+    );
+    expect(created.data).toMatchObject({ cycle: 'WEEKLY', weekday: 5 });
+    await asMentor.put(
+      `/api/trackables/${created.data.id}/entries/${created.data.currentCycle}`,
+      { value: 3 },
+    );
+    // Only where the log shows, so it still changes once something is logged.
+    const moved = await asMentor.patch(`/api/trackables/${created.data.id}`, {
+      weekday: null,
+    });
+    expect(moved.data.weekday).toBeNull();
+    expect(
+      (
+        await asMentor.patch(`/api/trackables/${created.data.id}`, {
+          weekday: 7,
+        })
+      ).status,
+    ).toBe(400);
+
+    // Other cycles have no weekday.
+    const dailyOne = await asMentor.post(
+      '/api/trackables',
+      daily(mentee.id, { weekday: 2 }),
+    );
+    expect(dailyOne.data.weekday).toBeNull();
+  });
+
   it('offers the mentee the last 30 days to fill, and counts what they missed', async () => {
     const { mentee, asMentor, asMentee } = await pair();
     const tr = (

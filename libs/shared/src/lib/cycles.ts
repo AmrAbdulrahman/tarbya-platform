@@ -43,6 +43,21 @@ export function cycleEnd(start: string, cycle: Cycle): string {
   return addDays(nextCycleStart(start, cycle), -1);
 }
 
+/**
+ * The day a cycle's log shows on: for a weekly cycle with a chosen weekday
+ * (0 Sunday … 6 Saturday), that day of the week; otherwise its first day.
+ */
+export function logDay(
+  start: string,
+  cycle: Cycle,
+  weekday: number | null | undefined,
+): string {
+  if (cycle !== 'WEEKLY' || weekday === null || weekday === undefined) {
+    return start;
+  }
+  return addDays(start, (weekday - WEEK_STARTS_ON + 7) % 7);
+}
+
 /** Starts of every cycle from the one holding `from` to the one holding `to`, oldest first. */
 export function cycleStarts(from: string, to: string, cycle: Cycle): string[] {
   const out: string[] = [];

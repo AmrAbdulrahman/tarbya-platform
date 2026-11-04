@@ -22,6 +22,7 @@ import {
 } from './library';
 import {
   sharedFields,
+  weekdayField,
   TrackableForm,
   type TrackableValues,
 } from './trackable-form';
@@ -112,6 +113,7 @@ function AddTrackable({
           type: v.type,
           cycle: v.cycle,
           startsOn: v.startsOn,
+          weekday: weekdayField(v),
         })
       ).data as TrackableDetailDto,
     onSuccess: async (trackable) => {
@@ -239,6 +241,7 @@ function FromTemplate({
             menteeId,
             target: shared.target,
             startsOn: v.startsOn,
+            weekday: weekdayField(v),
           })
         : await trackablesControllerCreate({
             ...shared,
@@ -246,6 +249,7 @@ function FromTemplate({
             type: v.type,
             cycle: v.cycle,
             startsOn: v.startsOn,
+            weekday: weekdayField(v),
           });
       return res.data as TrackableDetailDto;
     },
@@ -300,6 +304,8 @@ function EditTrackable({
       const shared = sharedFields(v);
       return trackablesControllerUpdate(trackable.id, {
         ...(fromTemplate ? { target: shared.target } : shared),
+        // Only where the log shows, so it can change after logging too.
+        weekday: weekdayField(v),
         ...(reshapable && {
           startsOn: v.startsOn,
           ...(!fromTemplate && { type: v.type, cycle: v.cycle }),

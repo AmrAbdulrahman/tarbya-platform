@@ -172,7 +172,7 @@ function TrackableAction({
                     'border-solid border-primary bg-primary-tint',
                 )}
               >
-                <CycleTile start={c} cycle={x.cycle} />
+                <CycleTile start={c} cycle={x.cycle} weekday={x.weekday} />
                 <Plus className="size-4 text-primary" aria-hidden />
               </button>
             ))}

@@ -165,7 +165,7 @@ As a mentor, I want to see all my mentees at a glance, so that I know who needs 
 As a mentor, I want a mentee's full picture: trackables with trend charts, timeline, challenges, tasks and notes.
 
 - The page leads with trackables, action items and challenges; contact details sit in one line under the name; the history log is collapsed until opened.
-- Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. This week shows every day, with the days to come as placeholders. Clicking a past cycle logs or re-logs it in place, even before the trackable's start (which then moves back); notes and replies show under it.
+- Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. This week shows every day in its own column, with the days to come as placeholders; a weekly trackable's log sits under its chosen weekday (the week's first day if none). Clicking a past cycle logs or re-logs it in place, even before the trackable's start (which then moves back); notes and replies show under it.
 - Breadcrumbs above every page lead back to where I came from.
 - Refs: BR-TRK-4, BR-TRK-5, BR-NOTE-1, BR-FU-4 · `Mentee.dc.html`
 
@@ -191,7 +191,7 @@ As a mentor, I want to record an outing, trip, sport or meal with one or more pe
 
 As a mentor, I want to create, edit, archive and restore a mentee's trackables.
 
-- Fields: name, optional goal, type (count, done/not done, percentage), cycle (daily, weekly, monthly), whether more is better, optional target, start day.
+- Fields: name, optional goal, type (count, done/not done, percentage), cycle (daily, weekly, monthly), whether more is better, optional target, start day, and for weekly ones an optional weekday the log shows on.
 - Type, cycle and start change only until something is logged.
 - Refs: BR-TRK-1, BR-TRK-6 · `Mentee.dc.html`
 

@@ -323,7 +323,11 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
             <span className="text-[13px] text-ink-subtle">
               {trackable.latestCycle
                 ? t('dashboard.updated', {
-                    when: cycleLabel(trackable.latestCycle, trackable.cycle),
+                    when: cycleLabel(
+                      trackable.latestCycle,
+                      trackable.cycle,
+                      trackable.weekday,
+                    ),
                   })
                 : t('dashboard.noReadings')}
             </span>

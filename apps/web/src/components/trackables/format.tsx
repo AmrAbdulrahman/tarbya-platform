@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TrackableType, TrackingCycle } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
-import { formatDate, formatMonth } from '@tarbya/shared';
+import { formatDate, formatMonth, logDay } from '@tarbya/shared';
 import { cn } from '@tarbya/ui';
 import { useMe } from '../../auth/session';
 
@@ -127,11 +127,14 @@ export function useCycleLabel() {
   const { t, i18n } = useTranslation();
   const me = useMe();
   const locale = i18n.language as Language;
-  return (start: string, cycle: TrackingCycle) => {
+  /** A weekly cycle with a chosen weekday is named by that day (BR-TRK-1). */
+  return (start: string, cycle: TrackingCycle, weekday?: number | null) => {
     // Noon UTC is the same calendar day in the organisation zone.
-    const at = `${start}T12:00:00Z`;
+    const at = `${logDay(start, cycle, weekday)}T12:00:00Z`;
     if (cycle === 'MONTHLY') return formatMonth(at, { locale });
     const date = formatDate(at, { locale, calendar: me.calendar });
-    return cycle === 'WEEKLY' ? t('trackables.weekOf', { date }) : date;
+    return cycle === 'WEEKLY' && (weekday === null || weekday === undefined)
+      ? t('trackables.weekOf', { date })
+      : date;
   };
 }

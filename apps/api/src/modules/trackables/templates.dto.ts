@@ -27,7 +27,7 @@ export class SaveAsTemplateDto {
 
 /** Changes apply to every trackable that follows the template. */
 export class UpdateTemplateDto extends PartialType(
-  OmitType(CreateTrackableDto, ['menteeId', 'startsOn'] as const),
+  OmitType(CreateTrackableDto, ['menteeId', 'startsOn', 'weekday'] as const),
 ) {
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isPublic?: boolean;
 }
@@ -37,4 +37,5 @@ export class AssignTemplateDto extends PickType(CreateTrackableDto, [
   'menteeId',
   'target',
   'startsOn',
+  'weekday',
 ] as const) {}

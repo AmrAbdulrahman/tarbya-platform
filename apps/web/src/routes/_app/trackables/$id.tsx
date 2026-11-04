@@ -288,7 +288,7 @@ function CycleForm({
     if (value.trim() !== '' && Number.isFinite(Number(value)))
       log.mutate(Number(value));
   };
-  const label = cycleLabel(periodStart, tr.cycle);
+  const label = cycleLabel(periodStart, tr.cycle, tr.weekday);
   const current = periodStart === tr.currentCycle;
 
   return (
@@ -408,7 +408,7 @@ function Entry({
     <li className="flex flex-col gap-2 py-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="min-w-40 font-semibold text-navy">
-          {cycleLabel(entry.periodStart, tr.cycle)}
+          {cycleLabel(entry.periodStart, tr.cycle, tr.weekday)}
         </span>
         <span
           className={cn(

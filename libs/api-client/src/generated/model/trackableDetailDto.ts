@@ -23,6 +23,12 @@ export interface TrackableDetailDto {
   /** @nullable */
   target: number | null;
   startsOn: string;
+  /**
+     * @minimum 0
+     * @maximum 6
+     * @nullable
+     */
+  weekday: number | null;
   /** @nullable */
   archivedAt: string | null;
   currentCycle: string;

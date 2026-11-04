@@ -3765,6 +3765,12 @@
             "type": "string",
             "format": "date"
           },
+          "weekday": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 6
+          },
           "archivedAt": {
             "type": "string",
             "format": "date-time",
@@ -3827,6 +3833,7 @@
           "higherIsBetter",
           "target",
           "startsOn",
+          "weekday",
           "archivedAt",
           "currentCycle",
           "latestCycle",
@@ -4138,6 +4145,12 @@
             "type": "string",
             "format": "date"
           },
+          "weekday": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 6
+          },
           "archivedAt": {
             "type": "string",
             "format": "date-time",
@@ -4224,6 +4237,7 @@
           "higherIsBetter",
           "target",
           "startsOn",
+          "weekday",
           "archivedAt",
           "currentCycle",
           "latestCycle",
@@ -4283,6 +4297,12 @@
           "startsOn": {
             "type": "string",
             "format": "date"
+          },
+          "weekday": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 6
           }
         },
         "required": [
@@ -4329,6 +4349,12 @@
           "startsOn": {
             "type": "string",
             "format": "date"
+          },
+          "weekday": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 6
           },
           "archived": {
             "type": "boolean"
@@ -4428,6 +4454,12 @@
           "startsOn": {
             "type": "string",
             "format": "date"
+          },
+          "weekday": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 6
           }
         },
         "required": [

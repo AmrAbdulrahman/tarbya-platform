@@ -10,4 +10,10 @@ export interface AssignTemplateDto {
   /** @nullable */
   target?: number | null;
   startsOn?: string;
+  /**
+     * @minimum 0
+     * @maximum 6
+     * @nullable
+     */
+  weekday?: number | null;
 }

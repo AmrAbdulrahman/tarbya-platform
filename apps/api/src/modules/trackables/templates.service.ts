@@ -131,7 +131,12 @@ export class TrackableTemplatesService {
       }),
       this.prisma.trackable.updateMany({
         where: { templateId: id },
-        data: { ...shared, ...(boolean && { target: null }) },
+        data: {
+          ...shared,
+          ...(boolean && { target: null }),
+          // A weekday means nothing outside a weekly cycle.
+          ...(dto.cycle && dto.cycle !== 'WEEKLY' && { weekday: null }),
+        },
       }),
     ]);
     const updated = await this.prisma.trackableTemplate.findUniqueOrThrow({
@@ -192,6 +197,7 @@ export class TrackableTemplatesService {
               ? template.target
               : dto.target,
         startsOn: dto.startsOn,
+        weekday: dto.weekday,
       },
       id,
     );

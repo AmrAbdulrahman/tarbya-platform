@@ -42,6 +42,7 @@ const trackableSelect = {
   higherIsBetter: true,
   target: true,
   startsOn: true,
+  weekday: true,
   archivedAt: true,
   entries: {
     select: { periodStart: true, value: true },
@@ -239,6 +240,8 @@ export class TrackablesService {
         higherIsBetter: dto.higherIsBetter ?? true,
         target: dto.target ?? null,
         startsOn: asDate(dto.startsOn ?? today),
+        // A weekday means nothing outside a weekly cycle.
+        weekday: dto.cycle === 'WEEKLY' ? (dto.weekday ?? null) : null,
       },
     });
     return this.get(actorId, row.id);
@@ -293,6 +296,7 @@ export class TrackablesService {
         type: dto.type,
         cycle: dto.cycle,
         startsOn: dto.startsOn ? asDate(dto.startsOn) : undefined,
+        weekday: (dto.cycle ?? row.cycle) === 'WEEKLY' ? dto.weekday : null,
         higherIsBetter: dto.higherIsBetter,
         target: dto.target,
         archivedAt:
@@ -462,6 +466,7 @@ export class TrackablesService {
       higherIsBetter: r.higherIsBetter,
       target: r.target,
       startsOn: day(r.startsOn),
+      weekday: r.weekday,
       archivedAt: r.archivedAt?.toISOString() ?? null,
       currentCycle: stats.currentCycle,
       latestCycle: last?.periodStart ?? null,

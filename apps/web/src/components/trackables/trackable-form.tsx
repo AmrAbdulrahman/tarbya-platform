@@ -9,6 +9,16 @@ import { Field, FormError } from '../login/fields';
 
 const TYPES = ['COUNT', 'BOOLEAN', 'PERCENTAGE'] as const;
 const CYCLES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
+// The organisation's week runs Saturday to Friday; the number is 0 for Sunday.
+const WEEKDAYS = [
+  [6, 'sat'],
+  [0, 'sun'],
+  [1, 'mon'],
+  [2, 'tue'],
+  [3, 'wed'],
+  [4, 'thu'],
+  [5, 'fri'],
+] as const;
 
 const schema = z.object({
   name: z.string().trim().min(1, 'validation.required').max(120),
@@ -22,6 +32,8 @@ const schema = z.object({
     .refine((v) => v.trim() === '' || Number(v) >= 0, 'validation.number'),
   startsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.date'),
   isPublic: z.boolean(),
+  // Weekly only; empty shows the log on the week's first day.
+  weekday: z.string(),
 });
 export type TrackableValues = z.infer<typeof schema>;
 
@@ -36,6 +48,11 @@ export function sharedFields(v: TrackableValues) {
   };
 }
 
+/** The weekday a weekly trackable's log shows on, or null (BR-TRK-1). */
+export function weekdayField(v: TrackableValues): number | null {
+  return v.cycle === 'WEEKLY' && v.weekday !== '' ? Number(v.weekday) : null;
+}
+
 export interface TrackableFormProps {
   initial?: Partial<{
     name: string;
@@ -46,6 +63,7 @@ export interface TrackableFormProps {
     target: number | null;
     startsOn: string;
     isPublic: boolean;
+    weekday: number | null;
   }>;
   /** Type and cycle are fixed (something is logged). */
   lockShape?: boolean;
@@ -95,10 +113,15 @@ export function TrackableForm({
           : String(initial.target),
       startsOn: initial?.startsOn ?? toZoned(new Date()).date,
       isPublic: initial?.isPublic ?? false,
+      weekday:
+        initial?.weekday === null || initial?.weekday === undefined
+          ? ''
+          : String(initial.weekday),
     },
   });
   const { errors } = form.formState;
   const type = form.watch('type');
+  const cycle = form.watch('cycle');
   const err = (name: keyof TrackableValues) =>
     errors[name]?.message
       ? t(errors[name]?.message as 'validation.required')
@@ -181,6 +204,19 @@ export function TrackableForm({
               aria-invalid={!!errors.target}
               {...form.register('target')}
             />
+          </Field>
+        )}
+        {/* Where the log shows, not when the week runs; templates leave it to each mentee. */}
+        {cycle === 'WEEKLY' && !showPublic && (
+          <Field id="trk-weekday" label={t('trackables.weekday')}>
+            <Select id="trk-weekday" {...form.register('weekday')}>
+              <option value="">{t('trackables.wholeWeek')}</option>
+              {WEEKDAYS.map(([d, name]) => (
+                <option key={d} value={String(d)}>
+                  {t(`trackables.weekdays.${name}`)}
+                </option>
+              ))}
+            </Select>
           </Field>
         )}
         {showStart && (
