@@ -5,35 +5,56 @@ const optionalString = z
   .optional()
   .transform((v) => (v ? v : undefined));
 
-export const envSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
-  PORT: z.coerce.number().int().positive().default(3000),
-  APP_URL: z.url(),
-  ORG_TIMEZONE: z.string().default('Africa/Cairo'),
+export const envSchema = z
+  .object({
+    NODE_ENV: z
+      .enum(['development', 'test', 'production'])
+      .default('development'),
+    PORT: z.coerce.number().int().positive().default(3000),
+    APP_URL: z.url(),
+    ORG_TIMEZONE: z.string().default('Africa/Cairo'),
 
-  DATABASE_URL: z.string().startsWith('postgres'),
-  JWT_SECRET: z.string().min(32),
-  /** Sign-in attempts per client IP per minute (US-1.2). Raised in dev and CI, where suites share one API. */
-  AUTH_SIGN_IN_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(10),
+    DATABASE_URL: z.string().startsWith('postgres'),
+    JWT_SECRET: z.string().min(32),
+    /** Sign-in attempts per client IP per minute (US-1.2). Raised in dev and CI, where suites share one API. */
+    AUTH_SIGN_IN_LIMIT_PER_MINUTE: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(10),
 
-  SUPER_ADMIN_EMAIL: z.email(),
-  SUPER_ADMIN_NAME: z.string().default('Super admin'),
-  SUPER_ADMIN_PASSWORD: optionalString,
+    SUPER_ADMIN_EMAIL: z.email(),
+    SUPER_ADMIN_NAME: z.string().default('Super admin'),
+    SUPER_ADMIN_PASSWORD: optionalString,
 
-  SMTP_HOST: z.string(),
-  SMTP_PORT: z.coerce.number().int().positive(),
-  SMTP_USER: optionalString,
-  SMTP_PASSWORD: optionalString,
-  SMTP_FROM: z.string(),
+    /** Sends through Resend's HTTPS API instead of SMTP when set. */
+    RESEND_API_KEY: optionalString,
+    /** Required unless RESEND_API_KEY is set. */
+    SMTP_HOST: optionalString,
+    SMTP_PORT: z.coerce.number().int().positive().optional(),
+    SMTP_USER: optionalString,
+    SMTP_PASSWORD: optionalString,
+    /** Sender for every email, whichever way it's sent. */
+    SMTP_FROM: z.string(),
 
-  S3_ENDPOINT: z.url(),
-  S3_REGION: z.string(),
-  S3_BUCKET: z.string(),
-  S3_ACCESS_KEY_ID: z.string(),
-  S3_SECRET_ACCESS_KEY: z.string(),
-});
+    S3_ENDPOINT: z.url(),
+    S3_REGION: z.string(),
+    S3_BUCKET: z.string(),
+    S3_ACCESS_KEY_ID: z.string(),
+    S3_SECRET_ACCESS_KEY: z.string(),
+  })
+  .superRefine((env, ctx) => {
+    if (env.RESEND_API_KEY) return;
+    for (const key of ['SMTP_HOST', 'SMTP_PORT'] as const) {
+      if (env[key] === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message: 'Required unless RESEND_API_KEY is set',
+        });
+      }
+    }
+  });
 
 export type Env = z.infer<typeof envSchema>;
 

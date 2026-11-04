@@ -10,17 +10,28 @@ export interface Mail {
   html: string;
 }
 
-/** Sends email over SMTP. Moves behind the pg-boss `email.send` queue with notifications (step 7). */
+const RESEND_URL = 'https://api.resend.com/emails';
+const TIMEOUT_MS = 10_000;
+
+/**
+ * Sends email through Resend's HTTPS API when `RESEND_API_KEY` is set (Railway blocks
+ * outbound SMTP below the Pro plan), otherwise over SMTP (Mailpit locally).
+ * Moves behind the pg-boss `email.send` queue with notifications (step 7).
+ */
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private readonly transport: Transporter;
   private readonly from: string;
+  private readonly resendKey?: string;
+  private readonly transport?: Transporter;
 
   constructor(config: ConfigService<Env, true>) {
+    this.from = config.get('SMTP_FROM', { infer: true });
+    this.resendKey = config.get('RESEND_API_KEY', { infer: true });
+    if (this.resendKey) return;
+
     const user = config.get('SMTP_USER', { infer: true });
     const port = config.get('SMTP_PORT', { infer: true });
-    this.from = config.get('SMTP_FROM', { infer: true });
     this.transport = createTransport({
       host: config.get('SMTP_HOST', { infer: true }),
       port,
@@ -28,11 +39,34 @@ export class MailService {
       auth: user
         ? { user, pass: config.get('SMTP_PASSWORD', { infer: true }) }
         : undefined,
+      // Fail fast: sign-in waits on this.
+      connectionTimeout: TIMEOUT_MS,
+      greetingTimeout: TIMEOUT_MS,
+      socketTimeout: TIMEOUT_MS,
     });
   }
 
   async send(mail: Mail): Promise<void> {
-    await this.transport.sendMail({ from: this.from, ...mail });
+    if (this.resendKey) {
+      await this.sendWithResend(mail, this.resendKey);
+    } else {
+      await this.transport?.sendMail({ from: this.from, ...mail });
+    }
     this.logger.log(`Sent "${mail.subject}"`);
+  }
+
+  private async sendWithResend(mail: Mail, key: string): Promise<void> {
+    const res = await fetch(RESEND_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: this.from, ...mail }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) {
+      throw new Error(`Resend responded ${res.status}: ${await res.text()}`);
+    }
   }
 }

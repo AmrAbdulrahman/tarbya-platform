@@ -24,6 +24,14 @@ describe('validateEnv', () => {
     expect(env.SMTP_USER).toBeUndefined();
   });
 
+  it('needs SMTP host and port only without a Resend key', () => {
+    const noSmtp = { ...valid, SMTP_HOST: undefined, SMTP_PORT: undefined };
+    expect(() => validateEnv(noSmtp)).toThrow(/SMTP_HOST[\s\S]*SMTP_PORT/);
+    expect(
+      validateEnv({ ...noSmtp, RESEND_API_KEY: 're_x' }).SMTP_HOST,
+    ).toBeUndefined();
+  });
+
   it('lists every invalid variable', () => {
     expect(() =>
       validateEnv({ ...valid, JWT_SECRET: 'short', SUPER_ADMIN_EMAIL: 'nope' }),
