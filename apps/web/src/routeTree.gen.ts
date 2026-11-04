@@ -20,8 +20,6 @@ import { Route as AppAdminMentorshipsRouteImport } from './routes/_app/admin/men
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppMentorIndexRouteImport } from './routes/_app/mentor/index'
-import { Route as AppMentorActivityRouteImport } from './routes/_app/mentor/activity'
-import { Route as AppMentorLogRouteImport } from './routes/_app/mentor/log'
 import { Route as AppMyIndexRouteImport } from './routes/_app/my/index'
 import { Route as AppMyTrackablesRouteImport } from './routes/_app/my/trackables'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people/$id'
@@ -82,16 +80,6 @@ const AppMentorIndexRoute = AppMentorIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppMentorRoute,
 } as any)
-const AppMentorActivityRoute = AppMentorActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => AppMentorRoute,
-} as any)
-const AppMentorLogRoute = AppMentorLogRouteImport.update({
-  id: '/log',
-  path: '/log',
-  getParentRoute: () => AppMentorRoute,
-} as any)
 const AppMyIndexRoute = AppMyIndexRouteImport.update({
   id: '/my/',
   path: '/my/',
@@ -128,8 +116,6 @@ export interface FileRoutesByFullPath {
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
-  '/mentor/activity': typeof AppMentorActivityRoute
-  '/mentor/log': typeof AppMentorLogRoute
   '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
   '/trackables/$id': typeof AppTrackablesIdRoute
@@ -146,8 +132,6 @@ export interface FileRoutesByTo {
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
-  '/mentor/activity': typeof AppMentorActivityRoute
-  '/mentor/log': typeof AppMentorLogRoute
   '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
   '/trackables/$id': typeof AppTrackablesIdRoute
@@ -167,8 +151,6 @@ export interface FileRoutesById {
   '/_app/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
-  '/_app/mentor/activity': typeof AppMentorActivityRoute
-  '/_app/mentor/log': typeof AppMentorLogRoute
   '/_app/my/trackables': typeof AppMyTrackablesRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
   '/_app/trackables/$id': typeof AppTrackablesIdRoute
@@ -188,8 +170,6 @@ export interface FileRouteTypes {
     | '/admin/mentorships'
     | '/admin/settings'
     | '/admin/users'
-    | '/mentor/activity'
-    | '/mentor/log'
     | '/my/trackables'
     | '/people/$id'
     | '/trackables/$id'
@@ -206,8 +186,6 @@ export interface FileRouteTypes {
     | '/admin/mentorships'
     | '/admin/settings'
     | '/admin/users'
-    | '/mentor/activity'
-    | '/mentor/log'
     | '/my/trackables'
     | '/people/$id'
     | '/trackables/$id'
@@ -226,8 +204,6 @@ export interface FileRouteTypes {
     | '/_app/admin/mentorships'
     | '/_app/admin/settings'
     | '/_app/admin/users'
-    | '/_app/mentor/activity'
-    | '/_app/mentor/log'
     | '/_app/my/trackables'
     | '/_app/people/$id'
     | '/_app/trackables/$id'
@@ -320,20 +296,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMentorIndexRouteImport
       parentRoute: typeof AppMentorRoute
     }
-    '/_app/mentor/activity': {
-      id: '/_app/mentor/activity'
-      path: '/activity'
-      fullPath: '/mentor/activity'
-      preLoaderRoute: typeof AppMentorActivityRouteImport
-      parentRoute: typeof AppMentorRoute
-    }
-    '/_app/mentor/log': {
-      id: '/_app/mentor/log'
-      path: '/log'
-      fullPath: '/mentor/log'
-      preLoaderRoute: typeof AppMentorLogRouteImport
-      parentRoute: typeof AppMentorRoute
-    }
     '/_app/my/': {
       id: '/_app/my/'
       path: '/my'
@@ -391,14 +353,10 @@ const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
 )
 
 interface AppMentorRouteChildren {
-  AppMentorActivityRoute: typeof AppMentorActivityRoute
-  AppMentorLogRoute: typeof AppMentorLogRoute
   AppMentorIndexRoute: typeof AppMentorIndexRoute
 }
 
 const AppMentorRouteChildren: AppMentorRouteChildren = {
-  AppMentorActivityRoute: AppMentorActivityRoute,
-  AppMentorLogRoute: AppMentorLogRoute,
   AppMentorIndexRoute: AppMentorIndexRoute,
 }
 

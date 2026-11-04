@@ -20,6 +20,7 @@ export function CollapsibleSection({
   const bodyId = useId();
   return (
     <section
+      aria-label={title}
       className={cn(
         'flex flex-col rounded-card border border-border bg-card',
         className,

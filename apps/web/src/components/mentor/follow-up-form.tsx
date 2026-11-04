@@ -1,7 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { Plus, X } from 'lucide-react';
+import {
+  ListChecks,
+  Mountain,
+  NotebookPen,
+  Plus,
+  TrendingUp,
+  X,
+} from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,46 +15,11 @@ import { z } from 'zod';
 import { interactionsControllerCreateFollowUp } from '@tarbya/api-client';
 import { fromZoned, toZoned } from '@tarbya/shared';
 import { Button, Input, Textarea } from '@tarbya/ui';
-import { errorMessage } from '../../../auth/error-message';
-import { Field, FormError } from '../../../components/login/fields';
-import { WhenStatus } from '../../../components/mentor/entry-kind';
-import {
-  Card,
-  Hint,
-  mineQueryKey,
-} from '../../../components/mentor/form-parts';
-import { LogScreen } from '../../../components/mentor/log-screen';
-import {
-  ChallengeNotes,
-  type ChallengeNote,
-} from '../../../components/mentor/challenge-notes';
-import { TrackableUpdates } from '../../../components/mentor/trackable-updates';
-
-/** US-4.3 · design/screens/FollowUp.dc.html */
-export const Route = createFileRoute('/_app/mentor/log')({
-  // Opened from the dashboard or a mentee's profile with the mentee chosen.
-  validateSearch: z.object({
-    menteeId: z.string().uuid().optional().catch(undefined),
-  }),
-  component: FollowUpPage,
-});
-
-function FollowUpPage() {
-  const { menteeId } = Route.useSearch();
-  return (
-    <LogScreen
-      kind="follow-up"
-      menteeId={menteeId}
-      form={(m, onSaved) => (
-        <FollowUpForm
-          key={m.mentee.id}
-          menteeId={m.mentee.id}
-          onSaved={onSaved}
-        />
-      )}
-    />
-  );
-}
+import { errorMessage } from '../../auth/error-message';
+import { Field, FormError } from '../login/fields';
+import { ChallengeNotes, type ChallengeNote } from './challenge-notes';
+import { Hint, mineQueryKey, Section, WhenStatus } from './form-parts';
+import { TrackableUpdates } from './trackable-updates';
 
 const schema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.date'),
@@ -74,12 +45,18 @@ function blank(): Values {
   };
 }
 
-function FollowUpForm({
+/**
+ * US-4.3 · design/screens/FollowUp.dc.html: when, then the mentee's trends with
+ * this cycle's values, challenges, tasks and notes.
+ */
+export function FollowUpForm({
   menteeId,
   onSaved,
+  onCancel,
 }: {
   menteeId: string;
   onSaved: () => void;
+  onCancel: () => void;
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -130,18 +107,17 @@ function FollowUpForm({
           })),
       }),
     onSuccess: async () => {
-      form.reset(blank());
-      setTrackableValues({});
-      setChallengeNotes({});
       onSaved();
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: mineQueryKey }),
-        queryClient.invalidateQueries({ queryKey: ['trackables'] }),
-        queryClient.invalidateQueries({ queryKey: ['challenges', menteeId] }),
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-        queryClient.invalidateQueries({ queryKey: ['feed'] }),
-        queryClient.invalidateQueries({ queryKey: ['tasks', menteeId] }),
-      ]);
+      await Promise.all(
+        [
+          mineQueryKey,
+          ['trackables'],
+          ['challenges', menteeId],
+          ['dashboard'],
+          ['feed'],
+          ['tasks', menteeId],
+        ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+      );
     },
   });
 
@@ -161,45 +137,93 @@ function FollowUpForm({
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
       className="flex min-w-0 flex-col gap-4"
     >
-      <Card>
-        <div className="grid gap-4 sm:grid-cols-3">
+      <div className="flex flex-col gap-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <Field
             id="fu-date"
             label={t('mentoring.log.date')}
             error={err('date')}
           >
-            <Input
-              id="fu-date"
-              type="date"
-              className="h-11 text-[15px]"
-              {...form.register('date')}
-            />
+            <Input id="fu-date" type="date" {...form.register('date')} />
           </Field>
           <Field
             id="fu-time"
             label={t('mentoring.log.time')}
             error={err('time')}
           >
-            <Input
-              id="fu-time"
-              type="time"
-              className="h-11 text-[15px]"
-              {...form.register('time')}
-            />
+            <Input id="fu-time" type="time" {...form.register('time')} />
           </Field>
           <Field id="fu-place" label={t('mentoring.log.place')}>
             <Input
               id="fu-place"
-              className="h-11 text-[15px]"
               placeholder={t('mentoring.log.placeHint')}
               {...form.register('place')}
             />
           </Field>
         </div>
         <WhenStatus upcoming={upcoming} />
-      </Card>
+      </div>
 
-      <Card title={t('mentoring.log.notes')}>
+      <Section title={t('trackables.trends')} icon={<TrendingUp />}>
+        <TrackableUpdates
+          menteeId={menteeId}
+          values={trackableValues}
+          onChange={setTrackableValues}
+          upcoming={upcoming}
+        />
+      </Section>
+
+      <Section title={t('mentoring.log.challenges')} icon={<Mountain />}>
+        <ChallengeNotes
+          menteeId={menteeId}
+          notes={challengeNotes}
+          onChange={setChallengeNotes}
+        />
+        {challenges.fields.map((f, i) => (
+          <Row
+            key={f.id}
+            onRemove={() => challenges.remove(i)}
+            removeLabel={t('mentoring.log.remove')}
+          >
+            <Input
+              aria-label={t('mentoring.log.challenge', { n: i + 1 })}
+              {...form.register(`challenges.${i}.text`)}
+            />
+          </Row>
+        ))}
+        <AddButton onClick={() => challenges.append({ text: '' })}>
+          {t('mentoring.log.addChallenge')}
+        </AddButton>
+      </Section>
+
+      <Section title={t('mentoring.log.tasks')} icon={<ListChecks />}>
+        {tasks.fields.map((f, i) => (
+          <Row
+            key={f.id}
+            onRemove={() => tasks.remove(i)}
+            removeLabel={t('mentoring.log.remove')}
+          >
+            <div className="flex flex-1 flex-wrap gap-2">
+              <Input
+                aria-label={t('mentoring.log.taskTitle', { n: i + 1 })}
+                className="flex-[2_1_160px]"
+                {...form.register(`tasks.${i}.title`)}
+              />
+              <Input
+                type="date"
+                aria-label={t('mentoring.log.taskDue', { n: i + 1 })}
+                className="flex-[1_1_140px]"
+                {...form.register(`tasks.${i}.dueOn`)}
+              />
+            </div>
+          </Row>
+        ))}
+        <AddButton onClick={() => tasks.append({ title: '', dueOn: '' })}>
+          {t('mentoring.log.addTask')}
+        </AddButton>
+      </Section>
+
+      <Section title={t('mentoring.log.notes')} icon={<NotebookPen />}>
         <Field
           id="fu-shared"
           label={
@@ -209,7 +233,7 @@ function FollowUpForm({
             </>
           }
         >
-          <Textarea id="fu-shared" rows={3} {...form.register('sharedNotes')} />
+          <Textarea id="fu-shared" rows={2} {...form.register('sharedNotes')} />
         </Field>
         <Field
           id="fu-private"
@@ -222,72 +246,11 @@ function FollowUpForm({
         >
           <Textarea
             id="fu-private"
-            rows={3}
+            rows={2}
             {...form.register('privateNotes')}
           />
         </Field>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title={t('mentoring.log.challenges')}>
-          <ChallengeNotes
-            menteeId={menteeId}
-            notes={challengeNotes}
-            onChange={setChallengeNotes}
-          />
-          <span className="text-sm font-semibold text-ink-muted">
-            {t('challenges.newTitle')}
-          </span>
-          {challenges.fields.map((f, i) => (
-            <Row
-              key={f.id}
-              onRemove={() => challenges.remove(i)}
-              removeLabel={t('mentoring.log.remove')}
-            >
-              <Input
-                aria-label={t('mentoring.log.challenge', { n: i + 1 })}
-                className="h-11 text-[15px]"
-                {...form.register(`challenges.${i}.text`)}
-              />
-            </Row>
-          ))}
-          <AddButton onClick={() => challenges.append({ text: '' })}>
-            {t('mentoring.log.addChallenge')}
-          </AddButton>
-        </Card>
-        <Card title={t('mentoring.log.tasks')}>
-          {tasks.fields.map((f, i) => (
-            <Row
-              key={f.id}
-              onRemove={() => tasks.remove(i)}
-              removeLabel={t('mentoring.log.remove')}
-            >
-              <div className="flex flex-1 flex-wrap gap-2">
-                <Input
-                  aria-label={t('mentoring.log.taskTitle', { n: i + 1 })}
-                  className="h-11 flex-[2_1_160px] text-[15px]"
-                  {...form.register(`tasks.${i}.title`)}
-                />
-                <Input
-                  type="date"
-                  aria-label={t('mentoring.log.taskDue', { n: i + 1 })}
-                  className="h-11 flex-[1_1_140px] text-[15px]"
-                  {...form.register(`tasks.${i}.dueOn`)}
-                />
-              </div>
-            </Row>
-          ))}
-          <AddButton onClick={() => tasks.append({ title: '', dueOn: '' })}>
-            {t('mentoring.log.addTask')}
-          </AddButton>
-        </Card>
-      </div>
-      <TrackableUpdates
-        menteeId={menteeId}
-        values={trackableValues}
-        onChange={setTrackableValues}
-        upcoming={upcoming}
-      />
+      </Section>
 
       <FormError
         message={save.isError ? errorMessage(t, save.error) : undefined}
@@ -295,6 +258,9 @@ function FollowUpForm({
       <div className="flex gap-2">
         <Button type="submit" disabled={save.isPending}>
           {t('mentoring.log.save')}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          {t('admin.common.cancel')}
         </Button>
       </div>
     </form>

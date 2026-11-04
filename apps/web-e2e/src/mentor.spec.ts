@@ -76,30 +76,50 @@ test('the mentor finds a mentee on the dashboard and shares a note with them (US
   await expect(note).toContainText(`مشتركة مع ${name}`);
 });
 
-test('picks a mentee first, then logs a follow-up from the panel (US-4.3)', async ({
+test("logs a follow-up and an activity from the + button on a mentee's page (US-4.3, US-4.4)", async ({
   page,
 }) => {
   await signIn(page);
-  const { name } = await newMentee(page);
+  const { id, name } = await newMentee(page);
+  const other = await newMentee(page);
+  const typeName = `e2e نزهة ${Date.now().toString(36)}`;
+  const type = await page.request.post('/api/lookups/activity-types', {
+    headers,
+    data: { nameAr: typeName, nameEn: typeName, scope: 'INDIVIDUAL' },
+  });
+  expect(type.ok(), await type.text()).toBe(true);
 
-  await page.goto('/mentor/log');
-  // Only the mentee picker until someone is chosen.
-  await expect(page.getByRole('region', { name: 'السجل' })).toBeHidden();
-  await page.getByLabel('المتابَع').selectOption({ label: name });
+  await page.goto(`/people/${id}`);
+  await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
+  await expect(page.getByText('آخر تواصل:')).toBeVisible();
 
-  const toggle = page.getByRole('button', { name: `تسجيل متابعة مع ${name}` });
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  const history = page.getByRole('region', { name: 'السجل' });
-  await expect(history).toContainText('لا شيء هنا بعد.');
-
-  await toggle.click();
-  await page.getByLabel('ملاحظات مشتركة').fill('بداية موفقة');
-  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
-
-  // Saving closes the panel and confirms with a toast.
+  // The follow-up opens over the page, with this mentee chosen.
+  await page.getByRole('button', { name: 'تسجيل متابعة أو نشاط' }).click();
+  await page.getByRole('menuitem', { name: 'متابعة / لقاء' }).click();
+  const dialog = page.getByRole('dialog', { name: 'متابعة جديدة' });
+  await expect(
+    dialog.getByRole('combobox', { name: 'المتابَع', exact: true }),
+  ).toHaveValue(id);
+  await expect(dialog).toContainText('آخر تواصل');
+  await dialog.getByLabel('ملاحظات مشتركة').fill('بداية موفقة');
+  await dialog.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('حُفظت المتابعة.');
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  await expect(history).toContainText('لقاء متابعة');
+  await expect(dialog).toBeHidden();
+  await page.getByRole('button', { name: 'السجل' }).click();
+  await expect(page.getByRole('region', { name: 'السجل' })).toContainText(
+    'لقاء متابعة',
+  );
+
+  // An activity takes more people; this mentee is already in.
+  await page.getByRole('button', { name: 'تسجيل متابعة أو نشاط' }).click();
+  await page.getByRole('menuitem', { name: 'نشاط' }).click();
+  const activity = page.getByRole('dialog', { name: 'نشاط جديد' });
+  await activity.getByRole('radio', { name: typeName }).click();
+  await activity.getByLabel('عنوان النشاط').fill('رحلة إلى البحر');
+  await activity.getByRole('button', { name: `إضافة ${other.name}` }).click();
+  await activity.getByRole('button', { name: 'حفظ', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('أُضيف النشاط.');
+  await expect(activity).toBeHidden();
 });
 
 test('creates a trackable, logs this cycle, and resolves a challenge (US-4.5, US-5.2, BR-CHL-1…3)', async ({
@@ -118,7 +138,10 @@ test('creates a trackable, logs this cycle, and resolves a challenge (US-4.5, US
   await dialog.getByRole('button', { name: 'ليس الآن' }).click();
   await expect(dialog).toBeHidden();
 
-  await page.getByRole('link', { name: /صلاة الفجر في المسجد/ }).click();
+  await page
+    .getByRole('region', { name: 'المؤشرات' })
+    .getByRole('link', { name: /صلاة الفجر في المسجد/ })
+    .click();
   const toLog = page.getByRole('region', { name: 'بانتظار التسجيل' });
   await toLog.getByRole('button', { name: 'تم', exact: true }).click();
   await toLog.getByRole('button', { name: 'تسجيل' }).click();
@@ -185,10 +208,11 @@ test('saves a trackable as a template and reuses it from the library for another
   await item.click();
   await dialog.getByRole('button', { name: 'إضافة المؤشر' }).click();
   await expect(dialog).toBeHidden();
-  await expect(page.getByRole('link', { name })).toBeVisible();
+  const board = page.getByRole('region', { name: 'المؤشرات' });
+  await expect(board.getByRole('link', { name })).toBeVisible();
 
   // Its page says it follows the template, used by both mentees.
-  await page.getByRole('link', { name }).click();
+  await board.getByRole('link', { name }).click();
   const library = page.getByRole('region', { name: 'المكتبة' });
   await expect(library).toContainText('هذا المؤشر يتبع قالبًا من المكتبة.');
   await expect(library).toContainText('مستخدم مع مسترشدَين');

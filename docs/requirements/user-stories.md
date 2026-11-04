@@ -164,7 +164,8 @@ As a mentor, I want to see all my mentees at a glance, so that I know who needs 
 
 As a mentor, I want a mentee's full picture: trackables with trend charts, timeline, challenges, tasks and notes.
 
-- The page leads with trackables, action items and challenges; contact details sit in one line under the name; the history log is collapsed until opened.
+- The page leads with trackables, action items and challenges; contact details sit in one line under the name, with the last contact and its status (regular / due / late) for the mentee's mentor; the history log is collapsed until opened.
+- A trend card per active trackable (trend, latest value, sparkline) sits above the cycles.
 - Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. This week shows every day in its own column, with the days to come as placeholders; a weekly trackable's log sits under its chosen weekday (the week's first day if none). Clicking a past cycle logs or re-logs it in place, even before the trackable's start (which then moves back); notes and replies show under it.
 - Breadcrumbs above every page lead back to where I came from.
 - Refs: BR-TRK-4, BR-TRK-5, BR-NOTE-1, BR-FU-4 · `Mentee.dc.html`
@@ -173,6 +174,8 @@ As a mentor, I want a mentee's full picture: trackables with trend charts, timel
 
 As a mentor, I want to record a follow-up with date, time, notes, challenges, one-time tasks and trackable updates.
 
+- Mentors log from a "+" button on every page, which offers a follow-up or an activity. Both open in a dialog over the page; there is no follow-up page and no switcher between the two. On a mentee's page, that mentee is chosen.
+- The dialog shows the mentee's last contact, then a simple trend card per trackable with this cycle's value to log, challenges, tasks and notes.
 - Trackable updates log the follow-up's cycle for each trackable.
 - New challenges are raised for the mentee; open ones get a comment or are resolved.
 - A future date makes it upcoming and offers notifying the mentee.
@@ -182,7 +185,8 @@ As a mentor, I want to record a follow-up with date, time, notes, challenges, on
 
 As a mentor, I want to record an outing, trip, sport or meal with one or more people.
 
-- Participant typeahead covers any active user.
+- Opens from the same "+" button in a dialog: activity type, title, participants, dates and notes; no trackables.
+- Participant typeahead covers any active user; on a mentee's page, that mentee starts in the list.
 - Upcoming or done is derived from date and time.
 - Done activities appear in each participant's feed.
 - Refs: BR-FU-2, BR-FU-3 · `Activity.dc.html`

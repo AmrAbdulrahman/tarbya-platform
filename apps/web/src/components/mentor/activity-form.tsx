@@ -1,52 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { NotebookPen } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import {
   interactionsControllerCreateActivity,
   lookupsControllerActivityTypes,
-  mentorshipsControllerMine,
   type ActivityTypeDto,
-  type MyMenteeDto,
-  type MyMentoringDto,
   type UserRefDto,
 } from '@tarbya/api-client';
 import { fromZoned, toZoned } from '@tarbya/shared';
 import { Button, Checkbox, cn, Input, Textarea } from '@tarbya/ui';
-import { errorMessage } from '../../../auth/error-message';
-import { lookupColors } from '../../../components/admin/lookup-colors';
-import { Field, FormError } from '../../../components/login/fields';
-import { WhenStatus } from '../../../components/mentor/entry-kind';
-import {
-  Card,
-  Hint,
-  mineQueryKey,
-} from '../../../components/mentor/form-parts';
-import { LogScreen } from '../../../components/mentor/log-screen';
-import { ParticipantsPicker } from '../../../components/mentor/participants-picker';
-
-/** US-4.4 · design/screens/Activity.dc.html */
-export const Route = createFileRoute('/_app/mentor/activity')({
-  validateSearch: z.object({
-    menteeId: z.string().uuid().optional().catch(undefined),
-  }),
-  component: ActivityPage,
-});
-
-function ActivityPage() {
-  const { menteeId } = Route.useSearch();
-  return (
-    <LogScreen
-      kind="activity"
-      menteeId={menteeId}
-      form={(m, onSaved) => (
-        <ActivityForm key={m.mentee.id} mentee={m} onSaved={onSaved} />
-      )}
-    />
-  );
-}
+import { errorMessage } from '../../auth/error-message';
+import { lookupColors } from '../admin/lookup-colors';
+import { Field, FormError } from '../login/fields';
+import { Hint, mineQueryKey, Section, WhenStatus } from './form-parts';
+import { useMyMentees } from './last-contact';
+import { ParticipantsPicker } from './participants-picker';
 
 const day = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -59,7 +30,6 @@ const schema = z
     multiDay: z.boolean(),
     returnDate: z.string(),
     time: z.string().regex(/^\d{2}:\d{2}$/, 'validation.required'),
-    place: z.string().max(200),
     sharedNotes: z.string().max(5000),
     privateNotes: z.string().max(5000),
   })
@@ -72,29 +42,32 @@ const schema = z
   );
 type Values = z.infer<typeof schema>;
 
-function blank(mentee: UserRefDto): Values {
+function blank(participants: UserRefDto[]): Values {
   const now = toZoned(new Date());
   return {
     activityTypeId: '',
     title: '',
-    // The chosen mentee takes part; others can be added (BR-FU-2).
-    participants: [mentee],
+    // Anyone active can be added (BR-FU-2).
+    participants,
     date: now.date,
     multiDay: false,
     returnDate: '',
     time: now.time,
-    place: '',
     sharedNotes: '',
     privateNotes: '',
   };
 }
 
-function ActivityForm({
-  mentee,
+/** US-4.4 · design/screens/Activity.dc.html: who, what and when; no trackables. */
+export function ActivityForm({
+  participants,
   onSaved,
+  onCancel,
 }: {
-  mentee: MyMenteeDto;
+  /** Who takes part to begin with, e.g. the mentee whose page is open. */
+  participants: UserRefDto[];
   onSaved: () => void;
+  onCancel: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
@@ -104,17 +77,13 @@ function ActivityForm({
       (await lookupsControllerActivityTypes({ signal }))
         .data as ActivityTypeDto[],
   });
-  const mine = useQuery({
-    queryKey: mineQueryKey,
-    queryFn: async ({ signal }) =>
-      (await mentorshipsControllerMine({ signal })).data as MyMentoringDto,
-  });
+  const { mentees } = useMyMentees();
   const choices = (types.data ?? []).filter(
     (x) => x.active && x.scope === 'INDIVIDUAL',
   );
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: blank(mentee.mentee),
+    defaultValues: blank(participants),
   });
   const { errors } = form.formState;
 
@@ -129,12 +98,10 @@ function ActivityForm({
         endsAt: v.multiDay
           ? fromZoned({ date: v.returnDate, time: v.time }).toISOString()
           : null,
-        place: v.place || null,
         sharedNotes: v.sharedNotes || null,
         privateNotes: v.privateNotes || null,
       }),
     onSuccess: async () => {
-      form.reset(blank(mentee.mentee));
       onSaved();
       await Promise.all(
         [mineQueryKey, ['dashboard'], ['feed']].map((queryKey) =>
@@ -162,11 +129,7 @@ function ActivityForm({
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
       className="flex min-w-0 flex-col gap-4"
     >
-      <p className="text-[15px] text-ink-subtle">
-        {t('mentoring.log.activityLead')}
-      </p>
-
-      <Card>
+      <div className="flex flex-col gap-4">
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 text-sm font-semibold text-ink-muted">
             {t('mentoring.log.activityType')}
@@ -225,7 +188,7 @@ function ActivityForm({
         >
           <Input
             id="ac-title"
-            className="h-11 text-[15px]"
+
             aria-invalid={!!errors.title}
             {...form.register('title')}
           />
@@ -248,16 +211,16 @@ function ActivityForm({
                 id="ac-who"
                 value={field.value}
                 onChange={field.onChange}
-                suggestions={mine.data?.mentees.map((m) => m.mentee) ?? []}
+                suggestions={mentees.map((m) => m.mentee)}
                 invalid={!!errors.participants}
               />
             )}
           />
         </Field>
-      </Card>
+      </div>
 
-      <Card>
-        <div className="grid gap-4 sm:grid-cols-3">
+      <div className="flex flex-col gap-2 border-t border-divider pt-4">
+        <div className="grid gap-3 sm:grid-cols-3">
           <Field
             id="ac-date"
             label={
@@ -268,7 +231,7 @@ function ActivityForm({
             <Input
               id="ac-date"
               type="date"
-              className="h-11 text-[15px]"
+
               {...form.register('date')}
             />
           </Field>
@@ -281,7 +244,7 @@ function ActivityForm({
               <Input
                 id="ac-return"
                 type="date"
-                className="h-11 text-[15px]"
+
                 aria-invalid={!!errors.returnDate}
                 {...form.register('returnDate')}
               />
@@ -295,15 +258,8 @@ function ActivityForm({
             <Input
               id="ac-time"
               type="time"
-              className="h-11 text-[15px]"
+
               {...form.register('time')}
-            />
-          </Field>
-          <Field id="ac-place" label={t('mentoring.log.place')}>
-            <Input
-              id="ac-place"
-              className="h-11 text-[15px]"
-              {...form.register('place')}
             />
           </Field>
         </div>
@@ -313,9 +269,9 @@ function ActivityForm({
           {...form.register('multiDay')}
         />
         <WhenStatus upcoming={upcoming} />
-      </Card>
+      </div>
 
-      <Card title={t('mentoring.log.notes')}>
+      <Section title={t('mentoring.log.notes')} icon={<NotebookPen />}>
         <Field
           id="ac-shared"
           label={
@@ -342,7 +298,7 @@ function ActivityForm({
             {...form.register('privateNotes')}
           />
         </Field>
-      </Card>
+      </Section>
 
       <FormError
         message={save.isError ? errorMessage(t, save.error) : undefined}
@@ -350,6 +306,9 @@ function ActivityForm({
       <div className="flex gap-2">
         <Button type="submit" disabled={save.isPending}>
           {t('mentoring.log.save')}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          {t('admin.common.cancel')}
         </Button>
       </div>
     </form>

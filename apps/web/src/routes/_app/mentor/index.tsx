@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Plus } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,10 +9,11 @@ import {
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
 import { daysSince, formatDate } from '@tarbya/shared';
-import { Badge, Button, cn } from '@tarbya/ui';
+import { Badge, cn } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
+import { useLogDialog } from '../../../components/mentor/log-dialog';
 import { useCycleLabel } from '../../../components/trackables/format';
 import { Sparkline, TrendBadge } from '../../../components/trackables/trend';
 
@@ -60,12 +60,6 @@ function MentorDashboard() {
           {t('dashboard.greeting', { name: me.name.split(' ')[0] })}
         </h1>
       </div>
-      <Button asChild>
-        <Link to="/mentor/log">
-          <Plus aria-hidden />
-          {t('dashboard.newFollowUp')}
-        </Link>
-      </Button>
     </header>
   );
 
@@ -257,6 +251,7 @@ function MentorDashboard() {
 
 function MenteeRow({ row }: { row: DashboardMenteeDto }) {
   const { t } = useTranslation();
+  const openLog = useLogDialog();
   const trackable = row.mainTrackable;
   const cycleLabel = useCycleLabel();
   return (
@@ -357,14 +352,14 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
         )}
       </td>
       <td className="px-6 py-3.5 text-end">
-        <Link
-          to="/mentor/log"
-          search={{ menteeId: row.mentee.id }}
+        <button
+          type="button"
+          onClick={() => openLog('follow-up', row.mentee.id)}
           aria-label={t('dashboard.contactWith', { name: row.mentee.name })}
           className="whitespace-nowrap text-sm font-semibold text-primary hover:text-primary-hover"
         >
           {t('dashboard.contact')}
-        </Link>
+        </button>
       </td>
     </tr>
   );

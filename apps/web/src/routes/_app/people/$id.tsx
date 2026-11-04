@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { History, Mail, Phone, Plus } from 'lucide-react';
+import { History, Mail, Phone } from 'lucide-react';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -26,6 +26,11 @@ import { TasksPanel } from '../../../components/mentee/tasks-panel';
 import { ChallengesPanel } from '../../../components/mentee/challenges-panel';
 import { TrackablesBoard } from '../../../components/trackables/trackables-board';
 import { Breadcrumbs } from '../../../components/breadcrumbs';
+import {
+  LastContact,
+  useMyMentees,
+} from '../../../components/mentor/last-contact';
+import { TrendCards } from '../../../components/trackables/trend-cards';
 import { CollapsibleSection } from '../../../components/collapsible-section';
 import { RoleChips } from '../../../components/role-chips';
 
@@ -38,6 +43,7 @@ function ProfilePage() {
   const { t } = useTranslation();
   const me = useMe();
   const { id } = Route.useParams();
+  const { mentees } = useMyMentees();
   const profile = useQuery({
     queryKey: ['profile', id],
     queryFn: async ({ signal }) =>
@@ -55,6 +61,7 @@ function ProfilePage() {
   }
   const p = profile.data;
   const isAdmin = hasAnyRole(me.roles, ['SUPER_ADMIN', 'MODERATOR']);
+  const myMentee = mentees.find((m) => m.mentee.id === p.id);
   return (
     <>
       <Breadcrumbs
@@ -112,20 +119,14 @@ function ProfilePage() {
               </Detail>
             )}
           </dl>
+          {myMentee && <LastContact mentee={myMentee} />}
         </div>
-        {p.isMentor && (
-          <Button asChild size="sm">
-            <Link to="/mentor/log" search={{ menteeId: p.id }}>
-              <Plus aria-hidden />
-              {t('dashboard.newFollowUp')}
-            </Link>
-          </Button>
-        )}
       </header>
 
       {p.canSeeMentoring ? (
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)]">
           <div className="flex min-w-0 flex-col gap-4">
+            <TrendCards menteeId={p.id} />
             <TrackablesBoard menteeId={p.id} canManage={p.canManageMentoring} />
             <CollapsibleSection
               title={t('feed.title')}
