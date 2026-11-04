@@ -10,6 +10,13 @@ const mail = {
   subject: 'Hi',
   text: 'Hi',
   html: '<p>Hi</p>',
+  preheader: 'Hello there',
+  locale: 'ar' as const,
+};
+const config = {
+  RESEND_API_KEY: 're_x',
+  SMTP_FROM: 'T <n@x.test>',
+  APP_URL: 'https://app.tarbya.test/',
 };
 
 function service(values: Partial<Env>) {
@@ -24,24 +31,32 @@ describe('MailService with a Resend key', () => {
     global.fetch = fetchMock;
   });
 
-  it('posts the mail to Resend with the sender', async () => {
+  it('posts the mail to Resend with the sender, in the branded layout', async () => {
     fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
-    await service({ RESEND_API_KEY: 're_x', SMTP_FROM: 'T <n@x.test>' }).send(
-      mail,
-    );
+    await service(config).send(mail);
 
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe('https://api.resend.com/emails');
     expect(init.headers.Authorization).toBe('Bearer re_x');
-    expect(JSON.parse(init.body)).toEqual({ from: 'T <n@x.test>', ...mail });
+    const body = JSON.parse(init.body);
+    expect(body).toMatchObject({
+      from: 'T <n@x.test>',
+      to: mail.to,
+      subject: mail.subject,
+      text: mail.text,
+    });
+    expect(body.html).toContain('<p>Hi</p>');
+    expect(body.html).toContain('dir="rtl"');
+    expect(body.html).toContain('https://app.tarbya.test/email-logo.png');
+    expect(body).not.toHaveProperty('locale');
   });
 
   it('throws when Resend refuses', async () => {
     fetchMock.mockResolvedValue(
       new Response('domain not verified', { status: 403 }),
     );
-    await expect(
-      service({ RESEND_API_KEY: 're_x', SMTP_FROM: 'T <n@x.test>' }).send(mail),
-    ).rejects.toThrow(/403: domain not verified/);
+    await expect(service(config).send(mail)).rejects.toThrow(
+      /403: domain not verified/,
+    );
   });
 });

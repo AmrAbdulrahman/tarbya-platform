@@ -1,9 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createTransport, type Transporter } from 'nodemailer';
+import type { Locale } from '@tarbya/db';
 import type { Env } from '../../config/env';
+import { emailLayout } from './email-layout';
 
 export interface Mail {
+  to: string;
+  subject: string;
+  text: string;
+  /** The message body only; `send` wraps it in the branded layout. */
+  html: string;
+  /** Preview text shown after the subject in most inboxes. */
+  preheader: string;
+  locale: Locale;
+}
+
+interface Outgoing {
+  from: string;
   to: string;
   subject: string;
   text: string;
@@ -22,11 +36,13 @@ const TIMEOUT_MS = 10_000;
 export class MailService {
   private readonly logger = new Logger(MailService.name);
   private readonly from: string;
+  private readonly appUrl: string;
   private readonly resendKey?: string;
   private readonly transport?: Transporter;
 
   constructor(config: ConfigService<Env, true>) {
     this.from = config.get('SMTP_FROM', { infer: true });
+    this.appUrl = config.get('APP_URL', { infer: true }).replace(/\/$/, '');
     this.resendKey = config.get('RESEND_API_KEY', { infer: true });
     if (this.resendKey) return;
 
@@ -47,22 +63,30 @@ export class MailService {
   }
 
   async send(mail: Mail): Promise<void> {
+    const { to, subject, text, html, preheader, locale } = mail;
+    const outgoing: Outgoing = {
+      from: this.from,
+      to,
+      subject,
+      text,
+      html: emailLayout({ body: html, preheader, locale, appUrl: this.appUrl }),
+    };
     if (this.resendKey) {
-      await this.sendWithResend(mail, this.resendKey);
+      await this.sendWithResend(outgoing, this.resendKey);
     } else {
-      await this.transport?.sendMail({ from: this.from, ...mail });
+      await this.transport?.sendMail(outgoing);
     }
-    this.logger.log(`Sent "${mail.subject}"`);
+    this.logger.log(`Sent "${subject}"`);
   }
 
-  private async sendWithResend(mail: Mail, key: string): Promise<void> {
+  private async sendWithResend(mail: Outgoing, key: string): Promise<void> {
     const res = await fetch(RESEND_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: this.from, ...mail }),
+      body: JSON.stringify(mail),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!res.ok) {
