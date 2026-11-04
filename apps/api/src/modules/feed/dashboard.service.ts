@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@tarbya/db';
 import { fromZoned, toZoned } from '@tarbya/shared';
+import { AvatarsService } from '../files/avatars.service';
 import { taskSelect, toTaskDto } from '../interactions/interactions.service';
 import { recentTasks } from '../interactions/tasks.service';
 import { ContactService } from '../mentorships/contact.service';
@@ -14,6 +15,17 @@ import type {
   MyMentorDto,
 } from './feed.dto';
 import { FeedService } from './feed.service';
+
+const personSelect = { id: true, name: true, avatarFileId: true } as const;
+const toPerson = (u: {
+  id: string;
+  name: string;
+  avatarFileId: string | null;
+}) => ({
+  id: u.id,
+  name: u.name,
+  avatarUrl: AvatarsService.url(u.id, u.avatarFileId),
+});
 
 /** The mentor dashboard (US-4.1) and the mentee's journey (US-5.1). */
 @Injectable()
@@ -84,7 +96,7 @@ export class DashboardService {
     const [mentorship, tasks, trackables, upcoming] = await Promise.all([
       this.prisma.mentorship.findFirst({
         where: { menteeId: userId, endedAt: null },
-        select: { mentor: { select: { id: true, name: true } } },
+        select: { mentor: { select: personSelect } },
       }),
       this.prisma.task.findMany({
         where: { assigneeId: userId, ...recentTasks() },
@@ -99,7 +111,7 @@ export class DashboardService {
       this.feed.upcoming(userId, 6),
     ]);
     return {
-      mentor: mentorship?.mentor ?? null,
+      mentor: mentorship ? toPerson(mentorship.mentor) : null,
       tasks: tasks.map(toTaskDto),
       trackables,
       upcoming,
@@ -130,7 +142,7 @@ export class DashboardService {
       select: {
         id: true,
         mentorId: true,
-        mentor: { select: { id: true, name: true } },
+        mentor: { select: personSelect },
       },
     });
     if (!ms) return null;
@@ -141,7 +153,7 @@ export class DashboardService {
       }),
     ]);
     return {
-      user: ms.mentor,
+      user: toPerson(ms.mentor),
       lastContactAt: contacts.get(ms.id)?.at.toISOString() ?? null,
       activeTrackables,
     };

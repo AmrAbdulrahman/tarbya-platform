@@ -4,14 +4,14 @@
  * Tarbya API
  * OpenAPI spec version: 0.1.0
  */
+import type { PersonRefDto } from './personRefDto.js';
 import type { TaskDto } from './taskDto.js';
 import type { TrackableSummaryDto } from './trackableSummaryDto.js';
 import type { UpcomingDto } from './upcomingDto.js';
-import type { UserRefDto } from './userRefDto.js';
 
 export interface JourneyDto {
   /** @nullable */
-  mentor: UserRefDto | null;
+  mentor: PersonRefDto | null;
   tasks: TaskDto[];
   trackables: TrackableSummaryDto[];
   upcoming: UpcomingDto[];

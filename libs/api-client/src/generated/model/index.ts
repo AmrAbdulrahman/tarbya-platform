@@ -71,6 +71,7 @@ export * from './noteVisibility.js';
 export * from './passwordSignInDto.js';
 export * from './peopleControllerSearchParams.js';
 export * from './personDto.js';
+export * from './personRefDto.js';
 export * from './profileDto.js';
 export * from './rangeEntryDto.js';
 export * from './reminderLead.js';

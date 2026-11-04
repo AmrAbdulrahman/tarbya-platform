@@ -406,7 +406,7 @@ function TrackableRow({
 }
 
 /** A cycle's short name: the day for daily and weekly cycles, the month for monthly. */
-export function CycleTile({
+function CycleTile({
   start,
   cycle,
   weekday,
@@ -434,7 +434,7 @@ export function CycleTile({
 }
 
 /** Logs or re-logs one cycle right in the board. */
-export function QuickLog({
+function QuickLog({
   trackable: tr,
   periodStart,
   entry,

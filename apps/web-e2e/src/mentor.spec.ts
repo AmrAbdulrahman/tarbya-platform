@@ -217,7 +217,7 @@ test('saves a trackable as a template and reuses it from the library for another
   await expect(library).toContainText('مستخدم مع مسترشدَين');
 });
 
-test("logs a trackable's waiting cycles right in the mentee's things to do (US-5.1, US-5.2)", async ({
+test("logs a trackable's cycles right on the mentee's journey (US-5.1, US-5.2)", async ({
   page,
 }) => {
   await signIn(page);
@@ -249,15 +249,24 @@ test("logs a trackable's waiting cycles right in the mentee's things to do (US-5
   expect(as.ok(), await as.text()).toBe(true);
   try {
     await page.goto('/my');
-    const item = page
-      .getByRole('region', { name: 'إجراءات مطلوبة' })
+    // The same tracking view as "My trackables", logged in place (US-5.1).
+    const row = page
+      .getByRole('region', { name: 'المؤشرات' })
       .getByRole('listitem')
       .filter({ hasText: 'المشي الصباحي' });
-    await expect(item).toContainText('دورتان بانتظار التسجيل');
-    await item.getByRole('button', { pressed: false }).first().click();
-    await item.getByRole('button', { name: 'تم', exact: true }).click();
-    await item.getByRole('button', { name: 'تسجيل' }).click();
-    await expect(item).toContainText('دورة واحدة بانتظار التسجيل');
+    // Today is the latest cycle still to log; days to come wait.
+    await row
+      .getByRole('button', { name: /: لم يُسجَّل بعد$/ })
+      .last()
+      .click();
+    await row.getByRole('button', { name: 'تم', exact: true }).click();
+    await row.getByRole('button', { name: 'تسجيل' }).click();
+    await expect(
+      row.getByRole('button', { name: /: مسجّل$/ }).getByRole('img', {
+        name: 'تم',
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole('region', { name: 'المهام' })).toBeVisible();
   } finally {
     await page.request.delete('/api/auth/impersonation', { headers });
   }

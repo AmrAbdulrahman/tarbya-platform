@@ -11,7 +11,7 @@ import {
 import { ActivityTypeRefDto, TaskDto } from '../interactions/interactions.dto';
 import { MyMenteeDto } from '../mentorships/mentorships.dto';
 import { TrackableSummaryDto } from '../trackables/trackables.dto';
-import { UserRefDto } from '../users/users.dto';
+import { PersonRefDto, UserRefDto } from '../users/users.dto';
 
 const FEED_KINDS = ['FOLLOW_UP', 'ACTIVITY', 'ENTRY', 'REPLY'] as const;
 type FeedKind = (typeof FEED_KINDS)[number];
@@ -132,7 +132,7 @@ export class MentorStatsDto {
 }
 
 export class MyMentorDto {
-  @ApiProperty({ type: UserRefDto }) user!: UserRefDto;
+  @ApiProperty({ type: PersonRefDto }) user!: PersonRefDto;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   lastContactAt!: string | null;
   @ApiProperty() activeTrackables!: number;
@@ -151,7 +151,8 @@ export class MentorDashboardDto {
 
 /** US-5.1 · design/screens/MyJourney.dc.html */
 export class JourneyDto {
-  @ApiProperty({ type: UserRefDto, nullable: true }) mentor!: UserRefDto | null;
+  @ApiProperty({ type: PersonRefDto, nullable: true })
+  mentor!: PersonRefDto | null;
   /** Open one-time tasks, soonest due first, then those done in the last 7 days. */
   @ApiProperty({ type: TaskDto, isArray: true }) tasks!: TaskDto[];
   /** Active trackables; `openCycles` lists the cycles waiting to be logged. */

@@ -4,10 +4,10 @@
  * Tarbya API
  * OpenAPI spec version: 0.1.0
  */
-import type { UserRefDto } from './userRefDto.js';
+import type { PersonRefDto } from './personRefDto.js';
 
 export interface MyMentorDto {
-  user: UserRefDto;
+  user: PersonRefDto;
   /** @nullable */
   lastContactAt: string | null;
   activeTrackables: number;

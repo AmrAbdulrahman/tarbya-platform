@@ -1,28 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { ListChecks, Plus, TrendingUp } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import {
-  feedControllerJourney,
-  tasksControllerUpdate,
-  type JourneyDto,
-} from '@tarbya/api-client';
-import type { Language } from '@tarbya/i18n';
-import { formatDate } from '@tarbya/shared';
-import { Button, cn } from '@tarbya/ui';
+import { feedControllerJourney, type JourneyDto } from '@tarbya/api-client';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
-import { FeedList, feedQueryKey } from '../../../components/feed/feed-list';
+import { FeedList } from '../../../components/feed/feed-list';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
+import { TasksPanel } from '../../../components/mentee/tasks-panel';
+import { Avatar } from '../../../components/profile/avatar';
 import { TrackableCard } from '../../../components/trackables/trackable-card';
-import {
-  CycleTile,
-  QuickLog,
-} from '../../../components/trackables/trackables-board';
-
-/** Waiting cycles offered in "Things to do"; the rest are on the trackable's page. */
-const SHOWN_CYCLES = 7;
+import { TrackablesBoard } from '../../../components/trackables/trackables-board';
 
 /** US-5.1 · design/screens/MyJourney.dc.html */
 export const Route = createFileRoute('/_app/my/')({
@@ -49,11 +36,7 @@ function JourneyPage() {
       </p>
     );
   }
-  const { mentor, tasks, trackables, upcoming } = journey.data;
-  // BR-TRK-4: anything with a cycle waiting to be logged.
-  const due = trackables.filter((x) => x.openCycles.length > 0);
-  // Done tasks stay listed, struck through, for 7 days (BR-FU-4).
-  const open = tasks.filter((x) => !x.doneAt).length;
+  const { mentor, trackables, upcoming } = journey.data;
 
   return (
     <>
@@ -65,12 +48,20 @@ function JourneyPage() {
           <h1 className="text-2xl font-bold text-navy">{t('journey.title')}</h1>
         </div>
         <div className="flex items-center gap-3 rounded-card border border-border bg-card px-4 py-3">
-          <span
-            aria-hidden
-            className="grid size-10 place-items-center rounded-full bg-navy font-bold text-white"
-          >
-            {mentor?.name.charAt(0) ?? '?'}
-          </span>
+          {mentor ? (
+            <Avatar
+              name={mentor.name}
+              url={mentor.avatarUrl}
+              className="size-10"
+            />
+          ) : (
+            <span
+              aria-hidden
+              className="grid size-10 place-items-center rounded-full bg-navy font-bold text-white"
+            >
+              ?
+            </span>
+          )}
           <div className="flex flex-col">
             <span className="text-[13px] text-ink-subtle">
               {t('dashboard.myMentor')}
@@ -82,43 +73,17 @@ function JourneyPage() {
         </div>
       </header>
 
-      <section
-        aria-labelledby="actions-title"
-        className="flex flex-col gap-3 rounded-card border border-border bg-card p-4"
-      >
-        <div className="flex items-center gap-2">
-          <h2 id="actions-title" className="text-base font-bold text-navy">
-            {t('journey.actions')}
-          </h2>
-          <span className="grid h-6 min-w-6 place-items-center rounded-full bg-primary px-1.5 font-figures text-[13px] font-semibold text-white">
-            {due.length + open}
-          </span>
+      {trackables.length > 0 && (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {trackables.map((x) => (
+            <TrackableCard key={x.id} trackable={x} />
+          ))}
         </div>
-        {due.length + tasks.length === 0 && (
-          <p className="text-ink-subtle">{t('journey.noActions')}</p>
-        )}
-        <ul className="flex flex-col divide-y divide-border">
-          {due.map((x) => (
-            <TrackableAction key={x.id} trackable={x} />
-          ))}
-          {tasks.map((task) => (
-            <TaskAction key={task.id} task={task} calendar={me.calendar} />
-          ))}
-        </ul>
-      </section>
+      )}
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-bold text-navy">{t('trackables.mine')}</h2>
-        {trackables.length === 0 ? (
-          <p className="text-ink-subtle">{t('trackables.none')}</p>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {trackables.map((x) => (
-              <TrackableCard key={x.id} trackable={x} />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* The same tracking view as "My trackables", then the action items (US-5.1). */}
+      <TrackablesBoard menteeId={me.id} canManage={false} isMentee />
+      <TasksPanel menteeId={me.id} />
 
       <div className="flex flex-wrap items-start gap-4">
         <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
@@ -133,176 +98,5 @@ function JourneyPage() {
         </section>
       </div>
     </>
-  );
-}
-
-/** Cycles waiting to be logged (BR-TRK-4), logged right here. */
-function TrackableAction({
-  trackable: x,
-}: {
-  trackable: JourneyDto['trackables'][number];
-}) {
-  const { t } = useTranslation();
-  const [selected, setSelected] = useState<string | null>(null);
-  // Newest first; older ones are on the trackable's page.
-  const cycles = [...x.openCycles].reverse().slice(0, SHOWN_CYCLES);
-  return (
-    <ActionRow
-      icon={<TrendingUp className="size-4" />}
-      iconClass="bg-amber-50 text-warn"
-      title={t('trackables.logName', { name: x.name })}
-      meta={t('trackables.waiting', { count: x.openCycles.length })}
-      below={
-        <>
-          <div
-            role="group"
-            aria-label={t('trackables.toLog')}
-            className="flex flex-wrap gap-1.5"
-          >
-            {cycles.map((c) => (
-              <button
-                key={c}
-                type="button"
-                aria-pressed={selected === c}
-                onClick={() => setSelected(selected === c ? null : c)}
-                className={cn(
-                  'flex min-w-14 flex-col items-center gap-0.5 rounded-lg border border-dashed border-primary/50 bg-primary-tint/40 px-2 py-1 text-[12px] leading-tight hover:border-primary',
-                  c === x.currentCycle && 'ring-2 ring-primary/40',
-                  selected === c &&
-                    'border-solid border-primary bg-primary-tint',
-                )}
-              >
-                <CycleTile start={c} cycle={x.cycle} weekday={x.weekday} />
-                <Plus className="size-4 text-primary" aria-hidden />
-              </button>
-            ))}
-            {x.openCycles.length > cycles.length && (
-              <Link
-                to="/trackables/$id"
-                params={{ id: x.id }}
-                className="self-center text-[13px] text-primary hover:text-primary-hover"
-              >
-                {t('journey.moreCycles', {
-                  count: x.openCycles.length - cycles.length,
-                })}
-              </Link>
-            )}
-          </div>
-          {selected && (
-            <QuickLog
-              key={selected}
-              trackable={x}
-              periodStart={selected}
-              onDone={() => setSelected(null)}
-            />
-          )}
-        </>
-      }
-    >
-      <Button asChild size="sm" variant="ghost">
-        <Link to="/trackables/$id" params={{ id: x.id }}>
-          {t('journey.open')}
-        </Link>
-      </Button>
-    </ActionRow>
-  );
-}
-
-function TaskAction({
-  task,
-  calendar,
-}: {
-  task: JourneyDto['tasks'][number];
-  calendar: ReturnType<typeof useMe>['calendar'];
-}) {
-  const { t, i18n } = useTranslation();
-  const queryClient = useQueryClient();
-  const me = useMe();
-  const done = useMutation({
-    mutationFn: () => tasksControllerUpdate(task.id, { done: !task.doneAt }),
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: journeyQueryKey }),
-        queryClient.invalidateQueries({ queryKey: feedQueryKey(me.id) }),
-      ]),
-  });
-  return (
-    <ActionRow
-      icon={<ListChecks className="size-4" />}
-      iconClass="bg-primary-tint text-primary-hover"
-      title={t('journey.task', { title: task.title })}
-      struck={!!task.doneAt}
-      meta={
-        task.dueOn
-          ? t('journey.due', {
-              date: formatDate(new Date(`${task.dueOn}T12:00:00Z`), {
-                locale: i18n.language as Language,
-                calendar,
-              }),
-            })
-          : t('journey.noDue')
-      }
-      error={done.isError ? errorMessage(t, done.error) : undefined}
-    >
-      <Button
-        size="sm"
-        variant={task.doneAt ? 'ghost' : 'outline'}
-        disabled={done.isPending}
-        onClick={() => done.mutate()}
-      >
-        {task.doneAt ? t('journey.undo') : t('journey.markDone')}
-      </Button>
-    </ActionRow>
-  );
-}
-
-function ActionRow({
-  icon,
-  iconClass,
-  title,
-  struck = false,
-  meta,
-  error,
-  below,
-  children,
-}: {
-  icon: ReactNode;
-  iconClass: string;
-  title: string;
-  struck?: boolean;
-  meta: string;
-  error?: string;
-  /** Full width under the row. */
-  below?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <li className="flex flex-wrap items-center gap-3 py-2 first:pt-0 last:pb-0">
-      <span
-        aria-hidden
-        className={`grid size-9 shrink-0 place-items-center rounded-full ${iconClass}`}
-      >
-        {icon}
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span
-          className={
-            struck
-              ? 'font-semibold text-ink-subtle line-through decoration-2'
-              : 'font-semibold text-navy'
-          }
-        >
-          {title}
-        </span>
-        <span className="text-[13px] text-ink-subtle">{meta}</span>
-        {error && (
-          <span role="alert" className="text-[13px] text-trend-down">
-            {error}
-          </span>
-        )}
-      </div>
-      {children}
-      {below && <div className="flex basis-full flex-col gap-2">{below}</div>}
-    </li>
   );
 }
