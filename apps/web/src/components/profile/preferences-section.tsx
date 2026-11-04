@@ -118,13 +118,13 @@ function Choices<T extends string>({
             {o.mark && (
               <span
                 aria-hidden
-                className="grid size-9 place-items-center rounded-lg bg-surface font-bold text-navy"
+                className="grid size-9 place-items-center rounded-lg bg-surface font-bold text-brand"
               >
                 {o.mark}
               </span>
             )}
             <span lang={o.lang} className="flex flex-col">
-              <span className="font-semibold text-navy">{o.label}</span>
+              <span className="font-semibold text-brand">{o.label}</span>
               {o.hint && (
                 <span className="text-[13px] text-ink-subtle">{o.hint}</span>
               )}

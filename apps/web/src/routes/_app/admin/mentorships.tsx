@@ -36,7 +36,7 @@ function MentorshipsPage() {
         items={[{ label: t('nav.admin') }, { label: t('nav.mentorships') }]}
       />
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-brand">
           {t('mentoring.mentorships.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">
@@ -74,7 +74,7 @@ function TreeSection() {
   return (
     <section className="flex min-w-0 flex-col gap-4 rounded-card border border-border bg-card p-4">
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="flex-1 text-base font-bold text-navy">
+        <h2 className="flex-1 text-base font-bold text-brand">
           {t('mentoring.mentorships.treeTitle')}
         </h2>
         <div
@@ -170,7 +170,7 @@ function ManagerNode({ node }: { node: ManagerTreeNode }) {
         <Link
           to="/people/$id"
           params={{ id: node.id }}
-          className="font-semibold text-navy hover:text-manager"
+          className="font-semibold text-brand hover:text-manager"
         >
           {node.name}
         </Link>
@@ -202,7 +202,7 @@ function AssignCard() {
 
   return (
     <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
-      <h2 className="text-base font-bold text-navy">
+      <h2 className="text-base font-bold text-brand">
         {t('mentoring.mentorships.assignTitle')}
       </h2>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -306,7 +306,7 @@ function TreeNode({ node }: { node: Node }) {
         <Link
           to="/people/$id"
           params={{ id: node.user.id }}
-          className="font-semibold text-navy hover:text-primary"
+          className="font-semibold text-brand hover:text-primary"
         >
           {node.user.name}
         </Link>

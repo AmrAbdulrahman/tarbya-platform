@@ -26,7 +26,7 @@ export function CollapsibleSection({
         className,
       )}
     >
-      <h2 className="text-base font-bold text-navy">
+      <h2 className="text-base font-bold text-brand">
         <button
           type="button"
           aria-expanded={open}

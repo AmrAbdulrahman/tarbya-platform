@@ -21,7 +21,7 @@ export function Section({
     >
       <div className="flex flex-wrap items-start gap-3">
         <div className="flex flex-1 flex-col gap-1">
-          <h2 id={`${id}-title`} className="text-base font-bold text-navy">
+          <h2 id={`${id}-title`} className="text-base font-bold text-brand">
             {title}
           </h2>
           {hint && <p className="text-[13px] text-ink-subtle">{hint}</p>}

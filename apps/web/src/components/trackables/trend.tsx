@@ -24,8 +24,8 @@ const tones: Record<
   },
   NEW: {
     arrow: '•',
-    className: 'bg-primary-tint text-primary-hover',
-    stroke: '#7446F0',
+    className: 'bg-accent-tint text-accent-strong',
+    stroke: '#D7A84A',
   },
 };
 

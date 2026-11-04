@@ -21,7 +21,7 @@ function MyTrackablesPage() {
           { label: t('trackables.mine') },
         ]}
       />
-      <h1 className="text-2xl font-bold text-navy">{t('trackables.mine')}</h1>
+      <h1 className="text-2xl font-bold text-brand">{t('trackables.mine')}</h1>
       <TrackablesBoard menteeId={me.id} canManage={false} isMentee />
       <ChallengesPanel menteeId={me.id} canManage={false} />
     </>

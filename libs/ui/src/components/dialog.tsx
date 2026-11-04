@@ -27,7 +27,7 @@ export function DialogContent({
 }: DialogContentProps) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-navy/40" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-brand/40" />
       <DialogPrimitive.Content
         className={cn(
           'fixed inset-x-0 top-1/2 z-50 mx-auto flex max-h-[90vh] w-[min(560px,calc(100vw-32px))] -translate-y-1/2 flex-col gap-5 overflow-y-auto rounded-card bg-card p-6 shadow-xl',
@@ -38,7 +38,7 @@ export function DialogContent({
       >
         <div className="flex items-start gap-3">
           <div className="flex flex-1 flex-col gap-1">
-            <DialogPrimitive.Title className="text-xl font-bold text-navy">
+            <DialogPrimitive.Title className="text-xl font-bold text-brand">
               {title}
             </DialogPrimitive.Title>
             {description && (

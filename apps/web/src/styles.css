@@ -4,12 +4,48 @@
 /* Scan the UI library for class names too. */
 @source '../../../libs/ui/src';
 
-/* Login hero: navy with a faint dot grid (design/screens/Login.dc.html). */
-.login-dots {
-  background-color: var(--color-navy);
-  background-image: radial-gradient(
-    rgb(255 255 255 / 0.1) 1px,
-    transparent 1px
-  );
-  background-size: 40px 40px;
+/*
+ * A hint of Islamic pattern: eight-pointed stars that show at a top corner and fade out
+ * by about a third of the screen. Drawn as a mask, so each use picks its colour with
+ * --pattern-color and --pattern-opacity. The corner is the top end (left in Arabic);
+ * .pattern-start moves it to the top start, .pattern-fixed pins it to the viewport.
+ */
+.pattern-corner {
+  position: relative;
+  isolation: isolate;
+  --pattern-at: top right;
+}
+[dir='rtl'] .pattern-corner,
+[dir='ltr'] .pattern-corner.pattern-start {
+  --pattern-at: top left;
+}
+[dir='rtl'] .pattern-corner.pattern-start {
+  --pattern-at: top right;
+}
+.pattern-corner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--pattern-color, #d9c9a6);
+  opacity: var(--pattern-opacity, 0.6);
+  mask-image:
+    radial-gradient(circle at var(--pattern-at), #000, transparent 33vw),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.25' stroke-linejoin='round'%3E%3Cpath d='M18 18H38V38H18Z'/%3E%3Cpath d='M28 13.9L42.1 28L28 42.1L13.9 28Z'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size:
+    100% 100%,
+    100px 100px;
+  mask-repeat: no-repeat, repeat;
+  mask-composite: intersect;
+}
+.pattern-fixed::before {
+  position: fixed;
+}
+
+/* Sign-in hero: brand green, with the stars in faint white. */
+.login-hero {
+  background-color: var(--color-brand);
+  --pattern-color: #ffffff;
+  --pattern-opacity: 0.08;
 }

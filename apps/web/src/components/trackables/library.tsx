@@ -197,7 +197,7 @@ function TemplateSummary({ template: x }: { template: TrackableTemplateDto }) {
   return (
     <>
       <span className="flex flex-wrap items-center gap-2">
-        <span className="text-[15px] font-semibold text-navy">{x.name}</span>
+        <span className="text-[15px] font-semibold text-brand">{x.name}</span>
         {x.assigned && (
           <Badge tone="success">
             <Check className="me-1 size-3.5" aria-hidden />

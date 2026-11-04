@@ -261,7 +261,7 @@ function FromTemplate({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface/60 px-3 py-2">
-        <span className="flex items-center gap-2 text-[13px] font-semibold text-navy">
+        <span className="flex items-center gap-2 text-[13px] font-semibold text-brand">
           <BookMarked className="size-4 text-primary" aria-hidden />
           {t('trackables.library.fromTemplate', { name: template.name })}
         </span>

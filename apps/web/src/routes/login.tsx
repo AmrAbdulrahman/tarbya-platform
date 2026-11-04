@@ -8,6 +8,7 @@ import { setLanguage } from '@tarbya/i18n';
 import { meQuery } from '../auth/session';
 import { CodeForm } from '../components/login/code-form';
 import { LanguageToggle } from '../components/login/language-toggle';
+import { LogoMark } from '../components/logo';
 import { PasswordForm } from '../components/login/password-form';
 
 const search = z.object({
@@ -51,13 +52,16 @@ function Login() {
   };
 
   return (
-    <div className="flex min-h-screen flex-wrap bg-card">
-      <section className="login-dots flex min-h-72 flex-[1_1_420px] flex-col justify-between gap-10 p-12 text-white">
+    <div className="flex min-h-screen flex-wrap bg-surface">
+      <section className="login-hero pattern-corner pattern-start flex min-h-72 flex-[1_1_420px] flex-col justify-between gap-10 p-12 text-white">
         <div className="flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-card bg-primary text-[22px] font-bold">
-            ت
+          <LogoMark tone="onDark" className="h-14 w-auto shrink-0" />
+          <div className="flex flex-col">
+            <span className="text-[24px] font-bold">{t('app.name')}</span>
+            <span className="text-[13px] text-white/75">
+              {t('app.tagline')}
+            </span>
           </div>
-          <span className="text-[22px] font-bold">{t('app.name')}</span>
         </div>
         <div className="flex max-w-[460px] flex-col gap-4">
           <h1 className="text-[40px] font-bold leading-tight">
@@ -70,13 +74,13 @@ function Login() {
         <span className="text-[13px] text-white/70">{t('login.closed')}</span>
       </section>
 
-      <section className="flex flex-[1_1_480px] flex-col px-12 py-10 max-sm:px-4">
+      <section className="pattern-corner flex flex-[1_1_480px] flex-col px-12 py-10 max-sm:px-4">
         <div className="flex justify-end">
           <LanguageToggle />
         </div>
         <main className="my-auto flex w-full max-w-[420px] flex-col gap-5 self-center py-8">
           <div className="flex flex-col gap-1.5">
-            <h2 className="text-[28px] font-bold text-navy">
+            <h2 className="text-[28px] font-bold text-brand">
               {t('login.title')}
             </h2>
             <span className="text-[15px] text-ink-subtle">

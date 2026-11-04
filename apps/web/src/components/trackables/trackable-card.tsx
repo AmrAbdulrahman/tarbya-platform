@@ -23,7 +23,7 @@ export function TrackableCard({
     >
       <div className="flex flex-wrap items-start gap-2">
         <div className="flex flex-1 flex-col gap-0.5">
-          <span className="text-[17px] font-bold text-navy">{tr.name}</span>
+          <span className="text-[17px] font-bold text-brand">{tr.name}</span>
           {tr.goal && <span className="text-sm text-ink-muted">{tr.goal}</span>}
         </div>
         {tr.archivedAt ? (
@@ -33,7 +33,7 @@ export function TrackableCard({
         )}
       </div>
       <div className="flex flex-wrap items-baseline gap-x-2">
-        <span className="font-figures text-3xl font-semibold text-navy">
+        <span className="font-figures text-3xl font-semibold text-brand">
           {tr.latest === null ? '—' : formatValue(tr.latest, tr.type)}
         </span>
         {tr.latestCycle && (

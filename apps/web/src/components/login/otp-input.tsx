@@ -94,7 +94,7 @@ export function OtpInput({
           aria-label={t('login.digit', { n: i + 1 })}
           aria-invalid={invalid || undefined}
           disabled={disabled}
-          className="h-14 w-full min-w-0 max-w-[52px] rounded-control border border-border bg-card text-center font-figures text-[22px] font-semibold text-navy focus:outline-2 focus:-outline-offset-1 focus:outline-primary aria-[invalid=true]:border-trend-down"
+          className="h-14 w-full min-w-0 max-w-[52px] rounded-control border border-border bg-card text-center font-figures text-[22px] font-semibold text-brand focus:outline-2 focus:-outline-offset-1 focus:outline-primary aria-[invalid=true]:border-trend-down"
         />
       ))}
     </div>

@@ -55,7 +55,7 @@ export function ChallengeNotes({
             key={c.id}
             className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-3"
           >
-            <span className="font-medium text-navy">{c.title}</span>
+            <span className="font-medium text-brand">{c.title}</span>
             <Input
               aria-label={t('challenges.noteOn', { title: c.title })}
               placeholder={t('challenges.commentPlaceholder')}

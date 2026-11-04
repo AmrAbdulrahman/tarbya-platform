@@ -56,7 +56,7 @@ function MentorDashboard() {
             calendar: me.calendar,
           })}
         </span>
-        <h1 className="text-2xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-brand">
           {t('dashboard.greeting', { name: me.name.split(' ')[0] })}
         </h1>
       </div>
@@ -133,7 +133,7 @@ function MentorDashboard() {
       <div className="flex flex-wrap items-start gap-4">
         <section className="flex min-w-0 flex-[2_1_620px] flex-col overflow-hidden rounded-card border border-border bg-card">
           <div className="flex flex-wrap items-center gap-3 border-b border-border px-6 py-4">
-            <h2 className="flex-1 text-base font-bold text-navy">
+            <h2 className="flex-1 text-base font-bold text-brand">
               {t('dashboard.mentees')}
             </h2>
             <div
@@ -213,12 +213,12 @@ function MentorDashboard() {
               <div className="flex items-center gap-3">
                 <span
                   aria-hidden
-                  className="grid size-10 shrink-0 place-items-center rounded-full bg-navy font-bold text-white"
+                  className="grid size-10 shrink-0 place-items-center rounded-full bg-brand font-bold text-white"
                 >
                   {mentor.user.name.charAt(0)}
                 </span>
                 <div className="flex min-w-0 flex-col">
-                  <span className="font-semibold text-navy">
+                  <span className="font-semibold text-brand">
                     {mentor.user.name}
                   </span>
                   <span className="text-[13px] text-ink-subtle">
@@ -268,7 +268,7 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
             <Link
               to="/people/$id"
               params={{ id: row.mentee.id }}
-              className="font-semibold text-navy hover:text-primary"
+              className="font-semibold text-brand hover:text-primary"
             >
               {row.mentee.name}
             </Link>
@@ -311,7 +311,7 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
             <Link
               to="/trackables/$id"
               params={{ id: trackable.id }}
-              className="font-medium text-navy hover:text-primary"
+              className="font-medium text-brand hover:text-primary"
             >
               {trackable.name}
             </Link>
@@ -380,7 +380,7 @@ function Kpi({
     <div className="flex flex-col gap-1 border-border px-6 py-5 [&:not(:first-child)]:border-s max-lg:[&:nth-child(3)]:border-s-0 max-lg:[&:nth-child(n+3)]:border-t">
       <span className="text-sm text-ink-subtle">{label}</span>
       <span
-        className={cn('font-figures text-3xl font-semibold text-navy', tone)}
+        className={cn('font-figures text-3xl font-semibold text-brand', tone)}
       >
         {value}
       </span>
@@ -401,7 +401,7 @@ function Panel({
   return (
     <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
       <div className="flex items-center gap-2">
-        <h2 className="flex-1 text-base font-bold text-navy">{title}</h2>
+        <h2 className="flex-1 text-base font-bold text-brand">{title}</h2>
         {aside}
       </div>
       {children}

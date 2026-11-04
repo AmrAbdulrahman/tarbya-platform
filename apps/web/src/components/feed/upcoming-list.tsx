@@ -45,12 +45,12 @@ export function UpcomingList({ items }: { items: UpcomingDto[] }) {
           >
             <div className="flex w-12 shrink-0 flex-col items-center rounded-lg bg-surface py-1.5">
               <span className="text-[11px] text-ink-subtle">{tile.month}</span>
-              <span className="font-figures text-lg font-semibold text-navy">
+              <span className="font-figures text-lg font-semibold text-brand">
                 {tile.day}
               </span>
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate font-semibold text-navy">{title}</span>
+              <span className="truncate font-semibold text-brand">{title}</span>
               <span className="text-[13px] text-ink-subtle">
                 <bdi>{formatTime(u.startsAt, { locale })}</bdi> · {kind}
                 {u.place && <> · {u.place}</>}

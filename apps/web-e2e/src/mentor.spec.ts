@@ -192,7 +192,7 @@ test('saves a trackable as a template and reuses it from the library for another
   await expect(
     page.getByRole('dialog', { name: 'أُضيف المؤشر' }),
   ).toBeVisible();
-  await dialog.getByLabel('مشاركته مع كل المرشدين').check();
+  await dialog.getByLabel('مشاركته مع كل المربّين').check();
   await dialog.getByRole('button', { name: 'حفظ كقالب' }).click();
   await expect(dialog).toBeHidden();
   await expect(page.getByText('حُفظ في المكتبة.')).toBeVisible();
@@ -203,7 +203,7 @@ test('saves a trackable as a template and reuses it from the library for another
   await dialog.getByRole('searchbox', { name: 'ابحث في المكتبة' }).fill(name);
   const item = dialog.getByRole('button').filter({ hasText: name });
   await expect(item).toContainText('من إعدادك');
-  await expect(item).toContainText('متاح لكل المرشدين');
+  await expect(item).toContainText('متاح لكل المربّين');
   await item.click();
   await dialog.getByRole('button', { name: 'إضافة المؤشر' }).click();
   await expect(dialog).toBeHidden();
@@ -214,7 +214,7 @@ test('saves a trackable as a template and reuses it from the library for another
   await board.getByRole('link', { name }).click();
   const library = page.getByRole('region', { name: 'المكتبة' });
   await expect(library).toContainText('هذا المؤشر يتبع قالبًا من المكتبة.');
-  await expect(library).toContainText('مستخدم مع مسترشدَين');
+  await expect(library).toContainText('مستخدم مع متربّيَين');
 });
 
 test("logs a trackable's cycles right on the mentee's journey (US-5.1, US-5.2)", async ({

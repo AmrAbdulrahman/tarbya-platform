@@ -31,14 +31,18 @@ These files are reference, not app code. They need a `support.js` that only the 
 
 ## Visual tokens
 
+Brand sheet: [brand/brand-sheet.webp](brand/brand-sheet.webp). Tokens live in `libs/ui/src/styles/theme.css`; the logo mark is `apps/web/src/components/logo.tsx` (also `apps/web/public/logo.svg`), and the favicon and app icons are in `apps/web/public/`. The screen snapshots predate the brand and still show the old purple and navy; where they differ, these tokens win.
+
 | Token | Value |
 |---|---|
-| Primary | `#7446F0` (hover `#5A2FD6`, tint `#EFEAFE`) |
-| Navy (headings) | `#001447` |
-| Page background | `#F0F5FA` |
-| Borders | `#D1D5DB`, dividers `#E2E8F0` |
+| Primary / brand (headings, key actions) | `#0E4D3A` (hover `#0A3B2C`, tint `#E3EFE9`) |
+| Secondary (UI elements, highlights) | `#2F6B57` |
+| Accent (gold: emphasis, "new" trend) | `#D7A84A` (tint `#F8EED8`, text on tint `#75560F`) |
+| Sand (sections) | `#F5E8D1` |
+| Page background | `#FAF8F2`; cards `#FFFFFF` |
+| Borders | `#DDD6C6`, dividers `#ECE6D8` |
 | Trend: improving / worse / steady | `#047857` ↑ / `#B91C1C` ↓ / `#475569` – (always arrow + label, never colour alone) |
 | Manager accent | `#0F4C81` on `#E0EEFA` |
 | Acting-on-behalf bar | `#78350F` on `#FFFBEB`, border `#B45309` |
-| Fonts | IBM Plex Sans Arabic (text), Space Grotesk (numbers), Inter (English) |
+| Fonts | Manrope (English and numbers), Tajawal (Arabic) |
 | Radius | 4px buttons and inputs, 10px cards |

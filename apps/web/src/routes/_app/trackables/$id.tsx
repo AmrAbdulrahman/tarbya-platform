@@ -101,7 +101,7 @@ function TrackablePage() {
       />
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex flex-1 flex-col gap-1">
-          <h1 className="text-2xl font-bold text-navy">{tr.name}</h1>
+          <h1 className="text-2xl font-bold text-brand">{tr.name}</h1>
           {tr.goal && <p className="text-[15px] text-ink-muted">{tr.goal}</p>}
           <p className="text-[13px] text-ink-subtle">
             {t(`trackables.cycles.${tr.cycle}`)} ·{' '}
@@ -156,7 +156,7 @@ function TrackablePage() {
             <span className="text-sm text-ink-subtle">
               {t('trackables.latest')}
             </span>
-            <span className="font-figures text-3xl font-semibold text-navy">
+            <span className="font-figures text-3xl font-semibold text-brand">
               {tr.latest === null ? '—' : formatValue(tr.latest, tr.type)}
             </span>
           </span>
@@ -195,7 +195,7 @@ function TrackablePage() {
           className="flex flex-col gap-3 rounded-card border-2 border-primary/30 bg-card p-4"
         >
           <div className="flex flex-col gap-1">
-            <h2 id="to-log-title" className="text-base font-bold text-navy">
+            <h2 id="to-log-title" className="text-base font-bold text-brand">
               {t('trackables.toLog')}
             </h2>
             <span className="text-[13px] text-ink-subtle">
@@ -220,7 +220,7 @@ function TrackablePage() {
         aria-labelledby="history-title"
         className="flex flex-col gap-3 rounded-card border border-border bg-card p-4"
       >
-        <h2 id="history-title" className="text-base font-bold text-navy">
+        <h2 id="history-title" className="text-base font-bold text-brand">
           {t('trackables.history')}
         </h2>
         {tr.entries.length === 0 && (
@@ -294,7 +294,7 @@ function CycleForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="min-w-40 font-semibold text-navy">
+        <span className="min-w-40 font-semibold text-brand">
           {label}
           {current && (
             <Badge tone="primary" className="ms-2">
@@ -394,7 +394,7 @@ function Entry({
   return (
     <li className="flex flex-col gap-2 py-4">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="min-w-40 font-semibold text-navy">
+        <span className="min-w-40 font-semibold text-brand">
           {cycleLabel(entry.periodStart, tr.cycle, tr.weekday)}
         </span>
         <span
@@ -402,7 +402,7 @@ function Entry({
             'font-figures text-xl font-semibold',
             tr.type === 'BOOLEAN' && entry.value < 1
               ? 'text-trend-down'
-              : 'text-navy',
+              : 'text-brand',
           )}
         >
           {formatValue(entry.value, tr.type)}

@@ -25,7 +25,7 @@ export function LanguageToggle() {
             className={cn(
               'h-10 px-4 text-sm font-semibold',
               active
-                ? 'bg-navy text-white'
+                ? 'bg-brand text-white'
                 : 'bg-card text-ink-muted hover:text-primary',
             )}
           >

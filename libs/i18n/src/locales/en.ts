@@ -3,7 +3,7 @@ import type { Messages } from './ar.js';
 export const en: Messages = {
   app: {
     name: 'Tarbya',
-    tagline: 'Mentorship platform',
+    tagline: 'Islamic mentorship platform',
   },
   nav: {
     breadcrumbs: 'Breadcrumbs',
@@ -24,6 +24,7 @@ export const en: Messages = {
     settings: 'System settings',
   },
   header: {
+    menu: 'Menu',
     search: 'Search members by name or phone…',
     messages: 'Messages',
     notifications: 'Notifications',

@@ -45,7 +45,9 @@ function JourneyPage() {
           <span className="text-sm text-ink-subtle">
             {t('journey.eyebrow')}
           </span>
-          <h1 className="text-2xl font-bold text-navy">{t('journey.title')}</h1>
+          <h1 className="text-2xl font-bold text-brand">
+            {t('journey.title')}
+          </h1>
         </div>
         <div className="flex items-center gap-3 rounded-card border border-border bg-card px-4 py-3">
           {mentor ? (
@@ -57,7 +59,7 @@ function JourneyPage() {
           ) : (
             <span
               aria-hidden
-              className="grid size-10 place-items-center rounded-full bg-navy font-bold text-white"
+              className="grid size-10 place-items-center rounded-full bg-brand font-bold text-white"
             >
               ?
             </span>
@@ -66,7 +68,7 @@ function JourneyPage() {
             <span className="text-[13px] text-ink-subtle">
               {t('dashboard.myMentor')}
             </span>
-            <span className="font-semibold text-navy">
+            <span className="font-semibold text-brand">
               {mentor?.name ?? t('journey.noMentor')}
             </span>
           </div>
@@ -87,13 +89,13 @@ function JourneyPage() {
 
       <div className="flex flex-wrap items-start gap-4">
         <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
-          <h2 className="text-base font-bold text-navy">
+          <h2 className="text-base font-bold text-brand">
             {t('dashboard.upcoming')}
           </h2>
           <UpcomingList items={upcoming} />
         </section>
         <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
-          <h2 className="text-base font-bold text-navy">{t('feed.latest')}</h2>
+          <h2 className="text-base font-bold text-brand">{t('feed.latest')}</h2>
           <FeedList userId={me.id} />
         </section>
       </div>

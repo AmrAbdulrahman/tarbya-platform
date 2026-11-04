@@ -1,23 +1,30 @@
 /* Design tokens from design/README.md. Import after `@import "tailwindcss";`. */
 
 @theme {
-  --font-sans: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
-  --font-figures: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  /* Manrope has no Arabic glyphs, so Latin text uses it and Arabic falls through to Tajawal. */
+  --font-sans: 'Manrope', 'Tajawal', system-ui, sans-serif;
+  --font-figures: 'Manrope', system-ui, sans-serif;
 
-  --color-primary: #7446f0;
-  --color-primary-hover: #5a2fd6;
-  --color-primary-tint: #efeafe;
-  --color-primary-strong: #4a22b8;
+  /* Brand palette (design/brand/brand-sheet.webp). */
+  --color-primary: #0e4d3a;
+  --color-primary-hover: #0a3b2c;
+  --color-primary-tint: #e3efe9;
+  --color-primary-strong: #082f24;
   --color-primary-foreground: #ffffff;
+  --color-secondary: #2f6b57;
+  --color-accent: #d7a84a;
+  --color-accent-tint: #f8eed8;
+  --color-accent-strong: #75560f;
+  --color-sand: #f5e8d1;
 
-  --color-navy: #001447;
-  --color-surface: #f0f5fa;
+  --color-brand: #0e4d3a;
+  --color-surface: #faf8f2;
   --color-card: #ffffff;
-  --color-border: #d1d5db;
-  --color-divider: #e2e8f0;
-  --color-ink: #1e293b;
-  --color-ink-muted: #475569;
-  --color-ink-subtle: #64748b;
+  --color-border: #ddd6c6;
+  --color-divider: #ece6d8;
+  --color-ink: #1f2a25;
+  --color-ink-muted: #4a5751;
+  --color-ink-subtle: #66726c;
 
   --color-trend-up: #047857;
   --color-trend-down: #b91c1c;
@@ -41,5 +48,23 @@
   :focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+}
+
+/* Sheet: slides in from the start edge, which is the right in RTL. */
+@keyframes sheet-in {
+  from {
+    transform: translateX(var(--sheet-from, -100%));
+  }
+}
+.sheet-in {
+  animation: sheet-in 200ms ease-out;
+}
+[dir='rtl'] .sheet-in {
+  --sheet-from: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-in {
+    animation: none;
   }
 }

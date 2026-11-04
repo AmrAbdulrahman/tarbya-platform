@@ -49,19 +49,19 @@ export function TrendCard({
           <Link
             to="/trackables/$id"
             params={{ id: tr.id }}
-            className="min-w-0 flex-1 truncate text-sm font-bold text-navy hover:text-primary"
+            className="min-w-0 flex-1 truncate text-sm font-bold text-brand hover:text-primary"
           >
             {tr.name}
           </Link>
         ) : (
-          <span className="min-w-0 flex-1 truncate text-sm font-bold text-navy">
+          <span className="min-w-0 flex-1 truncate text-sm font-bold text-brand">
             {tr.name}
           </span>
         )}
         <TrendBadge trend={tr.trend} />
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="font-figures text-xl font-semibold text-navy">
+        <span className="font-figures text-xl font-semibold text-brand">
           {tr.latest === null ? '—' : formatValue(tr.latest, tr.type)}
         </span>
         <span className="truncate text-[12px] text-ink-subtle">
@@ -98,7 +98,7 @@ export function TrendCards({ menteeId }: { menteeId: string }) {
     >
       <h2
         id="trends-title"
-        className="flex items-center gap-2 text-base font-bold text-navy"
+        className="flex items-center gap-2 text-base font-bold text-brand"
       >
         <Activity className="size-5 text-primary" aria-hidden />
         {t('trackables.trends')}

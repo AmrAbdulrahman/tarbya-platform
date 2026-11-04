@@ -58,7 +58,7 @@ function LookupsPage() {
       />
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-1 flex-col gap-1">
-          <h1 className="text-2xl font-bold text-navy">
+          <h1 className="text-2xl font-bold text-brand">
             {t('admin.lookups.title')}
           </h1>
           <p className="text-[15px] text-ink-subtle">
@@ -86,7 +86,7 @@ function LookupsPage() {
             className={cn(
               'flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold',
               tab === id
-                ? 'border-navy bg-navy text-white'
+                ? 'border-brand bg-brand text-white'
                 : 'border-border bg-card text-ink-muted hover:text-primary',
             )}
           >
@@ -143,7 +143,7 @@ function LookupsPage() {
                           {name(x).charAt(0)}
                         </span>
                         <span className="flex flex-col">
-                          <span className="font-semibold text-navy">
+                          <span className="font-semibold text-brand">
                             {name(x)}
                           </span>
                           <span

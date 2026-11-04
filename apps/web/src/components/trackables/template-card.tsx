@@ -37,7 +37,7 @@ export function TemplateCard({
     >
       <h2
         id="library-title"
-        className="flex items-center gap-2 text-base font-bold text-navy"
+        className="flex items-center gap-2 text-base font-bold text-brand"
       >
         <BookMarked className="size-4 text-primary" aria-hidden />
         {t('trackables.library.cardTitle')}

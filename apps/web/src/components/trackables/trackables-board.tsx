@@ -126,7 +126,7 @@ export function TrackablesBoard({
       <div className="flex flex-wrap items-center gap-2">
         <h2
           id="trackables-title"
-          className="flex flex-1 items-center gap-2 text-base font-bold text-navy"
+          className="flex flex-1 items-center gap-2 text-base font-bold text-brand"
         >
           <TrendingUp className="size-5 text-primary" aria-hidden />
           {t('trackables.title')}
@@ -280,7 +280,7 @@ function TrackableRow({
         <Link
           to="/trackables/$id"
           params={{ id: tr.id }}
-          className="text-[15px] font-bold text-navy hover:text-primary"
+          className="text-[15px] font-bold text-brand hover:text-primary"
         >
           {tr.name}
         </Link>
@@ -354,7 +354,7 @@ function TrackableRow({
                 )}
               >
                 <CycleTile start={s} cycle={tr.cycle} weekday={tr.weekday} />
-                <span className="flex h-6 items-center font-figures text-[15px] font-semibold text-navy">
+                <span className="flex h-6 items-center font-figures text-[15px] font-semibold text-brand">
                   {entry ? (
                     formatValue(entry.value, tr.type)
                   ) : ahead || !canPick ? (
@@ -480,7 +480,7 @@ function QuickLog({
       className="flex flex-col gap-1.5 rounded-lg border border-primary/30 bg-primary-tint/30 p-2"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[13px] font-semibold text-navy">{label}</span>
+        <span className="text-[13px] font-semibold text-brand">{label}</span>
         {entry && (
           <Badge>
             {t('trackables.board.current')}{' '}

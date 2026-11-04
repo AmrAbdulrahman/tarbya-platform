@@ -35,7 +35,7 @@ function LibraryPage() {
         ]}
       />
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-navy">{t('nav.library')}</h1>
+        <h1 className="text-2xl font-bold text-brand">{t('nav.library')}</h1>
         <p className="text-[15px] text-ink-subtle">
           {t('trackables.library.lead')}
         </p>

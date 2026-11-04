@@ -46,7 +46,7 @@ function UsersPage() {
         items={[{ label: t('nav.admin') }, { label: t('nav.users') }]}
       />
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-brand">
           {t('admin.users.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">{t('admin.users.lead')}</p>
@@ -151,7 +151,7 @@ function UserRow({ user, onOpen }: { user: UserDto; onOpen: () => void }) {
           <Link
             to="/people/$id"
             params={{ id: user.id }}
-            className="font-semibold text-navy hover:text-primary"
+            className="font-semibold text-brand hover:text-primary"
           >
             {user.name}
           </Link>

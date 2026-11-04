@@ -71,7 +71,7 @@ function ProfilePage() {
       </nav>
       <div className="flex min-w-0 max-w-3xl flex-[1_1_560px] flex-col gap-4">
         <Breadcrumbs items={[{ label: t('me.title') }]} />
-        <h1 className="text-2xl font-bold text-navy">{t('me.title')}</h1>
+        <h1 className="text-2xl font-bold text-brand">{t('me.title')}</h1>
         <PictureSection profile={p} onSaved={onSaved} />
         <PreferencesSection profile={p} onSaved={onSaved} />
         <ContactSection profile={p} onSaved={onSaved} />

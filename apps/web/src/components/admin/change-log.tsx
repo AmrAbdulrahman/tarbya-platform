@@ -102,7 +102,7 @@ function ChangeRow({ change }: { change: ChangeDto }) {
   return (
     <li className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-navy">
+        <span className="font-semibold text-brand">
           {t(`changes.action.${change.action}`)}
         </span>
         {change.onBehalfOf && (

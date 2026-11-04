@@ -14,7 +14,7 @@ export function Card({
 }) {
   return (
     <section className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
-      {title && <h2 className="text-base font-bold text-navy">{title}</h2>}
+      {title && <h2 className="text-base font-bold text-brand">{title}</h2>}
       {children}
     </section>
   );
@@ -50,7 +50,7 @@ export function Section({
           : 'border-t border-divider pt-4',
       )}
     >
-      <h3 className="flex items-center gap-2 text-[15px] font-bold text-navy [&_svg]:size-4 [&_svg]:text-primary">
+      <h3 className="flex items-center gap-2 text-[15px] font-bold text-brand [&_svg]:size-4 [&_svg]:text-primary">
         {icon}
         {title}
       </h3>

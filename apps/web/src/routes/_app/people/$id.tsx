@@ -84,7 +84,7 @@ function ProfilePage() {
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-navy">{p.name}</h1>
+            <h1 className="text-2xl font-bold text-brand">{p.name}</h1>
             <div
               className="flex flex-wrap gap-1"
               aria-label={t('profile.roles')}
@@ -218,7 +218,7 @@ function AdminNotes({ subjectId }: { subjectId: string }) {
   return (
     <section className="flex flex-col gap-3 rounded-card border border-border bg-card p-4">
       <div className="flex flex-col gap-1">
-        <h2 className="text-base font-bold text-navy">
+        <h2 className="text-base font-bold text-brand">
           {t('profile.adminNotes')}
         </h2>
         <p className="text-[13px] text-ink-subtle">

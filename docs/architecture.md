@@ -138,7 +138,7 @@ Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so R
 - App shell: sidebar with one section per role the user holds, sticky header (search, messages, notifications, avatar).
 - `dir` and `lang` set on `<html>` from the active locale. Use only Tailwind logical utilities (`ms-`, `pe-`, `start-`, `text-start`); a lint rule forbids physical `ml-/mr-/left-/right-` classes.
 - Dates are formatted through one helper in `libs/shared` using `Intl.DateTimeFormat` with `ca-islamic-umalqura` for Hijri, in the `Africa/Cairo` zone.
-- Fonts: IBM Plex Sans Arabic, Inter, Space Grotesk for figures.
+- Fonts: Manrope (English and figures) and Tajawal (Arabic), from the brand sheet in `design/brand/`.
 
 ## Environments and configuration
 

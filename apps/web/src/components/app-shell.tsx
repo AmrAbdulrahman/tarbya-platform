@@ -2,12 +2,13 @@ import { Link, Outlet, useNavigate } from '@tanstack/react-router';
 import {
   Bell,
   LogOut,
+  Menu,
   MessageSquare,
   MonitorX,
   Search,
   UserRound,
 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -17,76 +18,67 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Sheet,
+  SheetContent,
+  SheetTrigger,
 } from '@tarbya/ui';
 import { useMe, useSignOut } from '../auth/session';
 import { ImpersonateButton, ImpersonationBanner } from './impersonation';
 import { LanguageSwitch } from './language-switch';
+import { LogoMark } from './logo';
 import { LogProvider } from './mentor/log-dialog';
 import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
 
-/** Sidebar with one section per role, plus the sticky header (design/screens/Main.dc.html). */
+/**
+ * Sidebar with one section per role, plus the sticky header (design/screens/Main.dc.html).
+ * Below md the sidebar moves into a drawer opened from the header's menu button.
+ */
 export function AppShell() {
   const { t } = useTranslation();
-  const me = useMe();
   const top = useStickyHeight();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <LogProvider>
-      <div className="flex min-h-screen flex-col bg-surface md:flex-row">
+      <div className="pattern-corner pattern-fixed flex min-h-screen bg-surface [--pattern-opacity:0.3]">
+        {/* From md up the sidebar stays put and scrolls on its own. */}
         <nav
           aria-label={t('app.name')}
-          // From md up the sidebar stays put and scrolls on its own; below that it stacks above the page.
-          className="flex flex-col gap-4 border-e border-border bg-card px-4 py-6 md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:overflow-y-auto"
+          className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-e border-border bg-card px-4 py-6 md:block"
         >
-          <div className="flex items-center gap-2.5 px-2">
-            <div className="grid size-9 place-items-center rounded-card bg-primary text-lg font-bold text-primary-foreground">
-              ت
-            </div>
-            <div className="flex flex-col">
-              <span className="text-base font-bold text-navy">
-                {t('app.name')}
-              </span>
-              <span className="text-xs text-ink-subtle">
-                {t('app.tagline')}
-              </span>
-            </div>
-          </div>
-          {sectionsFor(me.roles).map((section, i) => (
-            <div
-              key={section.title}
-              className={
-                i
-                  ? 'flex flex-col gap-1 border-t border-divider pt-4'
-                  : 'flex flex-col gap-1'
-              }
-            >
-              <span className="px-3.5 pb-1 text-xs font-semibold text-ink-subtle">
-                {t(section.title)}
-              </span>
-              {section.items.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  className="flex min-h-11 items-center gap-3 rounded-lg px-3.5 text-[15px] font-medium text-ink hover:bg-surface hover:text-primary"
-                  activeProps={{
-                    className: 'bg-primary-tint text-primary-hover',
-                  }}
-                  activeOptions={{ exact: true }}
-                >
-                  <item.icon className="size-5" aria-hidden />
-                  {t(item.label)}
-                </Link>
-              ))}
-            </div>
-          ))}
+          <NavContent />
         </nav>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div ref={top} className="sticky top-0 z-20">
             <ImpersonationBanner />
-            <header className="flex h-14 items-center gap-3 border-b border-border bg-card/95 px-6 backdrop-blur">
-              <label className="relative flex-[0_1_380px]">
+            <header className="flex h-14 items-center gap-1 border-b border-border bg-card/95 px-4 backdrop-blur sm:gap-3 md:px-6">
+              <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t('header.menu')}
+                    className="md:hidden"
+                  >
+                    <Menu />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent
+                  title={t('header.menu')}
+                  closeLabel={t('admin.common.close')}
+                  className="px-4 py-6"
+                >
+                  <nav aria-label={t('app.name')}>
+                    <NavContent onNavigate={() => setMenuOpen(false)} />
+                  </nav>
+                </SheetContent>
+              </Sheet>
+              <Link to="/" aria-label={t('app.name')} className="md:hidden">
+                <LogoMark className="h-8 w-auto" />
+              </Link>
+              <label className="relative hidden flex-[0_1_380px] md:block">
                 <span className="sr-only">{t('header.search')}</span>
                 <input
                   type="search"
@@ -119,12 +111,61 @@ export function AppShell() {
             </header>
           </div>
           {/* Room at the bottom for the mentor's "+" button. */}
-          <main className="flex flex-col gap-4 px-6 pb-24 pt-4">
+          <main className="flex flex-col gap-4 px-4 pb-24 pt-4 md:px-6">
             <Outlet />
           </main>
         </div>
       </div>
     </LogProvider>
+  );
+}
+
+/** Brand and one link section per role; shared by the sidebar and the mobile drawer. */
+function NavContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useTranslation();
+  const me = useMe();
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2.5 px-2">
+        <LogoMark className="h-10 w-auto shrink-0" />
+        <div className="flex flex-col">
+          <span className="text-base font-bold text-brand">
+            {t('app.name')}
+          </span>
+          <span className="text-xs text-ink-subtle">{t('app.tagline')}</span>
+        </div>
+      </div>
+      {sectionsFor(me.roles).map((section, i) => (
+        <div
+          key={section.title}
+          className={
+            i
+              ? 'flex flex-col gap-1 border-t border-divider pt-4'
+              : 'flex flex-col gap-1'
+          }
+        >
+          <span className="px-3.5 pb-1 text-xs font-semibold text-ink-subtle">
+            {t(section.title)}
+          </span>
+          {section.items.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              onClick={onNavigate}
+              className="flex min-h-11 items-center gap-3 rounded-lg px-3.5 text-[15px] font-medium text-ink hover:bg-surface hover:text-primary"
+              activeProps={{
+                className: 'bg-primary-tint text-primary-hover',
+              }}
+              activeOptions={{ exact: true }}
+            >
+              <item.icon className="size-5" aria-hidden />
+              {t(item.label)}
+            </Link>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -170,7 +211,7 @@ function AccountMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>
-          <div className="font-semibold text-navy">{me.name}</div>
+          <div className="font-semibold text-brand">{me.name}</div>
           {me.email && (
             <div dir="ltr" className="text-start text-xs text-ink-subtle">
               {me.email}

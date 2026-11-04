@@ -154,12 +154,12 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
             <Link
               to="/trackables/$id"
               params={{ id: item.trackable.id }}
-              className="font-semibold text-navy hover:text-primary"
+              className="font-semibold text-brand hover:text-primary"
             >
               {title}
             </Link>
           ) : (
-            <span className="font-semibold text-navy">{title}</span>
+            <span className="font-semibold text-brand">{title}</span>
           )}
           <span className="text-[13px] text-ink-subtle">{kind}</span>
         </div>

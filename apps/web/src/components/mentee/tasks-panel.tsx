@@ -80,7 +80,7 @@ export function TasksPanel({
     >
       <h2
         id="tasks-title"
-        className="flex items-center gap-2 text-base font-bold text-navy"
+        className="flex items-center gap-2 text-base font-bold text-brand"
       >
         <ListChecks className="size-4 text-primary" aria-hidden />
         {t('mentee.tasks')}

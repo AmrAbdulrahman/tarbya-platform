@@ -74,7 +74,7 @@ export function ChallengesPanel({
     >
       <h2
         id="challenges-title"
-        className="flex items-center gap-2 text-base font-bold text-navy"
+        className="flex items-center gap-2 text-base font-bold text-brand"
       >
         <Mountain className="size-4 text-warn" aria-hidden />
         {t('challenges.title')}
@@ -175,7 +175,7 @@ function ChallengeItem({
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
             className={cn(
-              'text-[15px] font-semibold text-navy',
+              'text-[15px] font-semibold text-brand',
               resolved && 'text-ink-subtle line-through decoration-2',
             )}
           >

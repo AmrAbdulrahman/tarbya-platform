@@ -81,7 +81,7 @@ export function ActivityTypeEditor({ type, onDone }: Props) {
       onSubmit={form.handleSubmit((v) => save.mutate(v))}
       className="flex flex-col gap-4 rounded-card border border-border bg-card p-4"
     >
-      <h2 className="text-base font-bold text-navy">
+      <h2 className="text-base font-bold text-brand">
         {name
           ? t('admin.lookups.editTitle', { name })
           : t('admin.lookups.newTitle')}
@@ -144,7 +144,7 @@ export function ActivityTypeEditor({ type, onDone }: Props) {
                   style={{ backgroundColor: lookupColors[c].swatch }}
                   className={cn(
                     'size-9 rounded-full ring-2 ring-offset-2',
-                    field.value === c ? 'ring-navy' : 'ring-transparent',
+                    field.value === c ? 'ring-brand' : 'ring-transparent',
                   )}
                 />
               ))}

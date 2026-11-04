@@ -49,7 +49,7 @@ export function ToastProvider({
         {items.map((item) => (
           <div
             key={item.id}
-            className="pointer-events-auto flex items-center gap-2 rounded-card bg-navy px-4 py-3 text-[15px] font-medium text-white shadow-lg"
+            className="pointer-events-auto flex items-center gap-2 rounded-card bg-brand px-4 py-3 text-[15px] font-medium text-white shadow-lg"
           >
             <CircleCheck className="size-5 text-emerald-300" aria-hidden />
             {item.message}
