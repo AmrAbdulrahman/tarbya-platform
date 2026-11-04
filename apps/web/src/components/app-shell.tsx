@@ -7,6 +7,7 @@ import {
   Search,
   UserRound,
 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -28,6 +29,7 @@ import { sectionsFor } from './nav';
 export function AppShell() {
   const { t } = useTranslation();
   const me = useMe();
+  const top = useStickyHeight();
 
   return (
     <LogProvider>
@@ -81,7 +83,7 @@ export function AppShell() {
         </nav>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="sticky top-0 z-20">
+          <div ref={top} className="sticky top-0 z-20">
             <ImpersonationBanner />
             <header className="flex h-14 items-center gap-3 border-b border-border bg-card/95 px-6 backdrop-blur">
               <label className="relative flex-[0_1_380px]">
@@ -124,6 +126,28 @@ export function AppShell() {
       </div>
     </LogProvider>
   );
+}
+
+/**
+ * Keeps `--app-top` at the height of the sticky header (and the impersonation
+ * banner, when shown), so page headers can stick just below it.
+ */
+function useStickyHeight() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() =>
+      root.style.setProperty('--app-top', `${el.offsetHeight}px`),
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--app-top');
+    };
+  }, []);
+  return ref;
 }
 
 function AccountMenu() {

@@ -74,7 +74,8 @@ function ProfilePage() {
           { label: p.name },
         ]}
       />
-      <header className="flex flex-wrap items-center gap-3">
+      {/* Stays in view below the app header while the page scrolls. */}
+      <header className="sticky top-[var(--app-top,3.5rem)] z-10 -mx-6 -my-2 flex flex-wrap items-center gap-3 border-b border-border bg-surface/95 px-6 py-2 backdrop-blur">
         <span
           aria-hidden
           className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-tint text-lg font-bold text-primary-hover"
