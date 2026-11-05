@@ -5,6 +5,7 @@ import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { TrackablesService } from '../trackables/trackables.service';
 import { RolesService } from '../users/roles.service';
 import type {
@@ -71,7 +72,35 @@ export class InteractionsService {
     private readonly access: MentoringAccess,
     private readonly roles: RolesService,
     private readonly trackables: TrackablesService,
+    private readonly notifications: NotificationsService,
   ) {}
+
+  /** BR-FU-3: an upcoming follow-up or activity notifies those taking part. */
+  private async announceUpcoming(
+    actorId: string,
+    interaction: {
+      id: string;
+      kind: 'FOLLOW_UP' | 'ACTIVITY';
+      title: string | null;
+      startsAt: Date;
+    },
+    participantIds: string[],
+  ) {
+    if (interaction.startsAt <= new Date()) return;
+    await this.notifications.notify(
+      participantIds,
+      'INTERACTION_SCHEDULED',
+      {
+        interactionId: interaction.id,
+        kind: interaction.kind,
+        title: interaction.title,
+        startsAt: interaction.startsAt.toISOString(),
+        byId: actorId,
+        byName: await this.notifications.nameOf(actorId),
+      },
+      { actorId },
+    );
+  }
 
   async createFollowUp(
     actorId: string,
@@ -161,6 +190,31 @@ export class InteractionsService {
       }
       return interaction;
     });
+    await this.announceUpcoming(actorId, created, [dto.menteeId]);
+    if (dto.tasks?.length) {
+      await this.notifications.notify(
+        [dto.menteeId],
+        'TASK_ASSIGNED',
+        {
+          title: dto.tasks[0].title,
+          count: dto.tasks.length,
+          byName: await this.notifications.nameOf(actorId),
+        },
+        { actorId },
+      );
+    }
+    if (dto.challenges?.length) {
+      await this.notifications.notify(
+        [dto.menteeId],
+        'CHALLENGE_RAISED',
+        {
+          menteeId: dto.menteeId,
+          title: dto.challenges[0],
+          byName: await this.notifications.nameOf(actorId),
+        },
+        { actorId },
+      );
+    }
     return this.get(actorId, created.id);
   }
 
@@ -249,6 +303,7 @@ export class InteractionsService {
         participants: { create: participantIds.map((userId) => ({ userId })) },
       },
     });
+    await this.announceUpcoming(actorId, created, participantIds);
     return this.get(actorId, created.id);
   }
 

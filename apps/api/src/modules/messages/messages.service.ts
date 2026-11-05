@@ -3,6 +3,7 @@ import { Prisma, PrismaService } from '@tarbya/db';
 import { AppException } from '../../common/app-exception';
 import { impersonation } from '../../common/request-context';
 import { EventsService } from '../events/events.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { AvatarsService } from '../files/avatars.service';
 import type {
   ConversationDto,
@@ -59,6 +60,7 @@ export class MessagesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly events: EventsService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /** Conversations the user takes part in: their own directs and their groups'. */
@@ -261,7 +263,7 @@ export class MessagesService {
   }
 
   async send(userId: string, id: string, body: string): Promise<MessageDto> {
-    const { canPost, participants } = await this.access(userId, id);
+    const { kind, canPost, participants } = await this.access(userId, id);
     if (!canPost) {
       throw new AppException(409, {
         code: 'CONVERSATION_CLOSED',
@@ -269,6 +271,10 @@ export class MessagesService {
       });
     }
     const now = new Date();
+    // One notice per run of unread messages: only if the other person is up to date.
+    const others = participants.filter((p) => p !== userId);
+    const caughtUp =
+      kind === 'DIRECT' ? await this.caughtUp(id, others[0]) : false;
     const [message] = await this.prisma.$transaction([
       this.prisma.message.create({
         data: {
@@ -290,7 +296,35 @@ export class MessagesService {
       }),
     ]);
     this.events.publish(participants, { type: 'message', conversationId: id });
+    if (caughtUp) {
+      await this.notifications.notify(
+        others,
+        'NEW_MESSAGE',
+        {
+          conversationId: id,
+          byName: message.author.name,
+          preview: body.slice(0, 200),
+        },
+        { actorId: userId },
+      );
+    }
     return toMessage(message);
+  }
+
+  /** True when `userId` has read everything others wrote in the conversation. */
+  private async caughtUp(id: string, userId: string): Promise<boolean> {
+    const member = await this.prisma.conversationMember.findUnique({
+      where: { conversationId_userId: { conversationId: id, userId } },
+      select: { lastReadAt: true },
+    });
+    const unread = await this.prisma.message.count({
+      where: {
+        conversationId: id,
+        authorId: { not: userId },
+        ...(member?.lastReadAt && { createdAt: { gt: member.lastReadAt } }),
+      },
+    });
+    return unread === 0;
   }
 
   async markRead(userId: string, id: string): Promise<void> {

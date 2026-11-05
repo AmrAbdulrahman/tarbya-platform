@@ -18,6 +18,7 @@ CREATE TEMP TABLE e2e_groups ON COMMIT DROP AS
 
 UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Notification" WHERE "userId" IN (SELECT id FROM e2e_users);
+DELETE FROM "NotificationPreference" WHERE "userId" IN (SELECT id FROM e2e_users);
 -- Members and messages go with their conversation (ON DELETE CASCADE).
 DELETE FROM "Message" WHERE "authorId" IN (SELECT id FROM e2e_users);
 DELETE FROM "ConversationMember" WHERE "userId" IN (SELECT id FROM e2e_users);

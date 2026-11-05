@@ -4,6 +4,7 @@ import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { RolesService } from '../users/roles.service';
 import type {
   ChallengeDto,
@@ -63,7 +64,33 @@ export class ChallengesService {
     private readonly prisma: PrismaService,
     private readonly access: MentoringAccess,
     private readonly roles: RolesService,
+    private readonly notifications: NotificationsService,
   ) {}
+
+  /** BR-NTF-3: the mentee and their mentor hear about their challenges; never the one who acted. */
+  private async announce(
+    actorId: string,
+    type: 'CHALLENGE_RAISED' | 'CHALLENGE_COMMENTED' | 'CHALLENGE_RESOLVED',
+    challenge: { id: string; menteeId: string; title: string },
+    preview?: string,
+  ) {
+    const mentor = await this.prisma.mentorship.findFirst({
+      where: { menteeId: challenge.menteeId, endedAt: null },
+      select: { mentorId: true },
+    });
+    await this.notifications.notify(
+      [challenge.menteeId, ...(mentor ? [mentor.mentorId] : [])],
+      type,
+      {
+        challengeId: challenge.id,
+        menteeId: challenge.menteeId,
+        title: challenge.title,
+        byName: await this.notifications.nameOf(actorId),
+        ...(preview && { preview: preview.slice(0, 200) }),
+      },
+      { actorId },
+    );
+  }
 
   /** Open ones first, newest first; then resolved ones, latest resolved first. */
   async list(viewerId: string, menteeId: string): Promise<ChallengeDto[]> {
@@ -93,6 +120,7 @@ export class ChallengesService {
       },
       select: challengeSelect,
     });
+    await this.announce(actorId, 'CHALLENGE_RAISED', row);
     return toChallengeDto(row);
   }
 
@@ -115,6 +143,7 @@ export class ChallengesService {
       },
       select: challengeSelect,
     });
+    if (resolving) await this.announce(actorId, 'CHALLENGE_RESOLVED', updated);
     return toChallengeDto(updated);
   }
 
@@ -130,6 +159,7 @@ export class ChallengesService {
     await this.prisma.challengeComment.create({
       data: { challengeId: id, authorId: actorId, body, ...impersonation() },
     });
+    await this.announce(actorId, 'CHALLENGE_COMMENTED', row, body);
     return toChallengeDto(
       await this.prisma.challenge.findUniqueOrThrow({
         where: { id },

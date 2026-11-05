@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate } from '@tanstack/react-router';
-import { Bell, LogOut, Menu, MonitorX, Search, UserRound } from 'lucide-react';
+import { LogOut, Menu, MonitorX, Search, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,6 +20,7 @@ import { LanguageSwitch } from './language-switch';
 import { LogoMark } from './logo';
 import { LogProvider } from './mentor/log-dialog';
 import { MessagesMenu } from './messages/messages-menu';
+import { NotificationsMenu } from './notifications/notifications-menu';
 import { useLiveEvents } from '../lib/live-events';
 import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
@@ -90,13 +91,7 @@ export function AppShell() {
               <ImpersonateButton />
               <LanguageSwitch />
               <MessagesMenu />
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={t('header.notifications')}
-              >
-                <Bell />
-              </Button>
+              <NotificationsMenu />
               <AccountMenu />
             </header>
           </div>

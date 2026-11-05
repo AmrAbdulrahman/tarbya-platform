@@ -4,6 +4,7 @@ import { contactStatus, daysSince } from '@tarbya/shared';
 import { AppException } from '../../common/app-exception';
 import { AuditService } from '../audit/audit.service';
 import { HierarchyService } from '../hierarchy/hierarchy.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SettingsService } from '../settings/settings.service';
 import { ContactService } from './contact.service';
 import type {
@@ -45,7 +46,32 @@ export class MentorshipsService {
     private readonly hierarchy: HierarchyService,
     private readonly contact: ContactService,
     private readonly settings: SettingsService,
+    private readonly notifications: NotificationsService,
   ) {}
+
+  /** BR-NTF-3: both people hear when a mentorship starts or ends, each from their side. */
+  private async announce(
+    actorId: string,
+    type: 'MENTORSHIP_ASSIGNED' | 'MENTORSHIP_ENDED',
+    id: string,
+  ) {
+    const m = await this.prisma.mentorship.findUniqueOrThrow({
+      where: { id },
+      select: mentorshipSelect,
+    });
+    await this.notifications.notify(
+      [m.mentor.id, m.mentee.id],
+      type,
+      {
+        mentorshipId: m.id,
+        mentorId: m.mentor.id,
+        mentorName: m.mentor.name,
+        menteeId: m.mentee.id,
+        menteeName: m.mentee.name,
+      },
+      { actorId },
+    );
+  }
 
   /** Every active mentorship; the admin screen draws the tree from it. */
   async active(): Promise<MentorshipDto[]> {
@@ -64,6 +90,8 @@ export class MentorshipsService {
     const { mentorId, menteeId } = dto;
     if (mentorId === menteeId) throw cycle();
 
+    let replaced: string | undefined;
+    let isNew = false;
     const id = await this.prisma.$transaction(async (tx) => {
       // One mentoring change at a time, so two assignments can't form a loop between them.
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('mentoring'))`;
@@ -95,10 +123,12 @@ export class MentorshipsService {
           });
         }
         await this.endIn(tx, actorId, current.id);
+        replaced = current.id;
       }
       const created = await tx.mentorship.create({
         data: { mentorId, menteeId },
       });
+      isNew = true;
       await this.audit.record(
         {
           actorId,
@@ -111,6 +141,8 @@ export class MentorshipsService {
       );
       return created.id;
     });
+    if (replaced) await this.announce(actorId, 'MENTORSHIP_ENDED', replaced);
+    if (isNew) await this.announce(actorId, 'MENTORSHIP_ASSIGNED', id);
 
     return toDto(
       await this.prisma.mentorship.findUniqueOrThrow({
@@ -122,15 +154,18 @@ export class MentorshipsService {
 
   /** BR-MEN-4: ending keeps the follow-ups and notes attached to the mentorship. */
   async end(actorId: string, id: string): Promise<MentorshipDto> {
-    await this.prisma.$transaction(async (tx) => {
+    const ended = await this.prisma.$transaction(async (tx) => {
       const row = await tx.mentorship.findUnique({ where: { id } });
       if (!row)
         throw new AppException(404, {
           code: 'NOT_FOUND',
           title: 'Mentorship not found',
         });
-      if (!row.endedAt) await this.endIn(tx, actorId, id);
+      if (row.endedAt) return false;
+      await this.endIn(tx, actorId, id);
+      return true;
     });
+    if (ended) await this.announce(actorId, 'MENTORSHIP_ENDED', id);
     return toDto(
       await this.prisma.mentorship.findUniqueOrThrow({
         where: { id },

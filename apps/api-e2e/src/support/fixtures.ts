@@ -192,3 +192,23 @@ export async function notificationTypes(userId: string): Promise<string[]> {
   );
   return rows.map((r: { type: string }) => r.type);
 }
+
+/** Subjects of the emails Mailpit received for this address, newest first; waits for at least `atLeast`. */
+export async function mailSubjects(
+  email: string,
+  atLeast = 1,
+): Promise<string[]> {
+  let subjects: string[] = [];
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const res = await fetch(
+      `${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${email}"`)}`,
+    );
+    const { messages } = (await res.json()) as {
+      messages: { Subject: string }[];
+    };
+    subjects = messages.map((m) => m.Subject);
+    if (subjects.length >= atLeast) return subjects;
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return subjects;
+}

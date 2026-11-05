@@ -13,6 +13,7 @@ import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { impersonation } from '../../common/request-context';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SettingsService } from '../settings/settings.service';
 import { RolesService } from '../users/roles.service';
 import {
@@ -127,6 +128,7 @@ export class TrackablesService {
     private readonly access: MentoringAccess,
     private readonly roles: RolesService,
     private readonly settings: SettingsService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /** Active ones first, then archived, each newest first. */
@@ -245,6 +247,7 @@ export class TrackablesService {
         weekday: dto.cycle === 'WEEKLY' ? (dto.weekday ?? null) : null,
       },
     });
+    await this.announce(actorId, 'TRACKABLE_CREATED', row);
     return this.get(actorId, row.id);
   }
 
@@ -308,7 +311,31 @@ export class TrackablesService {
               : null,
       },
     });
+    // Archiving and restoring aren't a change the mentee needs to hear about.
+    if (Object.keys(dto).some((k) => k !== 'archived'))
+      await this.announce(actorId, 'TRACKABLE_CHANGED', {
+        ...row,
+        name: dto.name ?? row.name,
+      });
     return this.get(actorId, id);
+  }
+
+  /** BR-NTF-3: the mentee hears when their mentor adds or changes a trackable. */
+  private async announce(
+    actorId: string,
+    type: 'TRACKABLE_CREATED' | 'TRACKABLE_CHANGED',
+    row: { id: string; menteeId: string; name: string },
+  ) {
+    await this.notifications.notify(
+      [row.menteeId],
+      type,
+      {
+        trackableId: row.id,
+        name: row.name,
+        byName: await this.notifications.nameOf(actorId),
+      },
+      { actorId },
+    );
   }
 
   /**
@@ -330,6 +357,27 @@ export class TrackablesService {
       source: isMentee ? 'MENTEE' : 'MENTOR',
       limitToWindow: isMentee,
     });
+    if (isMentee) {
+      // BR-NTF-3: the mentor hears when the mentee logs a cycle.
+      const mentor = await this.prisma.mentorship.findFirst({
+        where: { menteeId: row.menteeId, endedAt: null },
+        select: { mentorId: true, mentee: { select: { name: true } } },
+      });
+      if (mentor) {
+        await this.notifications.notify(
+          [mentor.mentorId],
+          'ENTRY_LOGGED',
+          {
+            trackableId: id,
+            name: row.name,
+            menteeId: row.menteeId,
+            menteeName: mentor.mentee.name,
+            needsHelp: !!dto.needsHelp,
+          },
+          { actorId },
+        );
+      }
+    }
     return this.get(actorId, id);
   }
 
@@ -427,13 +475,27 @@ export class TrackablesService {
   ): Promise<TrackableDetailDto> {
     const entry = await this.prisma.trackableEntry.findUnique({
       where: { id: entryId },
-      select: { trackableId: true, trackable: { select: { menteeId: true } } },
+      select: {
+        trackableId: true,
+        trackable: { select: { menteeId: true, name: true } },
+      },
     });
     if (!entry) throw notFound();
     await this.assertCanManage(actorId, entry.trackable.menteeId);
     await this.prisma.trackableReply.create({
       data: { entryId, authorId: actorId, body, ...impersonation() },
     });
+    await this.notifications.notify(
+      [entry.trackable.menteeId],
+      'MENTOR_REPLIED',
+      {
+        trackableId: entry.trackableId,
+        name: entry.trackable.name,
+        byName: await this.notifications.nameOf(actorId),
+        preview: body.slice(0, 200),
+      },
+      { actorId },
+    );
     return this.get(actorId, entry.trackableId);
   }
 

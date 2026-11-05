@@ -13,6 +13,7 @@ export * from './me/me.js';
 export * from './mentorships/mentorships.js';
 export * from './messages/messages.js';
 export * from './notes/notes.js';
+export * from './notifications/notifications.js';
 export * from './people/people.js';
 export * from './profiles/profiles.js';
 export * from './settings/settings.js';

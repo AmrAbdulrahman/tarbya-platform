@@ -3,6 +3,7 @@ import { PrismaService } from '@tarbya/db';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
 import { MentoringAccess } from '../mentorships/mentoring-access.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { RolesService } from '../users/roles.service';
 import type { CreateTaskDto, TaskDto, TasksQuery } from './interactions.dto';
 import { newTask, taskSelect, toTaskDto } from './interactions.service';
@@ -29,6 +30,7 @@ export class TasksService {
     private readonly prisma: PrismaService,
     private readonly access: MentoringAccess,
     private readonly roles: RolesService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /** The mentor (or an admin) sets a task on its own, outside a follow-up. */
@@ -41,6 +43,16 @@ export class TasksService {
       data: newTask(dto, dto.assigneeId, actorId),
       select: taskSelect,
     });
+    await this.notifications.notify(
+      [dto.assigneeId],
+      'TASK_ASSIGNED',
+      {
+        taskId: row.id,
+        title: row.title,
+        byName: await this.notifications.nameOf(actorId),
+      },
+      { actorId },
+    );
     return toTaskDto(row);
   }
 

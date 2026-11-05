@@ -84,6 +84,7 @@ model User {
   attendanceRecorded        Attendance[]             @relation("AttendanceRecorder")
   attendanceInImpersonation Attendance[]             @relation("AttendanceImpersonator")
   notifications             Notification[]
+  notificationPreferences   NotificationPreference[]
   conversations             ConversationMember[]
   messages                  Message[]                @relation("MessageAuthor")
   messagesInImpersonation   Message[]                @relation("MessageImpersonator")
@@ -727,6 +728,19 @@ model Notification {
   createdAt DateTime  @default(now())
 
   @@index([userId, createdAt])
+  @@index([userId, readAt])
+}
+
+/// A user's choice of channels for one type (US-2.4); missing rows use the defaults in libs/shared.
+model NotificationPreference {
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  inApp     Boolean
+  email     Boolean
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, type])
 }
 
 // ── Messages (BR-MSG-1, BR-MSG-2, US-7.3) ────────────────────────────────

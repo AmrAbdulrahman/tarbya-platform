@@ -14,18 +14,21 @@ export function RsvpButtons({
   gatheringId,
   value,
   size = 'sm',
+  onAnswered,
 }: {
   gatheringId: string;
   value: RsvpResponse | null;
   size?: 'sm' | 'md';
+  onAnswered?: (response: RsvpResponse) => void;
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const answer = useMutation({
     mutationFn: (response: RsvpResponse) =>
       gatheringsControllerRsvp(gatheringId, { response }),
-    onSuccess: () =>
-      Promise.all(
+    onSuccess: (_res, response) => {
+      onAnswered?.(response);
+      return Promise.all(
         [
           gatheringQueryKey(gatheringId),
           ['groups'],
@@ -33,7 +36,8 @@ export function RsvpButtons({
           ['group-gatherings'],
           ['notifications'],
         ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
-      ),
+      );
+    },
   });
   const choice = (
     response: RsvpResponse,

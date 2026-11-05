@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppMentorRouteImport } from './routes/_app/mentor'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
+import { Route as AppNotificationsRouteImport } from './routes/_app/notifications'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppAdminLookupsRouteImport } from './routes/_app/admin/lookups'
 import { Route as AppAdminMentorshipsRouteImport } from './routes/_app/admin/mentorships'
@@ -56,6 +57,11 @@ const AppMentorRoute = AppMentorRouteImport.update({
 const AppMessagesRoute = AppMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRouteWithChildren
   '/mentor': typeof AppMentorRouteWithChildren
   '/messages': typeof AppMessagesRoute
+  '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/admin/lookups': typeof AppAdminLookupsRoute
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/messages': typeof AppMessagesRoute
+  '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/': typeof AppIndexRoute
   '/admin/lookups': typeof AppAdminLookupsRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/mentor': typeof AppMentorRouteWithChildren
   '/_app/messages': typeof AppMessagesRoute
+  '/_app/notifications': typeof AppNotificationsRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/lookups': typeof AppAdminLookupsRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/mentor'
     | '/messages'
+    | '/notifications'
     | '/profile'
     | '/admin/lookups'
     | '/admin/mentorships'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/messages'
+    | '/notifications'
     | '/profile'
     | '/'
     | '/admin/lookups'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/_app/admin'
     | '/_app/mentor'
     | '/_app/messages'
+    | '/_app/notifications'
     | '/_app/profile'
     | '/_app/'
     | '/_app/admin/lookups'
@@ -295,6 +307,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile': {
@@ -425,6 +444,7 @@ interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppMentorRoute: typeof AppMentorRouteWithChildren
   AppMessagesRoute: typeof AppMessagesRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
   AppGroupsIdRoute: typeof AppGroupsIdRoute
@@ -440,6 +460,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
   AppMentorRoute: AppMentorRouteWithChildren,
   AppMessagesRoute: AppMessagesRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
   AppGroupsIdRoute: AppGroupsIdRoute,
