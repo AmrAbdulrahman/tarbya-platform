@@ -69,6 +69,9 @@
     "webpack-dev-server": "^5.2.1"
   },
   "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.12"
+  },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",

@@ -5,7 +5,9 @@
 }
 
 :{$PORT:8080} {
-	encode zstd gzip
+	# Not the event stream (BR-NTF-2): compressing it would hold events back.
+	@compressible not path /api/events
+	encode @compressible zstd gzip
 
 	handle /api/* {
 		reverse_proxy {$API_URL} {
