@@ -34,4 +34,8 @@ export interface FeedItemDto {
   value: number | null;
   /** @nullable */
   text: string | null;
+  /** @nullable */
+  group: UserRefDto | null;
+  /** @nullable */
+  present: boolean | null;
 }

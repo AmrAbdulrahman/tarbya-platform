@@ -115,18 +115,20 @@ Trend and contact status are computed in `libs/shared` (pure functions, unit-tes
 
 - **Feed and dashboards** (`feed` module): `GET /feed?userId=` merges a member's done follow-ups and activities, their trackable entries and replies, newest first, with a `before` timestamp cursor; it carries counts, never notes. `GET /dashboard/mentor` (US-4.1) and `GET /dashboard/journey` (US-5.1) are built from the mentorship, plan and interaction services. What's waiting to be logged comes from each trackable's open cycles. Gatherings join the feed in step 8.
 
-Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so RSVPs and attendance attach to real rows.
+Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so RSVPs and attendance attach to real rows. Creating or editing a series materialises at once; occurrences edited by hand (`customised`) are left alone by later series edits. RSVP requests and reminders are found by a scan rather than scheduled per occurrence, so moving or cancelling an occurrence needs no rescheduling; each is sent once (`rsvpRequestedAt`, `remindedAt`).
 
 ## Jobs (pg-boss)
 
-| Job                                     | When                                                          |
-| --------------------------------------- | ------------------------------------------------------------- |
-| `email.send`                            | Queued by the notifications service; retries with backoff     |
-| `gatherings.materialise`                | Daily: create occurrences for the coming weeks                |
-| `gatherings.rsvp-request` / `.reminder` | Scheduled per occurrence from settings lead times             |
-| `contact.overdue-scan`                  | Daily: notify mentors of mentees crossing due/late thresholds |
-| `trackables.cycle-due`                  | Daily: remind mentees of cycles waiting to be logged          |
-| `auth.cleanup`                          | Hourly: expired codes and sessions                            |
+`JobsService` (`apps/api/src/modules/jobs`) starts pg-boss after the app boots; modules register handlers and crons in the organisation zone. `JOBS_ENABLED=false` turns it off (jobs sent meanwhile run inline).
+
+| Job                      | When                                                          |
+| ------------------------ | ------------------------------------------------------------- |
+| `email.send`             | Queued by the notifications service; retries with backoff     |
+| `gatherings.materialise` | Daily: create occurrences for the coming weeks                |
+| `gatherings.notices`     | Every 10 minutes: RSVP requests and reminders that came due   |
+| `contact.overdue-scan`   | Daily: notify mentors of mentees crossing due/late thresholds |
+| `trackables.cycle-due`   | Daily: remind mentees of cycles waiting to be logged          |
+| `auth.cleanup`           | Hourly: expired codes and sessions                            |
 
 ## Realtime
 

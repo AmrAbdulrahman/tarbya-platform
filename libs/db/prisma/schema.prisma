@@ -74,6 +74,16 @@ model User {
   challengesInImpersonation Challenge[]              @relation("ChallengeImpersonator")
   commentsInImpersonation   ChallengeComment[]       @relation("ChallengeCommentImpersonator")
   auditedOnBehalf           AuditLog[]               @relation("AuditOnBehalfOf")
+  groupMemberships          GroupMembership[]
+  groupsCreated             Group[]                  @relation("GroupCreator")
+  gatheringsCreated         Gathering[]              @relation("GatheringCreator")
+  gatheringsInImpersonation Gathering[]              @relation("GatheringImpersonator")
+  rsvps                     Rsvp[]                   @relation("RsvpUser")
+  rsvpsInImpersonation      Rsvp[]                   @relation("RsvpImpersonator")
+  attendances               Attendance[]             @relation("AttendanceUser")
+  attendanceRecorded        Attendance[]             @relation("AttendanceRecorder")
+  attendanceInImpersonation Attendance[]             @relation("AttendanceImpersonator")
+  notifications             Notification[]
 
   @@index([managerId])
 }
@@ -294,10 +304,17 @@ model ActivityType {
   showInFeed       Boolean       @default(true)
   reminder         ReminderLead  @default(NONE)
   active           Boolean       @default(true)
+  /// Group-specific one-time activity types (BR-GRP-6); null for organisation-wide types.
+  groupId          String?       @db.Uuid
+  group            Group?        @relation(fields: [groupId], references: [id])
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
   interactions Interaction[]
+  series       GatheringSeries[]
+  gatherings   Gathering[]
+
+  @@index([groupId])
 }
 
 // ── Audit (BR-ADM-4, BR-MGR-8) ──────────────────────────────────────────
@@ -547,4 +564,163 @@ model ChallengeComment {
   createdAt      DateTime     @default(now())
 
   @@index([challengeId, createdAt])
+}
+
+// ── Groups (BR-GRP-1…10, US-6.1…6.7) ────────────────────────────────────
+// Members are the group admin, group moderators and mentees (BR-GRP-3). The
+// group admin's manager chain sees the group without being stored here (BR-GRP-4).
+
+enum GroupRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+model Group {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  createdById String    @db.Uuid
+  createdBy   User      @relation("GroupCreator", fields: [createdById], references: [id])
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  memberships   GroupMembership[]
+  series        GatheringSeries[]
+  gatherings    Gathering[]
+  activityTypes ActivityType[]
+}
+
+/// Exactly one ADMIN per group: a partial unique index in the migration.
+model GroupMembership {
+  id        String    @id @default(uuid()) @db.Uuid
+  groupId   String    @db.Uuid
+  group     Group     @relation(fields: [groupId], references: [id])
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id])
+  role      GroupRole
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+/// A recurring gathering (BR-GRP-5): every `intervalWeeks` weeks on `weekday` at `time`, organisation time.
+model GatheringSeries {
+  id              String       @id @default(uuid()) @db.Uuid
+  groupId         String       @db.Uuid
+  group           Group        @relation(fields: [groupId], references: [id])
+  /// A GROUP_RECURRING activity type: the gathering type.
+  activityTypeId  String       @db.Uuid
+  activityType    ActivityType @relation(fields: [activityTypeId], references: [id])
+  title           String?
+  /// 0 Sunday … 6 Saturday.
+  weekday         Int          @db.SmallInt
+  /// HH:mm in the organisation zone.
+  time            String
+  intervalWeeks   Int          @default(1) @db.SmallInt
+  durationMinutes Int          @default(60)
+  place           String?
+  startsOn        DateTime     @db.Date
+  /// The last day an occurrence may fall on; set when the series is stopped.
+  endsOn          DateTime?    @db.Date
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  gatherings Gathering[]
+
+  @@index([groupId])
+}
+
+/// One occurrence: materialised ahead from a series, or a one-time group activity (BR-GRP-6).
+model Gathering {
+  id              String           @id @default(uuid()) @db.Uuid
+  groupId         String           @db.Uuid
+  group           Group            @relation(fields: [groupId], references: [id])
+  seriesId        String?          @db.Uuid
+  series          GatheringSeries? @relation(fields: [seriesId], references: [id])
+  /// The series slot this occurrence fills; stays put when the occurrence is moved.
+  scheduledFor    DateTime?
+  activityTypeId  String           @db.Uuid
+  activityType    ActivityType     @relation(fields: [activityTypeId], references: [id])
+  title           String?
+  startsAt        DateTime
+  endsAt          DateTime?
+  place           String?
+  /// Changed by hand, so a series edit leaves it alone.
+  customised      Boolean          @default(false)
+  cancelledAt     DateTime?
+  createdById     String?          @db.Uuid
+  createdBy       User?            @relation("GatheringCreator", fields: [createdById], references: [id])
+  /// The super admin who wrote this while impersonating the author (BR-ADM-5).
+  impersonatorId  String?          @db.Uuid
+  impersonator    User?            @relation("GatheringImpersonator", fields: [impersonatorId], references: [id])
+  /// When members were asked to confirm (BR-GRP-7) and when they were reminded (US-6.5).
+  rsvpRequestedAt DateTime?
+  remindedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  rsvps      Rsvp[]
+  attendance Attendance[]
+
+  @@unique([seriesId, scheduledFor])
+  @@index([groupId, startsAt])
+  @@index([startsAt])
+}
+
+enum RsvpResponse {
+  ATTENDING
+  NOT_ATTENDING
+}
+
+model Rsvp {
+  gatheringId    String       @db.Uuid
+  gathering      Gathering    @relation(fields: [gatheringId], references: [id], onDelete: Cascade)
+  userId         String       @db.Uuid
+  user           User         @relation("RsvpUser", fields: [userId], references: [id])
+  response       RsvpResponse
+  /// The super admin who answered while impersonating the member (BR-ADM-5).
+  impersonatorId String?      @db.Uuid
+  impersonator   User?        @relation("RsvpImpersonator", fields: [impersonatorId], references: [id])
+  respondedAt    DateTime     @default(now())
+
+  @@id([gatheringId, userId])
+  @@index([userId])
+}
+
+/// The attendance log (BR-GRP-8): one row per member per gathering, with a note.
+model Attendance {
+  gatheringId    String    @db.Uuid
+  gathering      Gathering @relation(fields: [gatheringId], references: [id], onDelete: Cascade)
+  userId         String    @db.Uuid
+  user           User      @relation("AttendanceUser", fields: [userId], references: [id])
+  present        Boolean
+  note           String?
+  recordedById   String    @db.Uuid
+  recordedBy     User      @relation("AttendanceRecorder", fields: [recordedById], references: [id])
+  /// The super admin who recorded this while impersonating (BR-ADM-5).
+  impersonatorId String?   @db.Uuid
+  impersonator   User?     @relation("AttendanceImpersonator", fields: [impersonatorId], references: [id])
+  updatedAt      DateTime  @updatedAt
+
+  @@id([gatheringId, userId])
+  @@index([userId])
+}
+
+// ── Notifications (BR-NTF-1…3) ───────────────────────────────────────────
+
+/// One in-app notification. `type` is one of NOTIFICATION_TYPES in libs/shared.
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id])
+  type      String
+  payload   Json
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
 }

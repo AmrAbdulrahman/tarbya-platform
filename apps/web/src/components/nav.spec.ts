@@ -11,6 +11,18 @@ describe('sectionsFor', () => {
     ]);
   });
 
+  it('lists a link once, in the first section that has it', () => {
+    const sections = sectionsFor(['MODERATOR', 'GROUP_ADMIN', 'MENTEE']);
+    const groups = sections.flatMap((s) =>
+      s.items.filter((i) => i.to === '/groups').map(() => s.title),
+    );
+    expect(groups).toEqual(['nav.admin']);
+    expect(sections.map((s) => s.title)).toEqual([
+      'nav.admin',
+      'nav.myJourney',
+    ]);
+  });
+
   it('shows nothing for a user with no roles', () => {
     expect(sectionsFor([])).toEqual([]);
   });

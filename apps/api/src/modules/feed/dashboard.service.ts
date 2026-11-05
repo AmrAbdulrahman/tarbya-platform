@@ -14,6 +14,7 @@ import type {
   MentorDashboardDto,
   MyMentorDto,
 } from './feed.dto';
+import { GatheringsService } from '../groups/gatherings.service';
 import { FeedService } from './feed.service';
 
 const personSelect = { id: true, name: true, avatarFileId: true } as const;
@@ -36,6 +37,7 @@ export class DashboardService {
     private readonly contact: ContactService,
     private readonly trackables: TrackablesService,
     private readonly feed: FeedService,
+    private readonly gatherings: GatheringsService,
   ) {}
 
   async mentor(userId: string): Promise<MentorDashboardDto> {
@@ -93,28 +95,31 @@ export class DashboardService {
   }
 
   async journey(userId: string): Promise<JourneyDto> {
-    const [mentorship, tasks, trackables, upcoming] = await Promise.all([
-      this.prisma.mentorship.findFirst({
-        where: { menteeId: userId, endedAt: null },
-        select: { mentor: { select: personSelect } },
-      }),
-      this.prisma.task.findMany({
-        where: { assigneeId: userId, ...recentTasks() },
-        select: taskSelect,
-        orderBy: [
-          { doneAt: { sort: 'desc', nulls: 'first' } },
-          { dueOn: { sort: 'asc', nulls: 'last' } },
-          { createdAt: 'asc' },
-        ],
-      }),
-      this.trackables.activeOf([userId]),
-      this.feed.upcoming(userId, 6),
-    ]);
+    const [mentorship, tasks, trackables, upcoming, gatherings] =
+      await Promise.all([
+        this.prisma.mentorship.findFirst({
+          where: { menteeId: userId, endedAt: null },
+          select: { mentor: { select: personSelect } },
+        }),
+        this.prisma.task.findMany({
+          where: { assigneeId: userId, ...recentTasks() },
+          select: taskSelect,
+          orderBy: [
+            { doneAt: { sort: 'desc', nulls: 'first' } },
+            { dueOn: { sort: 'asc', nulls: 'last' } },
+            { createdAt: 'asc' },
+          ],
+        }),
+        this.trackables.activeOf([userId]),
+        this.feed.upcoming(userId, 6),
+        this.gatherings.upcomingFor(userId, 6),
+      ]);
     return {
       mentor: mentorship ? toPerson(mentorship.mentor) : null,
       tasks: tasks.map(toTaskDto),
       trackables,
       upcoming,
+      gatherings,
     };
   }
 

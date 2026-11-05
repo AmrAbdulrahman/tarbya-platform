@@ -174,3 +174,21 @@ export async function markTaskDoneDaysAgo(taskId: string, days: number) {
     [taskId, String(days)],
   );
 }
+
+export async function setManager(userId: string, managerId: string | null) {
+  const c = await db();
+  await c.query(`UPDATE "User" SET "managerId" = $2 WHERE id = $1`, [
+    userId,
+    managerId,
+  ]);
+}
+
+/** Notification types a user received, oldest first. */
+export async function notificationTypes(userId: string): Promise<string[]> {
+  const c = await db();
+  const { rows } = await c.query(
+    `SELECT type FROM "Notification" WHERE "userId" = $1 ORDER BY "createdAt"`,
+    [userId],
+  );
+  return rows.map((r: { type: string }) => r.type);
+}

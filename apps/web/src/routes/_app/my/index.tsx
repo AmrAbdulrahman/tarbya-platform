@@ -6,6 +6,7 @@ import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { FeedList } from '../../../components/feed/feed-list';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
+import { MyGatherings } from '../../../components/groups/my-gatherings';
 import { TasksPanel } from '../../../components/mentee/tasks-panel';
 import { Avatar } from '../../../components/profile/avatar';
 import { TrackableCard } from '../../../components/trackables/trackable-card';
@@ -36,7 +37,7 @@ function JourneyPage() {
       </p>
     );
   }
-  const { mentor, trackables, upcoming } = journey.data;
+  const { mentor, trackables, upcoming, gatherings } = journey.data;
 
   return (
     <>
@@ -94,6 +95,14 @@ function JourneyPage() {
           </h2>
           <UpcomingList items={upcoming} />
         </section>
+        {gatherings.length > 0 && (
+          <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
+            <h2 className="text-base font-bold text-brand">
+              {t('groups.myGatherings')}
+            </h2>
+            <MyGatherings items={gatherings} />
+          </section>
+        )}
         <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">
           <h2 className="text-base font-bold text-brand">{t('feed.latest')}</h2>
           <FeedList userId={me.id} />

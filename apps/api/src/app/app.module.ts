@@ -12,6 +12,9 @@ import { RequestContextMiddleware } from '../common/request-context';
 import { AuditModule } from '../modules/audit/audit.module';
 import { AuthModule } from '../modules/auth/auth.module';
 import { FeedModule } from '../modules/feed/feed.module';
+import { GroupsModule } from '../modules/groups/groups.module';
+import { JobsModule } from '../modules/jobs/jobs.module';
+import { NotificationsModule } from '../modules/notifications/notifications.module';
 import { FilesModule } from '../modules/files/files.module';
 import { HierarchyModule } from '../modules/hierarchy/hierarchy.module';
 import { MeModule } from '../modules/me/me.module';
@@ -36,6 +39,8 @@ import { HealthController } from './health.controller';
     }),
     DbModule,
     MailModule,
+    JobsModule,
+    NotificationsModule,
     AuditModule,
     HierarchyModule,
     SettingsModule,
@@ -51,6 +56,7 @@ import { HealthController } from './health.controller';
     TrackablesModule,
     ChallengesModule,
     FeedModule,
+    GroupsModule,
   ],
   controllers: [HealthController],
   providers: [

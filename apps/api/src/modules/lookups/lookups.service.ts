@@ -31,8 +31,10 @@ const activityTypeSelect = {
 export class LookupsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** Organisation-wide types; a group's own one-time types live with the group (BR-GRP-6). */
   activityTypes(): Promise<ActivityTypeDto[]> {
     return this.prisma.activityType.findMany({
+      where: { groupId: null },
       select: activityTypeSelect,
       orderBy: [{ scope: 'asc' }, { nameEn: 'asc' }],
     });

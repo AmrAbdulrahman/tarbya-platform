@@ -19,6 +19,8 @@ import { Route as AppAdminLookupsRouteImport } from './routes/_app/admin/lookups
 import { Route as AppAdminMentorshipsRouteImport } from './routes/_app/admin/mentorships'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
+import { Route as AppGroupsIndexRouteImport } from './routes/_app/groups/index'
+import { Route as AppGroupsIdRouteImport } from './routes/_app/groups/$id'
 import { Route as AppMentorIndexRouteImport } from './routes/_app/mentor/index'
 import { Route as AppMyIndexRouteImport } from './routes/_app/my/index'
 import { Route as AppMyTrackablesRouteImport } from './routes/_app/my/trackables'
@@ -75,6 +77,16 @@ const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppGroupsIndexRoute = AppGroupsIndexRouteImport.update({
+  id: '/groups/',
+  path: '/groups/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGroupsIdRoute = AppGroupsIdRouteImport.update({
+  id: '/groups/$id',
+  path: '/groups/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMentorIndexRoute = AppMentorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -116,10 +128,12 @@ export interface FileRoutesByFullPath {
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
+  '/groups/$id': typeof AppGroupsIdRoute
   '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
   '/trackables/$id': typeof AppTrackablesIdRoute
   '/trackables/library': typeof AppTrackablesLibraryRoute
+  '/groups/': typeof AppGroupsIndexRoute
   '/mentor/': typeof AppMentorIndexRoute
   '/my/': typeof AppMyIndexRoute
 }
@@ -132,10 +146,12 @@ export interface FileRoutesByTo {
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
+  '/groups/$id': typeof AppGroupsIdRoute
   '/my/trackables': typeof AppMyTrackablesRoute
   '/people/$id': typeof AppPeopleIdRoute
   '/trackables/$id': typeof AppTrackablesIdRoute
   '/trackables/library': typeof AppTrackablesLibraryRoute
+  '/groups': typeof AppGroupsIndexRoute
   '/mentor': typeof AppMentorIndexRoute
   '/my': typeof AppMyIndexRoute
 }
@@ -151,10 +167,12 @@ export interface FileRoutesById {
   '/_app/admin/mentorships': typeof AppAdminMentorshipsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
+  '/_app/groups/$id': typeof AppGroupsIdRoute
   '/_app/my/trackables': typeof AppMyTrackablesRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
   '/_app/trackables/$id': typeof AppTrackablesIdRoute
   '/_app/trackables/library': typeof AppTrackablesLibraryRoute
+  '/_app/groups/': typeof AppGroupsIndexRoute
   '/_app/mentor/': typeof AppMentorIndexRoute
   '/_app/my/': typeof AppMyIndexRoute
 }
@@ -170,10 +188,12 @@ export interface FileRouteTypes {
     | '/admin/mentorships'
     | '/admin/settings'
     | '/admin/users'
+    | '/groups/$id'
     | '/my/trackables'
     | '/people/$id'
     | '/trackables/$id'
     | '/trackables/library'
+    | '/groups/'
     | '/mentor/'
     | '/my/'
   fileRoutesByTo: FileRoutesByTo
@@ -186,10 +206,12 @@ export interface FileRouteTypes {
     | '/admin/mentorships'
     | '/admin/settings'
     | '/admin/users'
+    | '/groups/$id'
     | '/my/trackables'
     | '/people/$id'
     | '/trackables/$id'
     | '/trackables/library'
+    | '/groups'
     | '/mentor'
     | '/my'
   id:
@@ -204,10 +226,12 @@ export interface FileRouteTypes {
     | '/_app/admin/mentorships'
     | '/_app/admin/settings'
     | '/_app/admin/users'
+    | '/_app/groups/$id'
     | '/_app/my/trackables'
     | '/_app/people/$id'
     | '/_app/trackables/$id'
     | '/_app/trackables/library'
+    | '/_app/groups/'
     | '/_app/mentor/'
     | '/_app/my/'
   fileRoutesById: FileRoutesById
@@ -289,6 +313,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminUsersRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/groups/': {
+      id: '/_app/groups/'
+      path: '/groups'
+      fullPath: '/groups/'
+      preLoaderRoute: typeof AppGroupsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/groups/$id': {
+      id: '/_app/groups/$id'
+      path: '/groups/$id'
+      fullPath: '/groups/$id'
+      preLoaderRoute: typeof AppGroupsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/mentor/': {
       id: '/_app/mentor/'
       path: '/'
@@ -369,10 +407,12 @@ interface AppRouteChildren {
   AppMentorRoute: typeof AppMentorRouteWithChildren
   AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppGroupsIdRoute: typeof AppGroupsIdRoute
   AppMyTrackablesRoute: typeof AppMyTrackablesRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
   AppTrackablesIdRoute: typeof AppTrackablesIdRoute
   AppTrackablesLibraryRoute: typeof AppTrackablesLibraryRoute
+  AppGroupsIndexRoute: typeof AppGroupsIndexRoute
   AppMyIndexRoute: typeof AppMyIndexRoute
 }
 
@@ -381,10 +421,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppMentorRoute: AppMentorRouteWithChildren,
   AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
+  AppGroupsIdRoute: AppGroupsIdRoute,
   AppMyTrackablesRoute: AppMyTrackablesRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,
   AppTrackablesIdRoute: AppTrackablesIdRoute,
   AppTrackablesLibraryRoute: AppTrackablesLibraryRoute,
+  AppGroupsIndexRoute: AppGroupsIndexRoute,
   AppMyIndexRoute: AppMyIndexRoute,
 }
 

@@ -1,7 +1,7 @@
 -- Removes everything the e2e suites create, and nothing else:
 -- users with an @tarbya.test email (a reserved test domain) with all their rows,
 -- sessions the suites open for the super admin (both mark their user agent "tarbya-e2e"),
--- and lookups and trackable templates whose (English) name starts with "e2e ".
+-- and lookups, trackable templates and groups whose (English) name starts with "e2e ".
 -- Run with `pnpm nx run db:e2e-cleanup`; both e2e suites run it when they finish.
 BEGIN;
 
@@ -12,7 +12,26 @@ CREATE TEMP TABLE e2e_mentorships ON COMMIT DROP AS
   SELECT id FROM "Mentorship"
   WHERE "mentorId" IN (SELECT id FROM e2e_users) OR "menteeId" IN (SELECT id FROM e2e_users);
 
+CREATE TEMP TABLE e2e_groups ON COMMIT DROP AS
+  SELECT id FROM "Group"
+  WHERE name LIKE 'e2e %' OR "createdById" IN (SELECT id FROM e2e_users);
+
 UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Notification" WHERE "userId" IN (SELECT id FROM e2e_users);
+-- RSVPs and attendance go with their gathering (ON DELETE CASCADE).
+DELETE FROM "Rsvp" WHERE "userId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Attendance"
+  WHERE "userId" IN (SELECT id FROM e2e_users) OR "recordedById" IN (SELECT id FROM e2e_users);
+DELETE FROM "Gathering"
+  WHERE "groupId" IN (SELECT id FROM e2e_groups)
+     OR "activityTypeId" IN (SELECT id FROM "ActivityType" WHERE "nameEn" LIKE 'e2e %');
+DELETE FROM "GatheringSeries"
+  WHERE "groupId" IN (SELECT id FROM e2e_groups)
+     OR "activityTypeId" IN (SELECT id FROM "ActivityType" WHERE "nameEn" LIKE 'e2e %');
+DELETE FROM "GroupMembership"
+  WHERE "groupId" IN (SELECT id FROM e2e_groups) OR "userId" IN (SELECT id FROM e2e_users);
+DELETE FROM "ActivityType" WHERE "groupId" IN (SELECT id FROM e2e_groups);
+DELETE FROM "Group" WHERE id IN (SELECT id FROM e2e_groups);
 DELETE FROM "AdminNote"
   WHERE "subjectId" IN (SELECT id FROM e2e_users)
      OR "authorId" IN (SELECT id FROM e2e_users);

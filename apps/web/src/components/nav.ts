@@ -36,7 +36,7 @@ export const navSections: NavSection[] = [
     items: [
       { label: 'nav.users', to: '/admin/users', icon: UserPlus },
       { label: 'nav.mentorships', to: '/admin/mentorships', icon: ListTree },
-      { label: 'nav.groups', to: '/', icon: CircleDot },
+      { label: 'nav.groups', to: '/groups', icon: CircleDot },
       { label: 'nav.lookups', to: '/admin/lookups', icon: ClipboardList },
       { label: 'nav.settings', to: '/admin/settings', icon: Settings },
     ],
@@ -50,19 +50,37 @@ export const navSections: NavSection[] = [
     ],
   },
   {
+    // Group admins and moderators, and managers who see their team's groups (BR-GRP-4).
+    title: 'nav.groups',
+    roles: ['GROUP_ADMIN', 'GROUP_MODERATOR', 'MANAGER'],
+    items: [{ label: 'nav.myGroups', to: '/groups', icon: Users }],
+  },
+  {
     title: 'nav.myJourney',
     roles: ['MENTEE'],
     items: [
       { label: 'nav.journeyOverview', to: '/my', icon: Compass },
       { label: 'nav.myPlans', to: '/my/trackables', icon: TrendingUp },
       { label: 'nav.reportToMentor', to: '/', icon: MessageSquareText },
-      { label: 'nav.myGroups', to: '/', icon: Users },
+      { label: 'nav.myGroups', to: '/groups', icon: Users },
     ],
   },
 ];
 
+/** The sections for the roles a user holds; a link shows once, in the first section that has it. */
 export function sectionsFor(roles: readonly Role[]): NavSection[] {
-  return navSections.filter((section) => hasAnyRole(roles, section.roles));
+  const seen = new Set<string>();
+  return navSections
+    .filter((section) => hasAnyRole(roles, section.roles))
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => {
+        if (seen.has(item.to)) return false;
+        seen.add(item.to);
+        return true;
+      }),
+    }))
+    .filter((section) => section.items.length > 0);
 }
 
 /**

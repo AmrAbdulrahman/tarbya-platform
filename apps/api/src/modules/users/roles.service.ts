@@ -15,6 +15,10 @@ export const roleFacts = {
       reports: { where: { deactivatedAt: null } },
     },
   },
+  groupMemberships: {
+    where: { role: { not: 'MEMBER' }, group: { archivedAt: null } },
+    select: { role: true },
+  },
 } satisfies Prisma.UserSelect;
 
 export type RoleFacts = Prisma.UserGetPayload<{ select: typeof roleFacts }>;
@@ -36,13 +40,14 @@ export class RolesService {
   }
 
   rolesFrom(user: RoleFacts): Role[] {
-    // Group roles join this list with the groups module (build order step 8).
     const held: Record<Role, boolean> = {
       SUPER_ADMIN: this.isSuperAdmin(user.email),
       MODERATOR: user.isModerator,
       MANAGER: user._count.reports > 0,
-      GROUP_ADMIN: false,
-      GROUP_MODERATOR: false,
+      GROUP_ADMIN: user.groupMemberships.some((m) => m.role === 'ADMIN'),
+      GROUP_MODERATOR: user.groupMemberships.some(
+        (m) => m.role === 'MODERATOR',
+      ),
       MENTOR: user._count.mentoring > 0,
       MENTEE: user._count.mentoredBy > 0,
     };

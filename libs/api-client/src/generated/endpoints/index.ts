@@ -3,6 +3,8 @@ export * from './auth/auth.js';
 export * from './challenges/challenges.js';
 export * from './feed/feed.js';
 export * from './files/files.js';
+export * from './gatherings/gatherings.js';
+export * from './groups/groups.js';
 export * from './health/health.js';
 export * from './hierarchy/hierarchy.js';
 export * from './interactions/interactions.js';

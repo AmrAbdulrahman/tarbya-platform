@@ -20,4 +20,10 @@ export const AuditAction = {
   mentorshipend: 'mentorship.end',
   userimpersonatestart: 'user.impersonate.start',
   userimpersonatestop: 'user.impersonate.stop',
+  groupcreate: 'group.create',
+  groupupdate: 'group.update',
+  groupadminset: 'group.admin.set',
+  groupmemberadd: 'group.member.add',
+  groupmemberremove: 'group.member.remove',
+  grouproleset: 'group.role.set',
 } as const;

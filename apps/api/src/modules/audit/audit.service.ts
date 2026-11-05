@@ -15,6 +15,12 @@ export const AUDIT_ACTIONS = [
   'mentorship.end',
   'user.impersonate.start',
   'user.impersonate.stop',
+  'group.create',
+  'group.update',
+  'group.admin.set',
+  'group.member.add',
+  'group.member.remove',
+  'group.role.set',
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
@@ -22,7 +28,7 @@ export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 export interface AuditEntry {
   actorId: string;
   action: AuditAction;
-  entity: 'User' | 'Setting' | 'Mentorship';
+  entity: 'User' | 'Setting' | 'Mentorship' | 'Group';
   entityId: string;
   /** Changed fields as { field: [before, after] }. */
   diff?: Record<string, [unknown, unknown]>;

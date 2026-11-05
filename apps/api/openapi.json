@@ -2327,6 +2327,734 @@
           "feed"
         ]
       }
+    },
+    "/api/groups": {
+      "get": {
+        "operationId": "GroupsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      },
+      "post": {
+        "operationId": "GroupsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}": {
+      "get": {
+        "operationId": "GroupsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      },
+      "patch": {
+        "operationId": "GroupsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}/admin": {
+      "post": {
+        "operationId": "GroupsController_setAdmin",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetGroupAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}/members": {
+      "post": {
+        "operationId": "GroupsController_addMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}/members/{userId}": {
+      "patch": {
+        "operationId": "GroupsController_setRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetMemberRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      },
+      "delete": {
+        "operationId": "GroupsController_removeMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}/activity-types": {
+      "post": {
+        "operationId": "GroupsController_createActivityType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupActivityTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}/series": {
+      "post": {
+        "operationId": "GroupsController_createSeries",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSeriesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/groups/{id}/gatherings": {
+      "get": {
+        "operationId": "GroupsController_gatheringsOf",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "when",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "upcoming",
+                "past"
+              ]
+            }
+          },
+          {
+            "name": "before",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      },
+      "post": {
+        "operationId": "GroupsController_createGathering",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGatheringDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "groups"
+        ]
+      }
+    },
+    "/api/gatherings/mine": {
+      "get": {
+        "operationId": "GatheringsController_mine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GatheringSummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      }
+    },
+    "/api/gatherings/{id}": {
+      "get": {
+        "operationId": "GatheringsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      },
+      "patch": {
+        "operationId": "GatheringsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGatheringDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      }
+    },
+    "/api/gatherings/{id}/rsvp": {
+      "put": {
+        "operationId": "GatheringsController_rsvp",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RsvpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      }
+    },
+    "/api/gatherings/{id}/attendance": {
+      "put": {
+        "operationId": "GatheringsController_attendance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatheringDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      }
+    },
+    "/api/gatherings/{id}/remind": {
+      "post": {
+        "operationId": "GatheringsController_remind",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemindResultDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      }
+    },
+    "/api/gathering-series/{id}": {
+      "patch": {
+        "operationId": "GatheringsController_updateSeries",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSeriesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      },
+      "delete": {
+        "operationId": "GatheringsController_stopSeries",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "gatherings"
+        ]
+      }
     }
   },
   "info": {
@@ -2373,7 +3101,13 @@
           "mentorship.start",
           "mentorship.end",
           "user.impersonate.start",
-          "user.impersonate.stop"
+          "user.impersonate.stop",
+          "group.create",
+          "group.update",
+          "group.admin.set",
+          "group.member.add",
+          "group.member.remove",
+          "group.role.set"
         ]
       },
       "UserRefDto": {
@@ -5005,7 +5739,8 @@
           "FOLLOW_UP",
           "ACTIVITY",
           "ENTRY",
-          "REPLY"
+          "REPLY",
+          "GATHERING"
         ]
       },
       "TrackableRefDto": {
@@ -5123,6 +5858,19 @@
           "text": {
             "type": "string",
             "nullable": true
+          },
+          "group": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserRefDto"
+              }
+            ]
+          },
+          "present": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "required": [
@@ -5141,7 +5889,9 @@
           "trackable",
           "cycle",
           "value",
-          "text"
+          "text",
+          "group",
+          "present"
         ]
       },
       "FeedPageDto": {
@@ -5410,6 +6160,174 @@
           "mentor"
         ]
       },
+      "GatheringTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nameAr": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LookupColor"
+              }
+            ]
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityScope"
+              }
+            ]
+          },
+          "requiresRsvp": {
+            "type": "boolean"
+          },
+          "tracksAttendance": {
+            "type": "boolean"
+          },
+          "reminder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReminderLead"
+              }
+            ]
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "nameAr",
+          "nameEn",
+          "color",
+          "scope",
+          "requiresRsvp",
+          "tracksAttendance",
+          "reminder",
+          "groupId"
+        ]
+      },
+      "AttendanceCountsDto": {
+        "type": "object",
+        "properties": {
+          "members": {
+            "type": "number"
+          },
+          "attending": {
+            "type": "number"
+          },
+          "notAttending": {
+            "type": "number"
+          },
+          "noReply": {
+            "type": "number"
+          },
+          "present": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "members",
+          "attending",
+          "notAttending",
+          "noReply",
+          "present"
+        ]
+      },
+      "RsvpResponse": {
+        "type": "string",
+        "enum": [
+          "ATTENDING",
+          "NOT_ATTENDING"
+        ]
+      },
+      "GatheringSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "seriesId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "activityType": {
+            "$ref": "#/components/schemas/GatheringTypeDto"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "place": {
+            "type": "string",
+            "nullable": true
+          },
+          "cancelledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "counts": {
+            "$ref": "#/components/schemas/AttendanceCountsDto"
+          },
+          "myRsvp": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RsvpResponse"
+              }
+            ]
+          },
+          "isMember": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "groupId",
+          "groupName",
+          "seriesId",
+          "activityType",
+          "title",
+          "startsAt",
+          "endsAt",
+          "place",
+          "cancelledAt",
+          "counts",
+          "myRsvp",
+          "isMember"
+        ]
+      },
       "JourneyDto": {
         "type": "object",
         "properties": {
@@ -5439,14 +6357,739 @@
             "items": {
               "$ref": "#/components/schemas/UpcomingDto"
             }
+          },
+          "gatherings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GatheringSummaryDto"
+            }
           }
         },
         "required": [
           "mentor",
           "tasks",
           "trackables",
-          "upcoming"
+          "upcoming",
+          "gatherings"
         ]
+      },
+      "GroupRole": {
+        "type": "string",
+        "enum": [
+          "ADMIN",
+          "MODERATOR",
+          "MEMBER"
+        ]
+      },
+      "GroupSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "admin": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonRefDto"
+              }
+            ]
+          },
+          "moderators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRefDto"
+            }
+          },
+          "memberCount": {
+            "type": "number"
+          },
+          "myRole": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GroupRole"
+              }
+            ]
+          },
+          "nextGathering": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GatheringSummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "admin",
+          "moderators",
+          "memberCount",
+          "myRole",
+          "nextGathering"
+        ]
+      },
+      "CreateGroupDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "adminId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "name",
+          "adminId"
+        ]
+      },
+      "GroupMemberDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GroupRole"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatarUrl",
+          "role"
+        ]
+      },
+      "SeriesDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activityType": {
+            "$ref": "#/components/schemas/GatheringTypeDto"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "time": {
+            "type": "string"
+          },
+          "intervalWeeks": {
+            "type": "number"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "place": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "activityType",
+          "title",
+          "weekday",
+          "time",
+          "intervalWeeks",
+          "durationMinutes",
+          "place",
+          "startsOn",
+          "endsOn"
+        ]
+      },
+      "GroupDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "admin": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonRefDto"
+              }
+            ]
+          },
+          "moderators": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRefDto"
+            }
+          },
+          "memberCount": {
+            "type": "number"
+          },
+          "myRole": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GroupRole"
+              }
+            ]
+          },
+          "nextGathering": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GatheringSummaryDto"
+              }
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupMemberDto"
+            }
+          },
+          "canManage": {
+            "type": "boolean"
+          },
+          "canManageRoles": {
+            "type": "boolean"
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeriesDto"
+            }
+          },
+          "activityTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GatheringTypeDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "admin",
+          "moderators",
+          "memberCount",
+          "myRole",
+          "nextGathering",
+          "members",
+          "canManage",
+          "canManageRoles",
+          "series",
+          "activityTypes"
+        ]
+      },
+      "UpdateGroupDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SetGroupAdminDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "AssignableGroupRole": {
+        "type": "string",
+        "enum": [
+          "MODERATOR",
+          "MEMBER"
+        ]
+      },
+      "AddMemberDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "default": "MEMBER",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssignableGroupRole"
+              }
+            ]
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "SetMemberRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssignableGroupRole"
+              }
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "CreateGroupActivityTypeDto": {
+        "type": "object",
+        "properties": {
+          "nameAr": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "nameEn": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LookupColor"
+              }
+            ]
+          }
+        },
+        "required": [
+          "nameAr",
+          "nameEn"
+        ]
+      },
+      "CreateSeriesDto": {
+        "type": "object",
+        "properties": {
+          "activityTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "nullable": true
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "time": {
+            "type": "string",
+            "example": "20:00"
+          },
+          "intervalWeeks": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 8,
+            "default": 1
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 15,
+            "maximum": 720,
+            "default": 60
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 200,
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "activityTypeId",
+          "weekday",
+          "time"
+        ]
+      },
+      "GatheringPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GatheringSummaryDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "CreateGatheringDto": {
+        "type": "object",
+        "properties": {
+          "activityTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 200,
+            "nullable": true
+          }
+        },
+        "required": [
+          "activityTypeId",
+          "title",
+          "startsAt"
+        ]
+      },
+      "GatheringRowDto": {
+        "type": "object",
+        "properties": {
+          "member": {
+            "$ref": "#/components/schemas/PersonRefDto"
+          },
+          "role": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GroupRole"
+              }
+            ]
+          },
+          "rsvp": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RsvpResponse"
+              }
+            ]
+          },
+          "present": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "member",
+          "role",
+          "rsvp",
+          "present",
+          "note"
+        ]
+      },
+      "GatheringDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "seriesId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "activityType": {
+            "$ref": "#/components/schemas/GatheringTypeDto"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "place": {
+            "type": "string",
+            "nullable": true
+          },
+          "cancelledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "counts": {
+            "$ref": "#/components/schemas/AttendanceCountsDto"
+          },
+          "myRsvp": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RsvpResponse"
+              }
+            ]
+          },
+          "isMember": {
+            "type": "boolean"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GatheringRowDto"
+            }
+          },
+          "canManage": {
+            "type": "boolean"
+          },
+          "remindedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "groupId",
+          "groupName",
+          "seriesId",
+          "activityType",
+          "title",
+          "startsAt",
+          "endsAt",
+          "place",
+          "cancelledAt",
+          "counts",
+          "myRsvp",
+          "isMember",
+          "rows",
+          "canManage",
+          "remindedAt"
+        ]
+      },
+      "UpdateGatheringDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 200,
+            "nullable": true
+          },
+          "cancelled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RsvpDto": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RsvpResponse"
+              }
+            ]
+          }
+        },
+        "required": [
+          "response"
+        ]
+      },
+      "AttendanceRowDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "present": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 300,
+            "nullable": true
+          }
+        },
+        "required": [
+          "userId",
+          "present"
+        ]
+      },
+      "SaveAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttendanceRowDto"
+            }
+          }
+        },
+        "required": [
+          "rows"
+        ]
+      },
+      "RemindResultDto": {
+        "type": "object",
+        "properties": {
+          "notified": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "notified"
+        ]
+      },
+      "UpdateSeriesDto": {
+        "type": "object",
+        "properties": {
+          "activityTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "nullable": true
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "time": {
+            "type": "string",
+            "example": "20:00"
+          },
+          "intervalWeeks": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 8,
+            "default": 1
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 15,
+            "maximum": 720,
+            "default": 60
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 200,
+            "nullable": true
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          }
+        }
       }
     }
   }

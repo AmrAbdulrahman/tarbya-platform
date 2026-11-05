@@ -6,6 +6,7 @@ import {
   Sparkles,
   TrendingUp,
   TriangleAlert,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,7 @@ import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
+import { typeName } from '../groups/format';
 import { useCycleLabel, useValueText } from '../trackables/format';
 
 const kinds: Record<FeedKind, { icon: LucideIcon; className: string }> = {
@@ -29,6 +31,7 @@ const kinds: Record<FeedKind, { icon: LucideIcon; className: string }> = {
     className: 'bg-primary-tint text-primary-hover',
   },
   ACTIVITY: { icon: Sparkles, className: 'bg-emerald-50 text-trend-up' },
+  GATHERING: { icon: Users, className: 'bg-sky-50 text-sky-800' },
   ENTRY: { icon: TrendingUp, className: 'bg-amber-50 text-warn' },
   REPLY: {
     icon: MessageSquareReply,
@@ -131,6 +134,16 @@ function FeedEntry({ item, last }: { item: FeedItemDto; last: boolean }) {
         trackable: item.trackable?.name,
       });
       body = item.text;
+      break;
+    case 'GATHERING':
+      title =
+        item.title ||
+        (item.activityType ? typeName(item.activityType, locale) : '');
+      kind = t('feed.gatheringAt', {
+        type: t('feed.kind.GATHERING'),
+        group: item.group?.name ?? '',
+      });
+      body = item.present ? t('feed.present') : t('feed.absent');
       break;
   }
 

@@ -6,3 +6,5 @@ export * from './lib/contact.js';
 export * from './lib/zoned.js';
 export * from './lib/trend.js';
 export * from './lib/cycles.js';
+export * from './lib/gatherings.js';
+export * from './lib/notifications.js';

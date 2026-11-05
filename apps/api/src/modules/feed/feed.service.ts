@@ -25,6 +25,8 @@ const blank = {
   cycle: null,
   value: null,
   text: null,
+  group: null,
+  present: null,
 } satisfies Partial<FeedItemDto>;
 
 /** A member's history (US-4.2 timeline, US-5.1 feed) and what's coming up. */
@@ -54,7 +56,7 @@ export class FeedService {
       select: { id: true, name: true, type: true, cycle: true },
     } as const;
 
-    const [interactions, entries, replies] = await Promise.all([
+    const [interactions, entries, replies, attendance] = await Promise.all([
       this.prisma.interaction.findMany({
         where: {
           participants: { some: { userId: query.userId } },
@@ -112,6 +114,29 @@ export class FeedService {
         orderBy: { createdAt: 'desc' },
         take,
       }),
+      // Gatherings the member was marked present or absent at (BR-GRP-9).
+      this.prisma.attendance.findMany({
+        where: {
+          userId: query.userId,
+          gathering: { startsAt: { lt: before }, cancelledAt: null },
+        },
+        select: {
+          present: true,
+          recordedBy: ref,
+          impersonator: ref,
+          gathering: {
+            select: {
+              id: true,
+              title: true,
+              startsAt: true,
+              group: ref,
+              activityType: typeRef,
+            },
+          },
+        },
+        orderBy: { gathering: { startsAt: 'desc' } },
+        take,
+      }),
     ]);
 
     const items: FeedItemDto[] = [
@@ -152,6 +177,18 @@ export class FeedService {
         trackable: r.entry.trackable,
         cycle: r.entry.periodStart.toISOString().slice(0, 10),
         text: r.body,
+      })),
+      ...attendance.map((a) => ({
+        ...blank,
+        key: `GATHERING:${a.gathering.id}`,
+        kind: 'GATHERING' as const,
+        at: a.gathering.startsAt.toISOString(),
+        actor: a.recordedBy,
+        impersonator: a.impersonator,
+        title: a.gathering.title,
+        activityType: a.gathering.activityType,
+        group: a.gathering.group,
+        present: a.present,
       })),
     ].sort((a, b) => b.at.localeCompare(a.at));
 

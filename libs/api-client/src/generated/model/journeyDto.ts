@@ -4,6 +4,7 @@
  * Tarbya API
  * OpenAPI spec version: 0.1.0
  */
+import type { GatheringSummaryDto } from './gatheringSummaryDto.js';
 import type { PersonRefDto } from './personRefDto.js';
 import type { TaskDto } from './taskDto.js';
 import type { TrackableSummaryDto } from './trackableSummaryDto.js';
@@ -15,4 +16,5 @@ export interface JourneyDto {
   tasks: TaskDto[];
   trackables: TrackableSummaryDto[];
   upcoming: UpcomingDto[];
+  gatherings: GatheringSummaryDto[];
 }

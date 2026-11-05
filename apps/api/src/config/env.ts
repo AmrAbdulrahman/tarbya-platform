@@ -13,6 +13,11 @@ export const envSchema = z
     PORT: z.coerce.number().int().positive().default(3000),
     APP_URL: z.url(),
     ORG_TIMEZONE: z.string().default('Africa/Cairo'),
+    /** Background jobs (pg-boss). Off for one-shot runs such as writing the OpenAPI spec. */
+    JOBS_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
 
     DATABASE_URL: z.string().startsWith('postgres'),
     JWT_SECRET: z.string().min(32),

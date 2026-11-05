@@ -10,10 +10,17 @@ import {
 } from 'class-validator';
 import { ActivityTypeRefDto, TaskDto } from '../interactions/interactions.dto';
 import { MyMenteeDto } from '../mentorships/mentorships.dto';
+import { GatheringSummaryDto } from '../groups/groups.dto';
 import { TrackableSummaryDto } from '../trackables/trackables.dto';
 import { PersonRefDto, UserRefDto } from '../users/users.dto';
 
-const FEED_KINDS = ['FOLLOW_UP', 'ACTIVITY', 'ENTRY', 'REPLY'] as const;
+const FEED_KINDS = [
+  'FOLLOW_UP',
+  'ACTIVITY',
+  'ENTRY',
+  'REPLY',
+  'GATHERING',
+] as const;
 type FeedKind = (typeof FEED_KINDS)[number];
 
 export class TrackableRefDto {
@@ -32,7 +39,7 @@ export class TrackableRefDto {
 }
 
 /**
- * One entry in a member's history (BR-GRP-9 adds gatherings in step 8). Only
+ * One entry in a member's history, gatherings included (BR-GRP-9). Only
  * what everyone allowed to see the feed may read: never private notes.
  */
 export class FeedItemDto {
@@ -68,6 +75,11 @@ export class FeedItemDto {
   @ApiProperty({ type: Number, nullable: true }) value!: number | null;
   /** The entry's note or the reply. */
   @ApiProperty({ type: String, nullable: true }) text!: string | null;
+
+  /** Gatherings: the group, and whether the member was there. */
+  @ApiProperty({ type: UserRefDto, nullable: true })
+  group!: UserRefDto | null;
+  @ApiProperty({ type: Boolean, nullable: true }) present!: boolean | null;
 }
 
 export class FeedPageDto {
@@ -159,4 +171,7 @@ export class JourneyDto {
   @ApiProperty({ type: TrackableSummaryDto, isArray: true })
   trackables!: TrackableSummaryDto[];
   @ApiProperty({ type: UpcomingDto, isArray: true }) upcoming!: UpcomingDto[];
+  /** Upcoming gatherings of the member's groups, with their RSVP (BR-GRP-7). */
+  @ApiProperty({ type: GatheringSummaryDto, isArray: true })
+  gatherings!: GatheringSummaryDto[];
 }

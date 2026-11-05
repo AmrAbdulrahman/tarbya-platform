@@ -13,4 +13,5 @@ export const FeedKind = {
   ACTIVITY: 'ACTIVITY',
   ENTRY: 'ENTRY',
   REPLY: 'REPLY',
+  GATHERING: 'GATHERING',
 } as const;
