@@ -94,9 +94,14 @@ function GroupCard({ group: g }: { group: GroupSummaryDto }) {
             {t('groups.members', { count: g.memberCount })}
           </span>
         </div>
-        <Badge tone={g.myRole ? 'primary' : 'neutral'}>
-          {g.myRole ? t(`groups.role.${g.myRole}`) : t('groups.observer')}
-        </Badge>
+        {g.myRole ? (
+          <Badge tone="primary">{t(`groups.role.${g.myRole}`)}</Badge>
+        ) : (
+          // Moderators run every group; only the manager chain just looks on.
+          !hasAnyRole(me.roles, ['SUPER_ADMIN', 'MODERATOR']) && (
+            <Badge>{t('groups.observer')}</Badge>
+          )
+        )}
       </div>
       {g.admin && (
         <span className="text-sm text-ink-muted">

@@ -18,6 +18,12 @@ CREATE TEMP TABLE e2e_groups ON COMMIT DROP AS
 
 UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Notification" WHERE "userId" IN (SELECT id FROM e2e_users);
+-- Members and messages go with their conversation (ON DELETE CASCADE).
+DELETE FROM "Message" WHERE "authorId" IN (SELECT id FROM e2e_users);
+DELETE FROM "ConversationMember" WHERE "userId" IN (SELECT id FROM e2e_users);
+DELETE FROM "Conversation"
+  WHERE "groupId" IN (SELECT id FROM e2e_groups)
+     OR (kind = 'DIRECT' AND NOT EXISTS (SELECT 1 FROM "ConversationMember" cm WHERE cm."conversationId" = "Conversation".id));
 -- RSVPs and attendance go with their gathering (ON DELETE CASCADE).
 DELETE FROM "Rsvp" WHERE "userId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Attendance"

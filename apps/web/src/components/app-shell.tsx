@@ -1,13 +1,5 @@
 import { Link, Outlet, useNavigate } from '@tanstack/react-router';
-import {
-  Bell,
-  LogOut,
-  Menu,
-  MessageSquare,
-  MonitorX,
-  Search,
-  UserRound,
-} from 'lucide-react';
+import { Bell, LogOut, Menu, MonitorX, Search, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -27,6 +19,8 @@ import { ImpersonateButton, ImpersonationBanner } from './impersonation';
 import { LanguageSwitch } from './language-switch';
 import { LogoMark } from './logo';
 import { LogProvider } from './mentor/log-dialog';
+import { MessagesMenu } from './messages/messages-menu';
+import { useLiveEvents } from '../lib/live-events';
 import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
 
@@ -38,6 +32,8 @@ export function AppShell() {
   const { t } = useTranslation();
   const top = useStickyHeight();
   const [menuOpen, setMenuOpen] = useState(false);
+  const me = useMe();
+  useLiveEvents(me.id);
 
   return (
     <LogProvider>
@@ -93,13 +89,7 @@ export function AppShell() {
               <div className="flex-1" />
               <ImpersonateButton />
               <LanguageSwitch />
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={t('header.messages')}
-              >
-                <MessageSquare />
-              </Button>
+              <MessagesMenu />
               <Button
                 variant="ghost"
                 size="icon"

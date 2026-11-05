@@ -132,7 +132,7 @@ Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so R
 
 ## Realtime
 
-`GET /api/events` is an SSE stream per signed-in user. Notification and message services publish to an in-process event bus. With more than one API instance, add Postgres `LISTEN/NOTIFY` as the fan-out; the stream contract stays the same. The web invalidates TanStack Query caches on events.
+`GET /api/events` is an SSE stream per signed-in user (`events` module); it sends a heartbeat every 25 s and ends after 14 minutes, so the browser reconnects with a fresh access token and a revoked session stops receiving. Notification and message services publish to an in-process event bus. With more than one API instance, add Postgres `LISTEN/NOTIFY` as the fan-out; the stream contract stays the same. The web invalidates TanStack Query caches on events.
 
 ## Web
 

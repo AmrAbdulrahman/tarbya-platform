@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppMentorRouteImport } from './routes/_app/mentor'
+import { Route as AppMessagesRouteImport } from './routes/_app/messages'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppAdminLookupsRouteImport } from './routes/_app/admin/lookups'
 import { Route as AppAdminMentorshipsRouteImport } from './routes/_app/admin/mentorships'
@@ -50,6 +51,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
 const AppMentorRoute = AppMentorRouteImport.update({
   id: '/mentor',
   path: '/mentor',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMessagesRoute = AppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/mentor': typeof AppMentorRouteWithChildren
+  '/messages': typeof AppMessagesRoute
   '/profile': typeof AppProfileRoute
   '/admin/lookups': typeof AppAdminLookupsRoute
   '/admin/mentorships': typeof AppAdminMentorshipsRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof AppAdminRouteWithChildren
+  '/messages': typeof AppMessagesRoute
   '/profile': typeof AppProfileRoute
   '/': typeof AppIndexRoute
   '/admin/lookups': typeof AppAdminLookupsRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/mentor': typeof AppMentorRouteWithChildren
+  '/_app/messages': typeof AppMessagesRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/lookups': typeof AppAdminLookupsRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/mentor'
+    | '/messages'
     | '/profile'
     | '/admin/lookups'
     | '/admin/mentorships'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/admin'
+    | '/messages'
     | '/profile'
     | '/'
     | '/admin/lookups'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_app/admin'
     | '/_app/mentor'
+    | '/_app/messages'
     | '/_app/profile'
     | '/_app/'
     | '/_app/admin/lookups'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       path: '/mentor'
       fullPath: '/mentor'
       preLoaderRoute: typeof AppMentorRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/messages': {
+      id: '/_app/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AppMessagesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile': {
@@ -405,6 +424,7 @@ const AppMentorRouteWithChildren = AppMentorRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppMentorRoute: typeof AppMentorRouteWithChildren
+  AppMessagesRoute: typeof AppMessagesRoute
   AppProfileRoute: typeof AppProfileRoute
   AppIndexRoute: typeof AppIndexRoute
   AppGroupsIdRoute: typeof AppGroupsIdRoute
@@ -419,6 +439,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
   AppMentorRoute: AppMentorRouteWithChildren,
+  AppMessagesRoute: AppMessagesRoute,
   AppProfileRoute: AppProfileRoute,
   AppIndexRoute: AppIndexRoute,
   AppGroupsIdRoute: AppGroupsIdRoute,

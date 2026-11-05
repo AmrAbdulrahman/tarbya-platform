@@ -84,6 +84,9 @@ model User {
   attendanceRecorded        Attendance[]             @relation("AttendanceRecorder")
   attendanceInImpersonation Attendance[]             @relation("AttendanceImpersonator")
   notifications             Notification[]
+  conversations             ConversationMember[]
+  messages                  Message[]                @relation("MessageAuthor")
+  messagesInImpersonation   Message[]                @relation("MessageImpersonator")
 
   @@index([managerId])
 }
@@ -587,6 +590,7 @@ model Group {
   updatedAt   DateTime  @updatedAt
 
   memberships   GroupMembership[]
+  conversation  Conversation?
   series        GatheringSeries[]
   gatherings    Gathering[]
   activityTypes ActivityType[]
@@ -723,4 +727,60 @@ model Notification {
   createdAt DateTime  @default(now())
 
   @@index([userId, createdAt])
+}
+
+// ── Messages (BR-MSG-1, BR-MSG-2, US-7.3) ────────────────────────────────
+// Who may read and post is derived: an active mentorship between the two for
+// DIRECT, current group membership for GROUP. Member rows hold read state.
+
+enum ConversationKind {
+  DIRECT
+  GROUP
+  /// v2: manager ↔ member (BR-MSG-3).
+  TEAM
+}
+
+model Conversation {
+  id            String           @id @default(uuid()) @db.Uuid
+  kind          ConversationKind
+  /// GROUP: one conversation per group.
+  groupId       String?          @unique @db.Uuid
+  group         Group?           @relation(fields: [groupId], references: [id])
+  /// DIRECT: "<smaller user id>:<larger user id>", one conversation per pair.
+  directKey     String?          @unique
+  lastMessageAt DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  members  ConversationMember[]
+  messages Message[]
+
+  @@index([lastMessageAt])
+}
+
+model ConversationMember {
+  conversationId String       @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String       @db.Uuid
+  user           User         @relation(fields: [userId], references: [id])
+  lastReadAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  authorId       String       @db.Uuid
+  author         User         @relation("MessageAuthor", fields: [authorId], references: [id])
+  /// The super admin who wrote this while impersonating the author (BR-ADM-5).
+  impersonatorId String?      @db.Uuid
+  impersonator   User?        @relation("MessageImpersonator", fields: [impersonatorId], references: [id])
+  body           String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
 }

@@ -15,20 +15,26 @@ async function signIn(page: Page) {
   await ensureArabic(page);
 }
 
-/** A mentee of the super admin and a gathering type; the teardown removes both ("e2e " names). */
+/**
+ * A mentee with their own mentor (not the super admin, whose mentee list other
+ * specs read) and a gathering type; the teardown removes them all.
+ */
 async function setUp(page: Page) {
   const tag = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   const me = await (await page.request.get('/api/auth/me')).json();
   const name = `بدر ${tag}`;
-  const mentee = await (
-    await page.request.post('/api/users', {
-      headers,
-      data: { name, email: `badr.${tag}@tarbya.test` },
-    })
-  ).json();
+  const newUser = async (n: string, mail: string) =>
+    (
+      await page.request.post('/api/users', {
+        headers,
+        data: { name: n, email: `${mail}.${tag}@tarbya.test` },
+      })
+    ).json();
+  const mentor = await newUser(`مربٍّ ${tag}`, 'mentor');
+  const mentee = await newUser(name, 'badr');
   await page.request.post('/api/mentorships', {
     headers,
-    data: { mentorId: me.id, menteeId: mentee.id },
+    data: { mentorId: mentor.id, menteeId: mentee.id },
   });
   const typeName = `e2e درس ${tag}`;
   await page.request.post('/api/lookups/activity-types', {

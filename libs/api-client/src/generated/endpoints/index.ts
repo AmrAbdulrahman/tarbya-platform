@@ -11,6 +11,7 @@ export * from './interactions/interactions.js';
 export * from './lookups/lookups.js';
 export * from './me/me.js';
 export * from './mentorships/mentorships.js';
+export * from './messages/messages.js';
 export * from './notes/notes.js';
 export * from './people/people.js';
 export * from './profiles/profiles.js';
