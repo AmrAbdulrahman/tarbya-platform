@@ -8,3 +8,5 @@ export * from './lib/trend.js';
 export * from './lib/cycles.js';
 export * from './lib/gatherings.js';
 export * from './lib/notifications.js';
+export * from './lib/search.js';
+export * from './lib/mentions.js';

@@ -11,5 +11,6 @@ export type ConversationKind = typeof ConversationKind[keyof typeof Conversation
 export const ConversationKind = {
   DIRECT: 'DIRECT',
   GROUP: 'GROUP',
+  CHAT: 'CHAT',
   TEAM: 'TEAM',
 } as const;

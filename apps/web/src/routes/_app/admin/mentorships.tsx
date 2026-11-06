@@ -22,6 +22,7 @@ import {
 import { UserPicker } from '../../../components/admin/user-picker';
 import { Field, FormError } from '../../../components/login/fields';
 import { Breadcrumbs } from '../../../components/breadcrumbs';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-3.3 · design/screens/Admin.dc.html (assign panel and mentoring tree) */
 export const Route = createFileRoute('/_app/admin/mentorships')({
@@ -35,14 +36,14 @@ function MentorshipsPage() {
       <Breadcrumbs
         items={[{ label: t('nav.admin') }, { label: t('nav.mentorships') }]}
       />
-      <div className="flex flex-col gap-1">
+      <PageHeader>
         <h1 className="text-2xl font-bold text-brand">
           {t('mentoring.mentorships.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">
           {t('mentoring.mentorships.lead')}
         </p>
-      </div>
+      </PageHeader>
       <div className="flex flex-col gap-4">
         <AssignCard />
         <TreeSection />

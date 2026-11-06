@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@tarbya/db';
 import { forbidden } from '../../common/access';
 import { AppException } from '../../common/app-exception';
+import { HierarchyService } from '../hierarchy/hierarchy.service';
 import { RolesService } from '../users/roles.service';
 
 /** Who may see or act on a mentee's follow-ups, tasks and notes. */
@@ -10,7 +11,20 @@ export class MentoringAccess {
   constructor(
     private readonly prisma: PrismaService,
     private readonly roles: RolesService,
+    private readonly hierarchy: HierarchyService,
   ) {}
+
+  /**
+   * Admins, and anyone above the member: up their mentoring chain or their
+   * management line (BR-NOTE-1, BR-NOTE-3). Never the member or their peers.
+   */
+  async isAbove(viewerId: string, memberId: string): Promise<boolean> {
+    if (viewerId === memberId) return false;
+    if (await this.roles.isAdmin(viewerId)) return true;
+    if (await this.hierarchy.isMentorAbove(this.prisma, memberId, viewerId))
+      return true;
+    return this.hierarchy.isManagerAbove(this.prisma, memberId, viewerId);
+  }
 
   /** The active mentorship where `mentorId` mentors `menteeId`, if there is one. */
   currentMentorship(mentorId: string, menteeId: string) {

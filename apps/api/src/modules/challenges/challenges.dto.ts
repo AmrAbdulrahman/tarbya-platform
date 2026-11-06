@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsBoolean,
   IsOptional,
   IsString,
@@ -83,4 +84,21 @@ export class CommentBodyDto {
   @MinLength(1)
   @MaxLength(2000)
   body!: string;
+}
+
+export class MentionAccessQuery {
+  @ApiProperty({ format: 'uuid' }) @IsUUID() menteeId!: string;
+
+  /** The people mentioned so far. */
+  @ApiProperty({ type: String, format: 'uuid', isArray: true })
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @IsUUID('all', { each: true })
+  @ArrayMaxSize(50)
+  userIds!: string[];
+}
+
+export class MentionAccessDto {
+  /** Those who can't see the mentee's challenges, so won't see the comment or be told. */
+  @ApiProperty({ type: String, format: 'uuid', isArray: true })
+  blocked!: string[];
 }

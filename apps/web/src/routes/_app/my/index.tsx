@@ -7,10 +7,12 @@ import { useMe } from '../../../auth/session';
 import { FeedList } from '../../../components/feed/feed-list';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
 import { MyGatherings } from '../../../components/groups/my-gatherings';
+import { ChallengesPanel } from '../../../components/mentee/challenges-panel';
 import { TasksPanel } from '../../../components/mentee/tasks-panel';
 import { Avatar } from '../../../components/profile/avatar';
 import { TrackableCard } from '../../../components/trackables/trackable-card';
 import { TrackablesBoard } from '../../../components/trackables/trackables-board';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-5.1 · design/screens/MyJourney.dc.html */
 export const Route = createFileRoute('/_app/my/')({
@@ -41,7 +43,7 @@ function JourneyPage() {
 
   return (
     <>
-      <header className="flex flex-wrap items-end gap-4">
+      <PageHeader className="flex-row flex-wrap items-end gap-4">
         <div className="flex flex-1 flex-col gap-1">
           <span className="text-sm text-ink-subtle">
             {t('journey.eyebrow')}
@@ -74,7 +76,7 @@ function JourneyPage() {
             </span>
           </div>
         </div>
-      </header>
+      </PageHeader>
 
       {trackables.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -87,6 +89,7 @@ function JourneyPage() {
       {/* The same tracking view as "My trackables", then the action items (US-5.1). */}
       <TrackablesBoard menteeId={me.id} canManage={false} isMentee />
       <TasksPanel menteeId={me.id} />
+      <ChallengesPanel menteeId={me.id} canManage={false} />
 
       <div className="flex flex-wrap items-start gap-4">
         <section className="flex min-w-0 flex-[1_1_320px] flex-col gap-4 rounded-card border border-border bg-card p-4">

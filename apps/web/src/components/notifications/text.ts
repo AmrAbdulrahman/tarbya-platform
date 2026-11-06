@@ -82,6 +82,11 @@ export function useNotificationText() {
       case 'MENTOR_REPLIED':
       case 'NEW_MESSAGE':
         return { title: t(`${k}.${n.type}`, p), body: str(p, 'preview') };
+      case 'MENTIONED':
+        return {
+          title: t(`${k}.${p['noteId'] ? 'MENTIONED_note' : 'MENTIONED'}`, p),
+          body: str(p, 'preview'),
+        };
     }
   };
 }

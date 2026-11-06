@@ -8,4 +8,5 @@
 export interface SendMessageDto {
   /** @maxLength 4000 */
   body: string;
+  attachmentIds?: string[];
 }

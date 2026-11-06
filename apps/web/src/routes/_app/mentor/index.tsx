@@ -1,21 +1,24 @@
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState, type ReactNode } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { MessageCircle, Plus } from 'lucide-react';
+import { useState, type MouseEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   feedControllerMentor,
+  messagesControllerDirect,
   type DashboardMenteeDto,
   type MentorDashboardDto,
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
 import { daysSince, formatDate } from '@tarbya/shared';
-import { Badge, cn } from '@tarbya/ui';
+import { Badge, cn, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { UpcomingList } from '../../../components/feed/upcoming-list';
 import { useLogDialog } from '../../../components/mentor/log-dialog';
 import { useCycleLabel } from '../../../components/trackables/format';
 import { Sparkline, TrendBadge } from '../../../components/trackables/trend';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-4.1 · design/screens/Main.dc.html */
 export const Route = createFileRoute('/_app/mentor/')({
@@ -48,7 +51,7 @@ function MentorDashboard() {
   });
 
   const header = (
-    <header className="flex flex-wrap items-end gap-4">
+    <PageHeader>
       <div className="flex flex-1 flex-col gap-1">
         <span className="text-sm text-ink-subtle">
           {formatDate(new Date(), {
@@ -60,7 +63,7 @@ function MentorDashboard() {
           {t('dashboard.greeting', { name: me.name.split(' ')[0] })}
         </h1>
       </div>
-    </header>
+    </PageHeader>
   );
 
   if (!dashboard.data) {
@@ -249,13 +252,29 @@ function MentorDashboard() {
   );
 }
 
+/** The whole row opens the mentee's page; its own links and buttons keep their job. */
 function MenteeRow({ row }: { row: DashboardMenteeDto }) {
   const { t } = useTranslation();
   const openLog = useLogDialog();
+  const navigate = useNavigate();
+  const toast = useToast();
   const trackable = row.mainTrackable;
   const cycleLabel = useCycleLabel();
+  const message = useMutation({
+    mutationFn: () => messagesControllerDirect({ userId: row.mentee.id }),
+    onSuccess: (res) =>
+      navigate({ to: '/messages', search: { c: res.data.id } }),
+    onError: (error) => toast(errorMessage(t, error)),
+  });
+  const openProfile = (e: MouseEvent<HTMLTableRowElement>) => {
+    if ((e.target as HTMLElement).closest('a, button')) return;
+    void navigate({ to: '/people/$id', params: { id: row.mentee.id } });
+  };
   return (
-    <tr>
+    <tr
+      onClick={openProfile}
+      className="cursor-pointer transition-colors hover:bg-primary-tint/40"
+    >
       <td className="px-6 py-3.5">
         <span className="flex items-center gap-3">
           <span
@@ -351,15 +370,28 @@ function MenteeRow({ row }: { row: DashboardMenteeDto }) {
           </span>
         )}
       </td>
-      <td className="px-6 py-3.5 text-end">
-        <button
-          type="button"
-          onClick={() => openLog('follow-up', row.mentee.id)}
-          aria-label={t('dashboard.contactWith', { name: row.mentee.name })}
-          className="whitespace-nowrap text-sm font-semibold text-primary hover:text-primary-hover"
-        >
-          {t('dashboard.contact')}
-        </button>
+      <td className="px-6 py-3.5">
+        <span className="flex items-center justify-end gap-1">
+          <button
+            type="button"
+            disabled={message.isPending}
+            onClick={() => message.mutate()}
+            aria-label={t('dashboard.messageWith', { name: row.mentee.name })}
+            title={t('dashboard.messageWith', { name: row.mentee.name })}
+            className="grid size-9 place-items-center rounded-full text-primary hover:bg-primary-tint hover:text-primary-hover disabled:opacity-50"
+          >
+            <MessageCircle className="size-5" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={() => openLog('follow-up', row.mentee.id)}
+            aria-label={t('dashboard.contactWith', { name: row.mentee.name })}
+            title={t('dashboard.contactWith', { name: row.mentee.name })}
+            className="grid size-9 place-items-center rounded-full text-primary hover:bg-primary-tint hover:text-primary-hover"
+          >
+            <Plus className="size-5" aria-hidden />
+          </button>
+        </span>
       </td>
     </tr>
   );

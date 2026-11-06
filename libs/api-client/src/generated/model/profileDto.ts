@@ -21,7 +21,7 @@ export interface ProfileDto {
   mentor: UserRefDto | null;
   /** @nullable */
   deactivatedAt: string | null;
-  canSeeAdminNotes: boolean;
+  canWriteNotes: boolean;
   canSeeMentoring: boolean;
   canManageMentoring: boolean;
   isMentor: boolean;

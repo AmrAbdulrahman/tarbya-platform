@@ -4,6 +4,7 @@ import {
   createMentorship,
   createUser,
   signedIn,
+  superAdminId,
 } from '../support/fixtures';
 import type { Session } from '../support/session';
 
@@ -363,5 +364,27 @@ describe('people search', () => {
     const people = (await asMentor.get('/api/people')).data;
     expect(people[0]).toMatchObject({ id: mentee.id, isMyMentee: true });
     expect((await asMentee.get('/api/people')).status).toBe(403);
+  });
+
+  it('finds, from the header, only people the viewer may open, whatever alef they typed', async () => {
+    const tag = Date.now().toString(36);
+    const mentor = await createUser();
+    const mentee = await createUser({ name: `E2E إبراهيم ${tag}` });
+    const stranger = await createUser({ name: `E2E ابراهيم ${tag} آخر` });
+    await createMentorship(mentor.id, mentee.id);
+    const q = `?q=${encodeURIComponent(`ابراهيم ${tag}`)}`;
+    const asMentor = await signedIn(mentor.id);
+    expect((await asMentor.get(`/api/search/people${q}`)).data).toEqual([
+      expect.objectContaining({ id: mentee.id, isMyMentee: true }),
+    ]);
+    const asAdmin = await signedIn(await superAdminId());
+    const ids = (
+      (
+        await asAdmin.get(
+          `/api/search/people?q=${encodeURIComponent(`أبراهيم ${tag}`)}`,
+        )
+      ).data as { id: string }[]
+    ).map((p) => p.id);
+    expect(ids).toEqual(expect.arrayContaining([mentee.id, stranger.id]));
   });
 });

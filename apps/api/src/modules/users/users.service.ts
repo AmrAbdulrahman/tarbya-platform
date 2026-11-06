@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService, type Prisma } from '@tarbya/db';
-import { canSignIn, type Role } from '@tarbya/shared';
+import { canSignIn, normalizeSearch, type Role } from '@tarbya/shared';
 import { AppException } from '../../common/app-exception';
 import type { Env } from '../../config/env';
 import { AuditService, diffOf } from '../audit/audit.service';
@@ -36,6 +36,22 @@ type UserRow = Prisma.UserGetPayload<{ select: typeof userSelect }>;
 const notFound = () =>
   new AppException(404, { code: 'NOT_FOUND', title: 'User not found' });
 
+/**
+ * Typeahead by name, email or phone (BR-USR-6). Names match whatever form of
+ * alef, yeh or diacritics was typed (`User.nameSearch`).
+ */
+export function personSearch(q: string): Prisma.UserWhereInput[] {
+  const text = normalizeSearch(q);
+  return [
+    { nameSearch: { contains: text } },
+    { email: { contains: text, mode: 'insensitive' } },
+    // Only a query that looks like a phone number searches phones.
+    ...(/^[+\d\s()-]+$/.test(text) && text.replace(/\D/g, '').length >= 3
+      ? [{ phone: { contains: text.replace(/[^\d+]/g, '') } }]
+      : []),
+  ];
+}
+
 /** User administration (US-3.1, US-3.2, US-3.4). Every route is admin-only. */
 @Injectable()
 export class UsersService {
@@ -55,17 +71,7 @@ export class UsersService {
       ...(query.status === 'active' && { deactivatedAt: null }),
       ...(query.status === 'inactive' && { deactivatedAt: { not: null } }),
       ...(query.moderatorsOnly && { AND: [{ OR: this.canManageWhere() }] }),
-      ...(query.q && {
-        OR: [
-          { name: { contains: query.q, mode: 'insensitive' } },
-          { email: { contains: query.q, mode: 'insensitive' } },
-          // Only a query that looks like a phone number searches phones.
-          ...(/^[+\d\s()-]+$/.test(query.q) &&
-          query.q.replace(/\D/g, '').length >= 3
-            ? [{ phone: { contains: query.q.replace(/[^\d+]/g, '') } }]
-            : []),
-        ],
-      }),
+      ...(query.q && { OR: personSearch(query.q) }),
     };
     const rows = await this.prisma.user.findMany({
       where,

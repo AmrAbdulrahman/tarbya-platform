@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsBoolean,
   IsIn,
   IsOptional,
@@ -30,10 +31,12 @@ export class NoteDto {
 }
 
 export class NotesQuery {
+  /** The member the notes are about. */
   @ApiProperty({ format: 'uuid' }) @IsUUID() menteeId!: string;
 }
 
 export class CreateNoteDto {
+  /** The member the note is about. */
   @ApiProperty({ format: 'uuid' }) @IsUUID() menteeId!: string;
 
   @ApiProperty({ enum: VISIBILITY, enumName: 'NoteVisibility' })
@@ -64,4 +67,19 @@ export class UpdateNoteDto {
 
   /** Required to turn a private note into a shared one (US-4.6). */
   @ApiPropertyOptional() @IsOptional() @IsBoolean() confirmWiden?: boolean;
+}
+
+export class NoteMentionAccessQuery {
+  @ApiProperty({ format: 'uuid' }) @IsUUID() menteeId!: string;
+
+  @ApiProperty({ enum: VISIBILITY, enumName: 'NoteVisibility' })
+  @IsIn(VISIBILITY)
+  visibility!: Visibility;
+
+  /** The people mentioned so far. */
+  @ApiProperty({ type: String, format: 'uuid', isArray: true })
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @IsUUID('all', { each: true })
+  @ArrayMaxSize(50)
+  userIds!: string[];
 }

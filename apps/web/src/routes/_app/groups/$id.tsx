@@ -32,6 +32,7 @@ import {
   RolesDialog,
   SeriesDialog,
 } from '../../../components/groups/group-dialogs';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-6.2…6.7 · design/screens/Group.dc.html */
 export const Route = createFileRoute('/_app/groups/$id')({
@@ -102,7 +103,7 @@ function GroupPage() {
       <Breadcrumbs
         items={[{ label: t('groups.title'), to: '/groups' }, { label: g.name }]}
       />
-      <header className="flex flex-wrap items-end gap-4">
+      <PageHeader className="flex-row flex-wrap items-end gap-4">
         <div className="flex min-w-0 flex-[1_1_420px] flex-col gap-2">
           <span className="text-[13px] font-semibold text-ink-subtle">
             {t('groups.eyebrow')} ·{' '}
@@ -149,7 +150,7 @@ function GroupPage() {
             </>
           )}
         </div>
-      </header>
+      </PageHeader>
 
       {!g.myRole && !g.canManage && (
         <p className="flex items-start gap-2 rounded-card border border-border bg-card px-4 py-3 text-sm text-ink-muted">

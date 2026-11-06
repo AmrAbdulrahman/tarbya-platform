@@ -12,6 +12,7 @@ import { useMe } from '../../../auth/session';
 import { Breadcrumbs } from '../../../components/breadcrumbs';
 import { gatheringTitle } from '../../../components/groups/format';
 import { CreateGroupDialog } from '../../../components/groups/group-dialogs';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-6.1, US-6.7: the groups someone belongs to or oversees. */
 export const Route = createFileRoute('/_app/groups/')({
@@ -32,7 +33,7 @@ function GroupsPage() {
   return (
     <>
       <Breadcrumbs items={[{ label: t('groups.title') }]} />
-      <div className="flex flex-wrap items-end gap-4">
+      <PageHeader className="flex-row flex-wrap items-end gap-4">
         <div className="flex flex-1 flex-col gap-1">
           <h1 className="text-2xl font-bold text-brand">{t('groups.title')}</h1>
           <p className="text-[15px] text-ink-subtle">{t('groups.lead')}</p>
@@ -43,7 +44,7 @@ function GroupsPage() {
             {t('groups.new')}
           </Button>
         )}
-      </div>
+      </PageHeader>
       {groups.isError && (
         <p className="text-ink-subtle">{errorMessage(t, groups.error)}</p>
       )}

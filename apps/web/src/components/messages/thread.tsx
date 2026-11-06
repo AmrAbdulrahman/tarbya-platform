@@ -1,10 +1,17 @@
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, SendHorizontal } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  SendHorizontal,
+  TriangleAlert,
+  Users,
+} from 'lucide-react';
 import {
   Fragment,
   useEffect,
@@ -15,12 +22,14 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  messagesControllerMembers,
   messagesControllerPage,
   messagesControllerRead,
   messagesControllerSend,
   type ConversationDto,
   type MessageDto,
   type MessagePageDto,
+  type PersonRefDto,
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
 import { addDays, formatDate, formatTime, toZoned } from '@tarbya/shared';
@@ -29,7 +38,20 @@ import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
 import { FormError } from '../login/fields';
-import { Avatar } from '../profile/avatar';
+import { ConversationAvatar } from './conversation-avatar';
+import {
+  AttachButton,
+  MessageFiles,
+  PendingFiles,
+  useAttachments,
+} from './attachments';
+import { MembersDialog } from './chat-dialogs';
+import {
+  MentionText,
+  MentionTextarea,
+  useMentionDraft,
+  type Mention,
+} from '../mention-textarea';
 import {
   conversationName,
   conversationRole,
@@ -50,7 +72,9 @@ export function Thread({
   const queryClient = useQueryClient();
   const queryKey = ['messages', c.id];
   const bottom = useRef<HTMLDivElement>(null);
-  const [draft, setDraft] = useState('');
+  const draft = useMentionDraft();
+  const [showMembers, setShowMembers] = useState(false);
+  const many = c.kind === 'GROUP' || c.kind === 'CHAT';
 
   const messages = useInfiniteQuery({
     queryKey,
@@ -85,10 +109,13 @@ export function Thread({
     bottom.current?.scrollIntoView({ block: 'end' });
   }, [latest]);
 
+  const files = useAttachments(c.id);
   const send = useMutation({
-    mutationFn: (body: string) => messagesControllerSend(c.id, { body }),
+    mutationFn: (body: string) =>
+      messagesControllerSend(c.id, { body, attachmentIds: files.ids }),
     onSuccess: async () => {
-      setDraft('');
+      draft.reset();
+      files.clear();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey }),
         queryClient.invalidateQueries({ queryKey: conversationsQueryKey }),
@@ -97,7 +124,8 @@ export function Thread({
   });
   const submit = (e?: FormEvent) => {
     e?.preventDefault();
-    if (draft.trim() && !send.isPending) send.mutate(draft.trim());
+    const ready = draft.text.trim() || files.ids.length;
+    if (ready && !files.uploading && !send.isPending) send.mutate(draft.body());
   };
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -130,11 +158,7 @@ export function Thread({
         >
           <Back aria-hidden />
         </Button>
-        <Avatar
-          name={conversationName(c)}
-          url={c.other?.avatarUrl ?? null}
-          className="size-10"
-        />
+        <ConversationAvatar conversation={c} className="size-10" />
         <div className="flex min-w-0 flex-1 flex-col">
           <h2 className="truncate font-bold text-brand">
             {conversationName(c)}
@@ -143,7 +167,27 @@ export function Thread({
             {conversationRole(t, c)}
           </span>
         </div>
+        {many && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-9"
+            aria-label={t('messages.chat.members')}
+            title={t('messages.chat.members')}
+            onClick={() => setShowMembers(true)}
+          >
+            <Users aria-hidden />
+          </Button>
+        )}
         <ProfileLink conversation={c} />
+        {many && (
+          <MembersDialog
+            conversation={c}
+            open={showMembers}
+            onOpenChange={setShowMembers}
+            onLeft={onBack}
+          />
+        )}
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto bg-surface/60 px-4 py-4">
@@ -177,7 +221,7 @@ export function Thread({
               <Bubble
                 message={m}
                 mine={m.author.id === me.id}
-                showAuthor={c.kind === 'GROUP'}
+                showAuthor={many}
               />
             </Fragment>
           );
@@ -185,26 +229,59 @@ export function Thread({
         <div ref={bottom} />
       </div>
 
+      {c.canPost && <PendingFiles files={files} />}
       {c.canPost ? (
         <form
           onSubmit={submit}
-          className="flex items-end gap-2 border-t border-border p-3"
+          className={cn(
+            'flex items-end gap-2 p-3',
+            !files.pending.length && 'border-t border-border',
+          )}
         >
-          <Textarea
-            aria-label={t('messages.write')}
-            placeholder={t('messages.write')}
-            className="max-h-40 min-h-11 flex-1 resize-none py-2.5"
-            rows={1}
-            maxLength={4000}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
+          <AttachButton files={files} />
+          <div className="flex-1">
+            {many ? (
+              <MentionTextarea
+                label={t('messages.write')}
+                placeholder={t('messages.writeMention')}
+                className="max-h-40 min-h-11 resize-none py-2.5"
+                rows={1}
+                maxLength={4000}
+                value={draft.text}
+                onChange={draft.setText}
+                picked={draft.picked}
+                onPick={draft.pick}
+                onKeyDown={onKeyDown}
+                above
+              />
+            ) : (
+              <Textarea
+                aria-label={t('messages.write')}
+                placeholder={t('messages.write')}
+                className="max-h-40 min-h-11 resize-none py-2.5"
+                rows={1}
+                maxLength={4000}
+                value={draft.text}
+                onChange={(e) => draft.setText(e.target.value)}
+                onKeyDown={onKeyDown}
+              />
+            )}
+            {many && (
+              <OutsideMentions
+                conversationId={c.id}
+                mentions={draft.mentioned}
+              />
+            )}
+          </div>
           <Button
             type="submit"
             size="icon"
             aria-label={t('messages.send')}
-            disabled={!draft.trim() || send.isPending}
+            disabled={
+              (!draft.text.trim() && !files.ids.length) ||
+              files.uploading ||
+              send.isPending
+            }
           >
             <SendHorizontal className="rtl:-scale-x-100" aria-hidden />
           </Button>
@@ -253,9 +330,12 @@ function Bubble({
           {actedBy(t, m.author, m.impersonator)}
         </span>
       )}
-      <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">
-        {m.body}
-      </p>
+      <MessageFiles files={m.attachments} mine={mine} />
+      {m.body && (
+        <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">
+          <MentionText body={m.body} />
+        </p>
+      )}
       <span
         className={cn(
           'text-[11px]',
@@ -293,4 +373,38 @@ function ProfileLink({ conversation: c }: { conversation: ConversationDto }) {
       </Link>
     );
   return null;
+}
+
+/** Under the composer: people mentioned who aren't in the conversation, so won't see it. */
+function OutsideMentions({
+  conversationId,
+  mentions,
+}: {
+  conversationId: string;
+  mentions: Mention[];
+}) {
+  const { t } = useTranslation();
+  const members = useQuery({
+    queryKey: ['conversation-members', conversationId],
+    queryFn: async ({ signal }) =>
+      (await messagesControllerMembers(conversationId, { signal }))
+        .data as PersonRefDto[],
+    enabled: mentions.length > 0,
+  });
+  const outside = members.data
+    ? mentions.filter((m) => !members.data.some((p) => p.id === m.id))
+    : [];
+  if (!outside.length) return null;
+  return (
+    <p
+      role="status"
+      className="mt-1 flex items-start gap-1.5 text-[13px] text-warn"
+    >
+      <TriangleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+      {t('mentions.notMember', {
+        count: outside.length,
+        names: outside.map((m) => m.name).join(t('mentions.and')),
+      })}
+    </p>
+  );
 }

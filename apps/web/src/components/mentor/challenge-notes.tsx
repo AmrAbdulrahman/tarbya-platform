@@ -4,13 +4,26 @@ import {
   challengesControllerList,
   type ChallengeDto,
 } from '@tarbya/api-client';
-import { Checkbox, Input } from '@tarbya/ui';
+import { withMentionTokens } from '@tarbya/shared';
+import { Checkbox } from '@tarbya/ui';
 import { challengesQueryKey } from '../mentee/challenges-panel';
+import {
+  MentionAccessWarning,
+  MentionTextarea,
+  mentionsIn,
+  type Mention,
+} from '../mention-textarea';
 
 export interface ChallengeNote {
   comment: string;
+  /** People picked while writing the comment. */
+  mentions: Mention[];
   resolve: boolean;
 }
+
+/** The comment as stored: each `@Name` still in it becomes a mention. */
+export const challengeComment = (n: ChallengeNote) =>
+  withMentionTokens(n.comment.trim(), mentionsIn(n.comment, n.mentions));
 
 /** BR-CHL-2: a word on each open challenge, or resolving it, as part of the follow-up. */
 export function ChallengeNotes({
@@ -20,7 +33,12 @@ export function ChallengeNotes({
 }: {
   menteeId: string;
   notes: Record<string, ChallengeNote>;
-  onChange: (notes: Record<string, ChallengeNote>) => void;
+  /** Takes an update, since a pick changes the text and the mentions at once. */
+  onChange: (
+    update: (
+      notes: Record<string, ChallengeNote>,
+    ) => Record<string, ChallengeNote>,
+  ) => void;
 }) {
   const { t } = useTranslation();
   const challenges = useQuery({
@@ -31,14 +49,17 @@ export function ChallengeNotes({
   });
   const open = (challenges.data ?? []).filter((c) => !c.resolvedAt);
   if (!open.length) return null;
-  const set = (id: string, patch: Partial<ChallengeNote>) =>
-    onChange({
-      ...notes,
-      [id]: {
-        comment: notes[id]?.comment ?? '',
-        resolve: notes[id]?.resolve ?? false,
-        ...patch,
-      },
+  const set = (
+    id: string,
+    patch: (note: ChallengeNote) => Partial<ChallengeNote>,
+  ) =>
+    onChange((all) => {
+      const note = {
+        comment: all[id]?.comment ?? '',
+        mentions: all[id]?.mentions ?? [],
+        resolve: all[id]?.resolve ?? false,
+      };
+      return { ...all, [id]: { ...note, ...patch(note) } };
     });
 
   return (
@@ -56,18 +77,31 @@ export function ChallengeNotes({
             className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-3"
           >
             <span className="font-medium text-brand">{c.title}</span>
-            <Input
-              aria-label={t('challenges.noteOn', { title: c.title })}
+            <MentionTextarea
+              label={t('challenges.noteOn', { title: c.title })}
               placeholder={t('challenges.commentPlaceholder')}
-              className="h-10 text-[15px]"
+              rows={1}
+              className="min-h-10 py-2"
+              maxLength={2000}
               value={notes[c.id]?.comment ?? ''}
-              onChange={(e) => set(c.id, { comment: e.target.value })}
+              onChange={(comment) => set(c.id, () => ({ comment }))}
+              picked={notes[c.id]?.mentions ?? []}
+              onPick={(m) =>
+                set(c.id, (n) => ({ mentions: [...n.mentions, m] }))
+              }
+            />
+            <MentionAccessWarning
+              menteeId={menteeId}
+              mentions={mentionsIn(
+                notes[c.id]?.comment ?? '',
+                notes[c.id]?.mentions ?? [],
+              )}
             />
             <Checkbox
               id={`resolve-${c.id}`}
               label={t('challenges.resolve')}
               checked={notes[c.id]?.resolve ?? false}
-              onChange={(e) => set(c.id, { resolve: e.target.checked })}
+              onChange={(e) => set(c.id, () => ({ resolve: e.target.checked }))}
             />
           </li>
         ))}

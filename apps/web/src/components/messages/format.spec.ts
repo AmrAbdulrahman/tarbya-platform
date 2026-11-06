@@ -8,6 +8,7 @@ const base: ConversationDto = {
   other: { id: 'u', name: 'Yousef', avatarUrl: null },
   relation: 'MY_MENTEE',
   group: null,
+  title: null,
   memberCount: null,
   lastMessage: null,
   unread: 0,
@@ -34,6 +35,21 @@ describe('conversation formatting (US-7.3)', () => {
     expect(conversationName(group)).toBe('Tuesday circle');
     expect(conversationRole(t, group)).toBe(
       'groups.eyebrow · groups.members:14',
+    );
+  });
+
+  it('names a group chat after its title, with its size', () => {
+    const chat = {
+      ...base,
+      kind: 'CHAT' as const,
+      other: null,
+      relation: null,
+      title: 'Trip planning',
+      memberCount: 4,
+    };
+    expect(conversationName(chat)).toBe('Trip planning');
+    expect(conversationRole(t, chat)).toBe(
+      'messages.chat.kind · groups.members:4',
     );
   });
 

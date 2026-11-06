@@ -3,6 +3,7 @@ import {
   createMentorship,
   createUser,
   markTaskDoneDaysAgo,
+  notificationTypes,
   signedIn,
 } from '../support/fixtures';
 
@@ -151,6 +152,43 @@ describe('challenges (BR-CHL-1…3)', () => {
         await a.asMentor.post(`/api/challenges/${ofB.id}/comments`, {
           body: 'x',
         })
+      ).status,
+    ).toBe(403);
+  });
+});
+
+describe('mentions in challenge comments', () => {
+  it('notify the people mentioned who can see the challenge, and name those who can’t', async () => {
+    const { mentee, asMentor } = await pair();
+    const moderator = await createUser({ moderator: true });
+    // A mentor elsewhere: can sign in, can't see this mentee's challenges.
+    const { mentor: outsider } = await pair();
+    const challenge = await asMentor.post('/api/challenges', {
+      menteeId: mentee.id,
+      title: 'Sleep schedule',
+    });
+
+    const check = await asMentor.get(
+      `/api/challenges/mention-access?menteeId=${mentee.id}&userIds=${moderator.id}&userIds=${outsider.id}`,
+    );
+    expect(check.data).toEqual({ blocked: [outsider.id] });
+
+    const body = `Can you help, @[Mod](${moderator.id}) and @[Out](${outsider.id})?`;
+    const commented = await asMentor.post(
+      `/api/challenges/${challenge.data.id}/comments`,
+      { body },
+    );
+    expect(commented.data.comments[0].body).toBe(body);
+    expect(await notificationTypes(moderator.id)).toEqual(['MENTIONED']);
+    expect(await notificationTypes(outsider.id)).not.toContain('MENTIONED');
+
+    // Only those who can see the challenges may ask.
+    const asOutsider = await signedIn(outsider.id);
+    expect(
+      (
+        await asOutsider.get(
+          `/api/challenges/mention-access?menteeId=${mentee.id}&userIds=${moderator.id}`,
+        )
       ).status,
     ).toBe(403);
   });

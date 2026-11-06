@@ -1,19 +1,32 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Search } from 'lucide-react';
+import { Search, SquarePen, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  messagesControllerContacts,
+  messagesControllerDirect,
+  type ConversationRefDto,
+  type PersonRefDto,
+} from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
-import { cn } from '@tarbya/ui';
+import { matchesSearch } from '@tarbya/shared';
+import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import {
   conversationName,
   conversationRole,
+  conversationsQueryKey,
   useConversations,
   when,
 } from '../../components/messages/format';
+import { FormError } from '../../components/login/fields';
+import { NewChatDialog } from '../../components/messages/chat-dialogs';
+import { PersonSearch } from '../../components/person-search';
 import { Thread } from '../../components/messages/thread';
-import { Avatar } from '../../components/profile/avatar';
+import { ConversationAvatar } from '../../components/messages/conversation-avatar';
+import { PageHeader } from '../../components/page-header';
 
 /** US-7.3 · design/screens/Messages.dc.html */
 export const Route = createFileRoute('/_app/messages')({
@@ -28,19 +41,30 @@ function MessagesPage() {
   const me = useMe();
   const { c: selected } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  const queryClient = useQueryClient();
   const [q, setQ] = useState('');
+  const [starting, setStarting] = useState(false);
+  const [newChat, setNewChat] = useState(false);
   const conversations = useConversations();
   const all = conversations.data ?? [];
-  const term = q.trim().toLowerCase();
-  const shown = term
-    ? all.filter((c) => conversationName(c).toLowerCase().includes(term))
-    : all;
+  const shown = all.filter((c) => matchesSearch(q, conversationName(c)));
   const current = all.find((c) => c.id === selected);
   const pick = (c?: string) => navigate({ search: c ? { c } : {} });
+  const start = useMutation({
+    mutationFn: async (userId: string) =>
+      (await messagesControllerDirect({ userId })).data as ConversationRefDto,
+    onSuccess: async ({ id }) => {
+      setStarting(false);
+      await queryClient.invalidateQueries({ queryKey: conversationsQueryKey });
+      await pick(id);
+    },
+  });
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-brand">{t('messages.title')}</h1>
+      <PageHeader>
+        <h1 className="text-2xl font-bold text-brand">{t('messages.title')}</h1>
+      </PageHeader>
       <div className="flex h-[calc(100dvh-var(--app-top,56px)-11rem)] min-h-[480px] overflow-hidden rounded-card border border-border bg-card">
         <aside
           className={cn(
@@ -48,20 +72,77 @@ function MessagesPage() {
             current && 'hidden md:flex',
           )}
         >
-          <label className="relative m-3">
-            <span className="sr-only">{t('messages.search')}</span>
-            <input
-              type="search"
-              placeholder={t('messages.search')}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-9 text-[15px]"
-            />
-            <Search
-              className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
-              aria-hidden
-            />
-          </label>
+          <div className="m-3 flex items-center gap-2">
+            {starting ? (
+              <PersonSearch
+                queryKey="contacts"
+                label={t('messages.newWith')}
+                placeholder={t('messages.newWith')}
+                className="flex-1"
+                autoFocus
+                search={async (text, signal) =>
+                  (await messagesControllerContacts({ q: text }, { signal }))
+                    .data as PersonRefDto[]
+                }
+                onPick={(p) => start.mutate(p.id)}
+              />
+            ) : (
+              <label className="relative flex-1">
+                <span className="sr-only">{t('messages.search')}</span>
+                <input
+                  type="search"
+                  placeholder={t('messages.search')}
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
+                />
+                <Search
+                  className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
+                  aria-hidden
+                />
+              </label>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              aria-label={
+                starting ? t('admin.common.cancel') : t('messages.new')
+              }
+              title={starting ? t('admin.common.cancel') : t('messages.new')}
+              onClick={() => {
+                start.reset();
+                setStarting((v) => !v);
+              }}
+            >
+              {starting ? <X aria-hidden /> : <SquarePen aria-hidden />}
+            </Button>
+            {!starting && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0"
+                aria-label={t('messages.chat.new')}
+                title={t('messages.chat.new')}
+                onClick={() => setNewChat(true)}
+              >
+                <Users aria-hidden />
+              </Button>
+            )}
+          </div>
+          <NewChatDialog
+            open={newChat}
+            onOpenChange={setNewChat}
+            onCreated={(id) => {
+              setNewChat(false);
+              void pick(id);
+            }}
+          />
+          {start.isError && (
+            <div className="px-4 pb-2">
+              <FormError message={errorMessage(t, start.error)} />
+            </div>
+          )}
           {conversations.isError && (
             <p className="px-4 text-sm text-ink-subtle">
               {errorMessage(t, conversations.error)}
@@ -84,9 +165,8 @@ function MessagesPage() {
                     c.id === selected && 'bg-primary-tint/60',
                   )}
                 >
-                  <Avatar
-                    name={conversationName(c)}
-                    url={c.other?.avatarUrl ?? null}
+                  <ConversationAvatar
+                    conversation={c}
                     className="size-10 shrink-0"
                   />
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">

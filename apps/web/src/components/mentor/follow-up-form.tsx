@@ -17,7 +17,11 @@ import { fromZoned, toZoned } from '@tarbya/shared';
 import { Button, Input, Textarea } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { Field, FormError } from '../login/fields';
-import { ChallengeNotes, type ChallengeNote } from './challenge-notes';
+import {
+  challengeComment,
+  ChallengeNotes,
+  type ChallengeNote,
+} from './challenge-notes';
 import { Hint, mineQueryKey, Section, WhenStatus } from './form-parts';
 import { TrackableUpdates } from './trackable-updates';
 
@@ -102,7 +106,7 @@ export function FollowUpForm({
           .filter(([, n]) => n.comment.trim() || n.resolve)
           .map(([challengeId, n]) => ({
             challengeId,
-            comment: n.comment.trim() || null,
+            comment: challengeComment(n) || null,
             resolve: n.resolve,
           })),
       }),

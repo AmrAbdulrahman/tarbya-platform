@@ -11,7 +11,14 @@ import {
 } from '@nestjs/common';
 import { ApiConflictResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentAuth, type AuthContext } from '../../common/auth-context';
-import { CreateNoteDto, NoteDto, NotesQuery, UpdateNoteDto } from './notes.dto';
+import {
+  CreateNoteDto,
+  NoteDto,
+  NoteMentionAccessQuery,
+  NotesQuery,
+  UpdateNoteDto,
+} from './notes.dto';
+import { MentionAccessDto } from '../challenges/challenges.dto';
 import { NotesService } from './notes.service';
 
 @ApiTags('notes')
@@ -26,6 +33,21 @@ export class NotesController {
     @Query() query: NotesQuery,
   ): Promise<NoteDto[]> {
     return this.notes.list(auth.userId, query.menteeId);
+  }
+
+  /** Who of the mentioned people couldn't read a note of this visibility. */
+  @Get('mention-access')
+  @ApiOkResponse({ type: MentionAccessDto })
+  mentionAccess(
+    @CurrentAuth() auth: AuthContext,
+    @Query() query: NoteMentionAccessQuery,
+  ): Promise<MentionAccessDto> {
+    return this.notes.mentionAccess(
+      auth.userId,
+      query.menteeId,
+      query.visibility,
+      query.userIds,
+    );
   }
 
   @Post()

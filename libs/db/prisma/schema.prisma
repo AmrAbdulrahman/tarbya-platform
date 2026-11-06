@@ -26,6 +26,8 @@ enum CalendarPreference {
 model User {
   id            String             @id @default(uuid()) @db.Uuid
   name          String
+  /// `name` normalised for search (`normalizeSearch` in libs/shared); kept by a database trigger.
+  nameSearch    String             @default("")
   email         String?            @unique
   phone         String?            @unique
   locale        Locale             @default(ar)
@@ -51,8 +53,8 @@ model User {
   tasks                     Task[]                   @relation("TaskAssignee")
   tasksSet                  Task[]                   @relation("TaskCreator")
   notes                     Note[]                   @relation("NoteAuthor")
-  adminNotes                AdminNote[]              @relation("AdminNoteSubject")
-  adminNotesWritten         AdminNote[]              @relation("AdminNoteAuthor")
+  notesAbout                Note[]                   @relation("NoteSubject")
+  attachmentsUploaded       MessageAttachment[]      @relation("AttachmentUploader")
   contactChanges            ContactChange[]
   trackables                Trackable[]              @relation("TrackableMentee")
   trackablesCreated         Trackable[]              @relation("TrackableCreator")
@@ -65,7 +67,6 @@ model User {
   createdInImpersonation    Interaction[]            @relation("InteractionImpersonator")
   tasksSetInImpersonation   Task[]                   @relation("TaskImpersonator")
   notesInImpersonation      Note[]                   @relation("NoteImpersonator")
-  adminNotesInImpersonation AdminNote[]              @relation("AdminNoteImpersonator")
   trackablesInImpersonation Trackable[]              @relation("TrackableImpersonator")
   trackableTemplates        TrackableTemplate[]      @relation("TemplateAuthor")
   templatesInImpersonation  TrackableTemplate[]      @relation("TemplateImpersonator")
@@ -241,16 +242,22 @@ model Task {
 // ── Notes (US-4.6, BR-NOTE-1) ─────────────────────────────────────────────
 
 enum NoteVisibility {
-  /// The mentee, the mentor and moderators.
+  /// The member and everyone above them.
   SHARED
-  /// The mentor and moderators; never returned to the mentee.
+  /// Only those above the member: mentors up their mentoring chain, managers up
+  /// their management line, and admins. Never returned to the member.
   PRIVATE
 }
 
+/// A note on a member (BR-NOTE-1, BR-NOTE-3).
 model Note {
   id             String         @id @default(uuid()) @db.Uuid
-  mentorshipId   String         @db.Uuid
-  mentorship     Mentorship     @relation(fields: [mentorshipId], references: [id])
+  /// The member the note is about.
+  subjectId      String         @db.Uuid
+  subject        User           @relation("NoteSubject", fields: [subjectId], references: [id])
+  /// The mentorship it was written in, when the author was the member's mentor.
+  mentorshipId   String?        @db.Uuid
+  mentorship     Mentorship?    @relation(fields: [mentorshipId], references: [id])
   authorId       String         @db.Uuid
   author         User           @relation("NoteAuthor", fields: [authorId], references: [id])
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
@@ -261,7 +268,7 @@ model Note {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  @@index([mentorshipId, createdAt])
+  @@index([subjectId, createdAt])
 }
 
 model Setting {
@@ -342,22 +349,6 @@ model AuditLog {
 
 /// Notes about a user for the people responsible for them: everyone above them in
 /// the management chain, their current mentor, and moderators. Never shown to the user.
-model AdminNote {
-  id             String   @id @default(uuid()) @db.Uuid
-  subjectId      String   @db.Uuid
-  subject        User     @relation("AdminNoteSubject", fields: [subjectId], references: [id])
-  authorId       String   @db.Uuid
-  author         User     @relation("AdminNoteAuthor", fields: [authorId], references: [id])
-  /// The super admin who wrote this while impersonating the author (BR-ADM-5).
-  impersonatorId String?  @db.Uuid
-  impersonator   User?    @relation("AdminNoteImpersonator", fields: [impersonatorId], references: [id])
-  body           String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([subjectId, createdAt])
-}
-
 // ── Files and profile (US-2.1, US-2.2) ───────────────────────────────────
 
 /**
@@ -370,7 +361,8 @@ model FileObject {
   size      Int
   createdAt DateTime @default(now())
 
-  avatarOf User?
+  avatarOf     User?
+  attachmentOf MessageAttachment?
 }
 
 enum ContactKind {
@@ -421,14 +413,14 @@ enum EntrySource {
 
 /// Something a mentee tracks, measured once per cycle. Belongs to the mentee, so it survives a change of mentor.
 model Trackable {
-  id             String        @id @default(uuid()) @db.Uuid
-  menteeId       String        @db.Uuid
-  mentee         User          @relation("TrackableMentee", fields: [menteeId], references: [id])
-  createdById    String        @db.Uuid
-  createdBy      User          @relation("TrackableCreator", fields: [createdById], references: [id])
+  id             String             @id @default(uuid()) @db.Uuid
+  menteeId       String             @db.Uuid
+  mentee         User               @relation("TrackableMentee", fields: [menteeId], references: [id])
+  createdById    String             @db.Uuid
+  createdBy      User               @relation("TrackableCreator", fields: [createdById], references: [id])
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
-  impersonatorId String?       @db.Uuid
-  impersonator   User?         @relation("TrackableImpersonator", fields: [impersonatorId], references: [id])
+  impersonatorId String?            @db.Uuid
+  impersonator   User?              @relation("TrackableImpersonator", fields: [impersonatorId], references: [id])
   /// The library template it follows (BR-TRK-7). Its name, goal, type, cycle
   /// and direction mirror the template's and change only through it.
   templateId     String?            @db.Uuid
@@ -438,17 +430,17 @@ model Trackable {
   type           TrackableType
   cycle          TrackingCycle
   /// False for things that should go down (screen time, absences).
-  higherIsBetter Boolean       @default(true)
+  higherIsBetter Boolean            @default(true)
   /// Per cycle; optional.
   target         Float?
   /// The first day tracking counts from (organisation calendar).
-  startsOn       DateTime      @db.Date
+  startsOn       DateTime           @db.Date
   /// Weekly only: the day of the week (0 Sunday … 6 Saturday) its log shows on.
   /// Null shows it on the week's first day. The cycle is still the whole week.
-  weekday        Int?          @db.SmallInt
+  weekday        Int?               @db.SmallInt
   archivedAt     DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   entries TrackableEntry[]
 
@@ -750,6 +742,8 @@ model NotificationPreference {
 enum ConversationKind {
   DIRECT
   GROUP
+  /// A group chat anyone starts with the people they pick; not tied to a group.
+  CHAT
   /// v2: manager ↔ member (BR-MSG-3).
   TEAM
 }
@@ -762,12 +756,15 @@ model Conversation {
   group         Group?           @relation(fields: [groupId], references: [id])
   /// DIRECT: "<smaller user id>:<larger user id>", one conversation per pair.
   directKey     String?          @unique
+  /// CHAT: its name.
+  title         String?
   lastMessageAt DateTime?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
-  members  ConversationMember[]
-  messages Message[]
+  members     ConversationMember[]
+  messages    Message[]
+  attachments MessageAttachment[]
 
   @@index([lastMessageAt])
 }
@@ -778,6 +775,7 @@ model ConversationMember {
   userId         String       @db.Uuid
   user           User         @relation(fields: [userId], references: [id])
   lastReadAt     DateTime?
+  /// When they joined: in a chat they see only messages from then on.
   createdAt      DateTime     @default(now())
 
   @@id([conversationId, userId])
@@ -793,8 +791,30 @@ model Message {
   /// The super admin who wrote this while impersonating the author (BR-ADM-5).
   impersonatorId String?      @db.Uuid
   impersonator   User?        @relation("MessageImpersonator", fields: [impersonatorId], references: [id])
+  /// May be empty when the message carries attachments.
   body           String
   createdAt      DateTime     @default(now())
 
+  attachments MessageAttachment[]
+
   @@index([conversationId, createdAt])
+}
+
+/// A file sent in a conversation: uploaded first, then sent with a message.
+model MessageAttachment {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  uploaderId     String       @db.Uuid
+  uploader       User         @relation("AttachmentUploader", fields: [uploaderId], references: [id])
+  /// Null until the message that carries it is sent.
+  messageId      String?      @db.Uuid
+  message        Message?     @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileId         String       @unique @db.Uuid
+  file           FileObject   @relation(fields: [fileId], references: [id])
+  /// The file name as uploaded.
+  name           String
+  createdAt      DateTime     @default(now())
+
+  @@index([messageId])
 }

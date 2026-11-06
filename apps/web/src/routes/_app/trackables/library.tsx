@@ -12,6 +12,7 @@ import {
   templatesQueryKey,
 } from '../../../components/trackables/library';
 import { TemplateActions } from '../../../components/trackables/template-card';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-4.9: every template the viewer can use — theirs and those shared with all mentors. */
 export const Route = createFileRoute('/_app/trackables/library')({
@@ -34,12 +35,12 @@ function LibraryPage() {
           { label: t('nav.library') },
         ]}
       />
-      <div className="flex flex-col gap-1">
+      <PageHeader>
         <h1 className="text-2xl font-bold text-brand">{t('nav.library')}</h1>
         <p className="text-[15px] text-ink-subtle">
           {t('trackables.library.lead')}
         </p>
-      </div>
+      </PageHeader>
       <section className="rounded-card border border-border bg-card p-4">
         {templates.data ? (
           <LibraryList

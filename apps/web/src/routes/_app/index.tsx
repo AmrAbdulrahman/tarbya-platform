@@ -5,6 +5,7 @@ import type { Language } from '@tarbya/i18n';
 import { useHealthControllerCheck } from '@tarbya/api-client';
 import { meQuery } from '../../auth/session';
 import { homeFor } from '../../components/nav';
+import { PageHeader } from '../../components/page-header';
 
 export const Route = createFileRoute('/_app/')({
   beforeLoad: async ({ context }) => {
@@ -22,7 +23,7 @@ function Home() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
+      <PageHeader>
         <span className="text-sm text-ink-subtle">
           {formatDate(new Date(), {
             locale: i18n.language as Language,
@@ -30,7 +31,7 @@ function Home() {
           })}
         </span>
         <h1 className="text-2xl font-bold text-brand">{t('home.title')}</h1>
-      </div>
+      </PageHeader>
       <section className="flex items-center gap-3 rounded-card border border-border bg-card px-6 py-5">
         <span className="text-sm text-ink-subtle">{t('home.apiStatus')}</span>
         <span

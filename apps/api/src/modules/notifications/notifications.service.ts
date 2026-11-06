@@ -6,6 +6,8 @@ import {
   deliveryFor,
   isNotificationType,
   MANDATORY_NOTIFICATIONS,
+  mentionedIds,
+  plainMentions,
   NOTIFICATION_CATEGORY,
   NOTIFICATION_TYPES,
   notificationLink,
@@ -56,8 +58,13 @@ export class NotificationsService {
     config: ConfigService<Env, true>,
   ) {
     this.appUrl = config.get('APP_URL', { infer: true }).replace(/\/$/, '');
-    jobs.register('email.send', (data) =>
-      this.sendEmail(data as unknown as EmailJob),
+    // Each email stands alone, so several go out at once, soon after they're
+    // queued: a group's reminders shouldn't trickle out one every 2 s.
+    jobs.register(
+      'email.send',
+      (data) => this.sendEmail(data as unknown as EmailJob),
+      undefined,
+      { concurrency: 5, pollSeconds: 0.5 },
     );
   }
 
@@ -94,6 +101,34 @@ export class NotificationsService {
       });
     }
     return recipients;
+  }
+
+  /**
+   * Tells the people `body` mentions, except the author and those `canSee`
+   * turns away (they couldn't open what they're mentioned in). `payload` says
+   * where: a `title`, and the ids its link needs. Returns who was mentioned and told.
+   */
+  async notifyMentions(
+    actorId: string,
+    body: string,
+    canSee: (userId: string) => Promise<boolean>,
+    payload: Prisma.InputJsonObject,
+  ): Promise<string[]> {
+    const ids: string[] = [];
+    for (const id of mentionedIds(body)) {
+      if (id !== actorId && (await canSee(id))) ids.push(id);
+    }
+    if (!ids.length) return [];
+    return this.notify(
+      ids,
+      'MENTIONED',
+      {
+        ...payload,
+        byName: await this.nameOf(actorId),
+        preview: plainMentions(body).slice(0, 200),
+      },
+      { actorId },
+    );
   }
 
   /** The name a notification shows for whoever acted. */

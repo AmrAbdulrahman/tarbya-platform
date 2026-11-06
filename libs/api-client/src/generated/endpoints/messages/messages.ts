@@ -24,11 +24,19 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AddMembersDto,
+  AttachmentDto,
   ConversationDto,
+  ConversationRefDto,
+  CreateChatDto,
   MessageDto,
   MessagePageDto,
+  MessagesControllerContactsParams,
   MessagesControllerPageParams,
+  MessagesControllerUploadBody,
+  PersonRefDto,
   SendMessageDto,
+  StartDirectDto,
   UnreadDto
 } from '../../model';
 
@@ -270,7 +278,585 @@ export function useMessagesControllerUnread<TData = Awaited<ReturnType<typeof me
 
 
 
-export type messagesControllerPageResponse200 = {
+export type messagesControllerContactsResponse200 = {
+  data: PersonRefDto[]
+  status: 200
+}
+
+export type messagesControllerContactsResponseSuccess = (messagesControllerContactsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerContactsResponse = (messagesControllerContactsResponseSuccess)
+
+export const getMessagesControllerContactsUrl = (params?: MessagesControllerContactsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/conversations/contacts?${stringifiedParams}` : `/api/conversations/contacts`
+}
+
+export const messagesControllerContacts = async (params?: MessagesControllerContactsParams, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerContactsResponse> => {
+
+  return apiFetch<messagesControllerContactsResponse>(getMessagesControllerContactsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerContactsQueryKey = (params?: MessagesControllerContactsParams,) => {
+    return [
+    `/api/conversations/contacts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMessagesControllerContactsQueryOptions = <TData = Awaited<ReturnType<typeof messagesControllerContacts>>, TError = unknown>(params?: MessagesControllerContactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerContacts>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMessagesControllerContactsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof messagesControllerContacts>>> = ({ signal }) => messagesControllerContacts(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof messagesControllerContacts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MessagesControllerContactsQueryResult = NonNullable<Awaited<ReturnType<typeof messagesControllerContacts>>>
+export type MessagesControllerContactsQueryError = unknown
+
+
+export function useMessagesControllerContacts<TData = Awaited<ReturnType<typeof messagesControllerContacts>>, TError = unknown>(
+ params: undefined |  MessagesControllerContactsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerContacts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof messagesControllerContacts>>,
+          TError,
+          Awaited<ReturnType<typeof messagesControllerContacts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessagesControllerContacts<TData = Awaited<ReturnType<typeof messagesControllerContacts>>, TError = unknown>(
+ params?: MessagesControllerContactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerContacts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof messagesControllerContacts>>,
+          TError,
+          Awaited<ReturnType<typeof messagesControllerContacts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessagesControllerContacts<TData = Awaited<ReturnType<typeof messagesControllerContacts>>, TError = unknown>(
+ params?: MessagesControllerContactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerContacts>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMessagesControllerContacts<TData = Awaited<ReturnType<typeof messagesControllerContacts>>, TError = unknown>(
+ params?: MessagesControllerContactsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerContacts>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMessagesControllerContactsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type messagesControllerDirectResponse200 = {
+  data: ConversationRefDto
+  status: 200
+}
+
+export type messagesControllerDirectResponseSuccess = (messagesControllerDirectResponse200) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerDirectResponse = (messagesControllerDirectResponseSuccess)
+
+export const getMessagesControllerDirectUrl = () => {
+
+
+
+
+  return `/api/conversations/direct`
+}
+
+export const messagesControllerDirect = async (startDirectDto: StartDirectDto, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerDirectResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<messagesControllerDirectResponse>(getMessagesControllerDirectUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(startDirectDto)
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerDirectMutationKey = () => ['messagesControllerDirect'] as const;
+
+export const getMessagesControllerDirectMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerDirect>>, TError,MessagesControllerDirectMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof messagesControllerDirect>>, TError,MessagesControllerDirectMutationVariables, TContext> => {
+
+const mutationKey = getMessagesControllerDirectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof messagesControllerDirect>>, MessagesControllerDirectMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  messagesControllerDirect(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MessagesControllerDirectMutationResult = NonNullable<Awaited<ReturnType<typeof messagesControllerDirect>>>
+    export type MessagesControllerDirectMutationBody = StartDirectDto
+    export type MessagesControllerDirectMutationError = unknown
+    export type MessagesControllerDirectMutationVariables = {data: StartDirectDto}
+
+    export const useMessagesControllerDirect = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerDirect>>, TError,MessagesControllerDirectMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof messagesControllerDirect>>,
+        TError,
+        MessagesControllerDirectMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMessagesControllerDirectMutationOptions(options), queryClient);
+    }
+    export type messagesControllerCreateChatResponse200 = {
+  data: ConversationRefDto
+  status: 200
+}
+
+export type messagesControllerCreateChatResponseSuccess = (messagesControllerCreateChatResponse200) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerCreateChatResponse = (messagesControllerCreateChatResponseSuccess)
+
+export const getMessagesControllerCreateChatUrl = () => {
+
+
+
+
+  return `/api/conversations/chats`
+}
+
+export const messagesControllerCreateChat = async (createChatDto: CreateChatDto, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerCreateChatResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<messagesControllerCreateChatResponse>(getMessagesControllerCreateChatUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createChatDto)
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerCreateChatMutationKey = () => ['messagesControllerCreateChat'] as const;
+
+export const getMessagesControllerCreateChatMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerCreateChat>>, TError,MessagesControllerCreateChatMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof messagesControllerCreateChat>>, TError,MessagesControllerCreateChatMutationVariables, TContext> => {
+
+const mutationKey = getMessagesControllerCreateChatMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof messagesControllerCreateChat>>, MessagesControllerCreateChatMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  messagesControllerCreateChat(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MessagesControllerCreateChatMutationResult = NonNullable<Awaited<ReturnType<typeof messagesControllerCreateChat>>>
+    export type MessagesControllerCreateChatMutationBody = CreateChatDto
+    export type MessagesControllerCreateChatMutationError = unknown
+    export type MessagesControllerCreateChatMutationVariables = {data: CreateChatDto}
+
+    export const useMessagesControllerCreateChat = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerCreateChat>>, TError,MessagesControllerCreateChatMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof messagesControllerCreateChat>>,
+        TError,
+        MessagesControllerCreateChatMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMessagesControllerCreateChatMutationOptions(options), queryClient);
+    }
+    export type messagesControllerMembersResponse200 = {
+  data: PersonRefDto[]
+  status: 200
+}
+
+export type messagesControllerMembersResponseSuccess = (messagesControllerMembersResponse200) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerMembersResponse = (messagesControllerMembersResponseSuccess)
+
+export const getMessagesControllerMembersUrl = (id: string,) => {
+
+
+
+
+  return `/api/conversations/${id}/members`
+}
+
+export const messagesControllerMembers = async (id: string, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerMembersResponse> => {
+
+  return apiFetch<messagesControllerMembersResponse>(getMessagesControllerMembersUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerMembersQueryKey = (id: string,) => {
+    return [
+    `/api/conversations/${id}/members`
+    ] as const;
+    }
+
+
+export const getMessagesControllerMembersQueryOptions = <TData = Awaited<ReturnType<typeof messagesControllerMembers>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerMembers>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMessagesControllerMembersQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof messagesControllerMembers>>> = ({ signal }) => messagesControllerMembers(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof messagesControllerMembers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MessagesControllerMembersQueryResult = NonNullable<Awaited<ReturnType<typeof messagesControllerMembers>>>
+export type MessagesControllerMembersQueryError = unknown
+
+
+export function useMessagesControllerMembers<TData = Awaited<ReturnType<typeof messagesControllerMembers>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerMembers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof messagesControllerMembers>>,
+          TError,
+          Awaited<ReturnType<typeof messagesControllerMembers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessagesControllerMembers<TData = Awaited<ReturnType<typeof messagesControllerMembers>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerMembers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof messagesControllerMembers>>,
+          TError,
+          Awaited<ReturnType<typeof messagesControllerMembers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessagesControllerMembers<TData = Awaited<ReturnType<typeof messagesControllerMembers>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerMembers>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMessagesControllerMembers<TData = Awaited<ReturnType<typeof messagesControllerMembers>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerMembers>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMessagesControllerMembersQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type messagesControllerAddMembersResponse204 = {
+  data: void
+  status: 204
+}
+
+export type messagesControllerAddMembersResponseSuccess = (messagesControllerAddMembersResponse204) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerAddMembersResponse = (messagesControllerAddMembersResponseSuccess)
+
+export const getMessagesControllerAddMembersUrl = (id: string,) => {
+
+
+
+
+  return `/api/conversations/${id}/members`
+}
+
+export const messagesControllerAddMembers = async (id: string,
+    addMembersDto: AddMembersDto, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerAddMembersResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return apiFetch<messagesControllerAddMembersResponse>(getMessagesControllerAddMembersUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(addMembersDto)
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerAddMembersMutationKey = () => ['messagesControllerAddMembers'] as const;
+
+export const getMessagesControllerAddMembersMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerAddMembers>>, TError,MessagesControllerAddMembersMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof messagesControllerAddMembers>>, TError,MessagesControllerAddMembersMutationVariables, TContext> => {
+
+const mutationKey = getMessagesControllerAddMembersMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof messagesControllerAddMembers>>, MessagesControllerAddMembersMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  messagesControllerAddMembers(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MessagesControllerAddMembersMutationResult = NonNullable<Awaited<ReturnType<typeof messagesControllerAddMembers>>>
+    export type MessagesControllerAddMembersMutationBody = AddMembersDto
+    export type MessagesControllerAddMembersMutationError = unknown
+    export type MessagesControllerAddMembersMutationVariables = {id: string;data: AddMembersDto}
+
+    export const useMessagesControllerAddMembers = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerAddMembers>>, TError,MessagesControllerAddMembersMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof messagesControllerAddMembers>>,
+        TError,
+        MessagesControllerAddMembersMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMessagesControllerAddMembersMutationOptions(options), queryClient);
+    }
+    export type messagesControllerLeaveResponse204 = {
+  data: void
+  status: 204
+}
+
+export type messagesControllerLeaveResponseSuccess = (messagesControllerLeaveResponse204) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerLeaveResponse = (messagesControllerLeaveResponseSuccess)
+
+export const getMessagesControllerLeaveUrl = (id: string,) => {
+
+
+
+
+  return `/api/conversations/${id}/members/me`
+}
+
+export const messagesControllerLeave = async (id: string, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerLeaveResponse> => {
+
+  return apiFetch<messagesControllerLeaveResponse>(getMessagesControllerLeaveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerLeaveMutationKey = () => ['messagesControllerLeave'] as const;
+
+export const getMessagesControllerLeaveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerLeave>>, TError,MessagesControllerLeaveMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof messagesControllerLeave>>, TError,MessagesControllerLeaveMutationVariables, TContext> => {
+
+const mutationKey = getMessagesControllerLeaveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof messagesControllerLeave>>, MessagesControllerLeaveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  messagesControllerLeave(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MessagesControllerLeaveMutationResult = NonNullable<Awaited<ReturnType<typeof messagesControllerLeave>>>
+
+    export type MessagesControllerLeaveMutationError = unknown
+    export type MessagesControllerLeaveMutationVariables = {id: string}
+
+    export const useMessagesControllerLeave = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerLeave>>, TError,MessagesControllerLeaveMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof messagesControllerLeave>>,
+        TError,
+        MessagesControllerLeaveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMessagesControllerLeaveMutationOptions(options), queryClient);
+    }
+    export type messagesControllerPageResponse200 = {
   data: MessagePageDto
   status: 200
 }
@@ -485,7 +1071,203 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getMessagesControllerSendMutationOptions(options), queryClient);
     }
-    export type messagesControllerReadResponse204 = {
+    export type messagesControllerUploadResponse200 = {
+  data: AttachmentDto
+  status: 200
+}
+
+export type messagesControllerUploadResponseSuccess = (messagesControllerUploadResponse200) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerUploadResponse = (messagesControllerUploadResponseSuccess)
+
+export const getMessagesControllerUploadUrl = (id: string,) => {
+
+
+
+
+  return `/api/conversations/${id}/attachments`
+}
+
+export const messagesControllerUpload = async (id: string,
+    messagesControllerUploadBody: MessagesControllerUploadBody, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerUploadResponse> => {
+    const formData = new FormData();
+formData.append(`file`, messagesControllerUploadBody.file);
+
+  return apiFetch<messagesControllerUploadResponse>(getMessagesControllerUploadUrl(id),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerUploadMutationKey = () => ['messagesControllerUpload'] as const;
+
+export const getMessagesControllerUploadMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerUpload>>, TError,MessagesControllerUploadMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof messagesControllerUpload>>, TError,MessagesControllerUploadMutationVariables, TContext> => {
+
+const mutationKey = getMessagesControllerUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof messagesControllerUpload>>, MessagesControllerUploadMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  messagesControllerUpload(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MessagesControllerUploadMutationResult = NonNullable<Awaited<ReturnType<typeof messagesControllerUpload>>>
+    export type MessagesControllerUploadMutationBody = MessagesControllerUploadBody
+    export type MessagesControllerUploadMutationError = unknown
+    export type MessagesControllerUploadMutationVariables = {id: string;data: MessagesControllerUploadBody}
+
+    export const useMessagesControllerUpload = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof messagesControllerUpload>>, TError,MessagesControllerUploadMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof messagesControllerUpload>>,
+        TError,
+        MessagesControllerUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMessagesControllerUploadMutationOptions(options), queryClient);
+    }
+    export type messagesControllerAttachmentResponse200 = {
+  data: void
+  status: 200
+}
+
+export type messagesControllerAttachmentResponseSuccess = (messagesControllerAttachmentResponse200) & {
+  headers: Headers;
+};
+;
+
+export type messagesControllerAttachmentResponse = (messagesControllerAttachmentResponseSuccess)
+
+export const getMessagesControllerAttachmentUrl = (id: string,
+    attachmentId: string,) => {
+
+
+
+
+  return `/api/conversations/${id}/attachments/${attachmentId}`
+}
+
+export const messagesControllerAttachment = async (id: string,
+    attachmentId: string, options?: Parameters<typeof apiFetch>[1]): Promise<messagesControllerAttachmentResponse> => {
+
+  return apiFetch<messagesControllerAttachmentResponse>(getMessagesControllerAttachmentUrl(id,attachmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMessagesControllerAttachmentQueryKey = (id: string,
+    attachmentId: string,) => {
+    return [
+    `/api/conversations/${id}/attachments/${attachmentId}`
+    ] as const;
+    }
+
+
+export const getMessagesControllerAttachmentQueryOptions = <TData = Awaited<ReturnType<typeof messagesControllerAttachment>>, TError = unknown>(id: string,
+    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerAttachment>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMessagesControllerAttachmentQueryKey(id,attachmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof messagesControllerAttachment>>> = ({ signal }) => messagesControllerAttachment(id,attachmentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && attachmentId !== null && attachmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof messagesControllerAttachment>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MessagesControllerAttachmentQueryResult = NonNullable<Awaited<ReturnType<typeof messagesControllerAttachment>>>
+export type MessagesControllerAttachmentQueryError = unknown
+
+
+export function useMessagesControllerAttachment<TData = Awaited<ReturnType<typeof messagesControllerAttachment>>, TError = unknown>(
+ id: string,
+    attachmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerAttachment>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof messagesControllerAttachment>>,
+          TError,
+          Awaited<ReturnType<typeof messagesControllerAttachment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessagesControllerAttachment<TData = Awaited<ReturnType<typeof messagesControllerAttachment>>, TError = unknown>(
+ id: string,
+    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerAttachment>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof messagesControllerAttachment>>,
+          TError,
+          Awaited<ReturnType<typeof messagesControllerAttachment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMessagesControllerAttachment<TData = Awaited<ReturnType<typeof messagesControllerAttachment>>, TError = unknown>(
+ id: string,
+    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerAttachment>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMessagesControllerAttachment<TData = Awaited<ReturnType<typeof messagesControllerAttachment>>, TError = unknown>(
+ id: string,
+    attachmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof messagesControllerAttachment>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMessagesControllerAttachmentQueryOptions(id,attachmentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type messagesControllerReadResponse204 = {
   data: void
   status: 204
 }

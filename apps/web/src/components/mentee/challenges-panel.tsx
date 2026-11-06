@@ -16,12 +16,19 @@ import {
   type ChallengeDto,
 } from '@tarbya/api-client';
 import type { Language } from '@tarbya/i18n';
-import { formatDate } from '@tarbya/shared';
-import { Badge, Button, cn, Input, Textarea } from '@tarbya/ui';
+import { formatDate, withMentionTokens } from '@tarbya/shared';
+import { Badge, Button, cn, Input } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
 import { actedBy } from '../acted-by';
 import { FormError } from '../login/fields';
+import {
+  MentionAccessWarning,
+  MentionText,
+  MentionTextarea,
+  mentionsIn,
+  type Mention,
+} from '../mention-textarea';
 
 export const challengesQueryKey = (menteeId: string) => [
   'challenges',
@@ -140,6 +147,8 @@ function ChallengeItem({
   const threadId = useId();
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState('');
+  const [picked, setPicked] = useState<Mention[]>([]);
+  const mentioned = mentionsIn(body, picked);
   const resolved = !!c.resolvedAt;
   const date = (iso: string) =>
     formatDate(iso, {
@@ -151,9 +160,13 @@ function ChallengeItem({
     onSuccess: onChanged,
   });
   const comment = useMutation({
-    mutationFn: () => challengesControllerComment(c.id, { body }),
+    mutationFn: () =>
+      challengesControllerComment(c.id, {
+        body: withMentionTokens(body, mentioned),
+      }),
     onSuccess: async () => {
       setBody('');
+      setPicked([]);
       await onChanged();
     },
   });
@@ -233,7 +246,9 @@ function ChallengeItem({
                 {actedBy(t, x.author, x.impersonator)} · {date(x.createdAt)}
                 {x.interactionId && <> · {t('challenges.inFollowUp')}</>}
               </p>
-              <p className="whitespace-pre-line text-[15px]">{x.body}</p>
+              <p className="whitespace-pre-line text-[15px]">
+                <MentionText body={x.body} />
+              </p>
             </div>
           ))}
           <form
@@ -243,13 +258,16 @@ function ChallengeItem({
               if (body.trim()) comment.mutate();
             }}
           >
-            <Textarea
-              aria-label={t('challenges.comment')}
-              rows={2}
+            <MentionTextarea
+              label={t('challenges.comment')}
               placeholder={t('challenges.commentPlaceholder')}
+              maxLength={2000}
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={setBody}
+              picked={picked}
+              onPick={(m) => setPicked((list) => [...list, m])}
             />
+            <MentionAccessWarning menteeId={c.menteeId} mentions={mentioned} />
             <FormError
               message={
                 comment.isError ? errorMessage(t, comment.error) : undefined

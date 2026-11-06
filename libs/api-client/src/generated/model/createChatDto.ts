@@ -5,10 +5,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AdminNoteBodyDto {
+export interface CreateChatDto {
   /**
      * @minLength 1
-     * @maxLength 5000
+     * @maxLength 100
      */
-  body: string;
+  title: string;
+  userIds: string[];
 }

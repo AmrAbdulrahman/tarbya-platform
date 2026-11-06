@@ -20,6 +20,7 @@ import {
   formatDayTile,
   formatMonth,
   logDay,
+  plainMentions,
   toZoned,
   WEEK_STARTS_ON,
 } from '@tarbya/shared';
@@ -394,7 +395,8 @@ function TrackableRow({
               {e.note}
               {e.replies.map((r) => (
                 <span key={r.id} className="block text-ink-muted">
-                  ↳ {actedBy(t, r.author, r.impersonator)}: {r.body}
+                  ↳ {actedBy(t, r.author, r.impersonator)}:{' '}
+                  {plainMentions(r.body)}
                 </span>
               ))}
             </li>

@@ -5,6 +5,7 @@ import {
   cycleEnd,
   cycleStart,
   FILL_WINDOW_DAYS,
+  plainMentions,
   takesTarget,
   toZoned,
   trackableStats,
@@ -485,14 +486,21 @@ export class TrackablesService {
     await this.prisma.trackableReply.create({
       data: { entryId, authorId: actorId, body, ...impersonation() },
     });
+    const menteeId = entry.trackable.menteeId;
+    const mentioned = await this.notifications.notifyMentions(
+      actorId,
+      body,
+      (userId) => this.access.canView(userId, menteeId),
+      { trackableId: entry.trackableId, menteeId, title: entry.trackable.name },
+    );
     await this.notifications.notify(
-      [entry.trackable.menteeId],
+      [menteeId].filter((id) => !mentioned.includes(id)),
       'MENTOR_REPLIED',
       {
         trackableId: entry.trackableId,
         name: entry.trackable.name,
         byName: await this.notifications.nameOf(actorId),
-        preview: body.slice(0, 200),
+        preview: plainMentions(body).slice(0, 200),
       },
       { actorId },
     );

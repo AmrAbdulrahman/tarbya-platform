@@ -1,7 +1,9 @@
 import { Link, Outlet, useNavigate } from '@tanstack/react-router';
-import { LogOut, Menu, MonitorX, Search, UserRound } from 'lucide-react';
+import { LogOut, Menu, MonitorX, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { searchControllerFind, type PersonHitDto } from '@tarbya/api-client';
+import { hasAnyRole } from '@tarbya/shared';
 import {
   Button,
   DropdownMenu,
@@ -21,6 +23,7 @@ import { LogoMark } from './logo';
 import { LogProvider } from './mentor/log-dialog';
 import { MessagesMenu } from './messages/messages-menu';
 import { NotificationsMenu } from './notifications/notifications-menu';
+import { PersonSearch } from './person-search';
 import { useLiveEvents } from '../lib/live-events';
 import { Avatar } from './profile/avatar';
 import { sectionsFor } from './nav';
@@ -75,18 +78,7 @@ export function AppShell() {
               <Link to="/" aria-label={t('app.name')} className="md:hidden">
                 <LogoMark className="h-8 w-auto" />
               </Link>
-              <label className="relative hidden flex-[0_1_380px] md:block">
-                <span className="sr-only">{t('header.search')}</span>
-                <input
-                  type="search"
-                  placeholder={t('header.search')}
-                  className="h-10 w-full rounded-control border border-border bg-card pe-3 ps-10 text-[15px]"
-                />
-                <Search
-                  className="pointer-events-none absolute start-3 top-2.5 size-5 text-ink-subtle"
-                  aria-hidden
-                />
-              </label>
+              <HeaderSearch />
               <div className="flex-1" />
               <ImpersonateButton />
               <LanguageSwitch />
@@ -102,6 +94,34 @@ export function AppShell() {
         </div>
       </div>
     </LogProvider>
+  );
+}
+
+/** Finds a member by name or phone and opens their profile (design/screens/Main.dc.html). */
+function HeaderSearch() {
+  const { t } = useTranslation();
+  const me = useMe();
+  const navigate = useNavigate();
+  // Only admins and mentors have profiles to open besides their own.
+  if (!hasAnyRole(me.roles, ['SUPER_ADMIN', 'MODERATOR', 'MENTOR']))
+    return null;
+  return (
+    <PersonSearch
+      queryKey="header"
+      label={t('header.search')}
+      placeholder={t('header.search')}
+      className="hidden flex-[0_1_380px] md:block"
+      search={async (q, signal) =>
+        (
+          (await searchControllerFind({ q }, { signal })).data as PersonHitDto[]
+        ).map((p) => ({
+          ...p,
+          hint: p.phone,
+          tag: p.isMyMentee ? t('messages.relation.MY_MENTEE') : null,
+        }))
+      }
+      onPick={(p) => navigate({ to: '/people/$id', params: { id: p.id } })}
+    />
   );
 }
 

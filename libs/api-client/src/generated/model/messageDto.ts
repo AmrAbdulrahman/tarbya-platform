@@ -4,6 +4,7 @@
  * Tarbya API
  * OpenAPI spec version: 0.1.0
  */
+import type { AttachmentDto } from './attachmentDto.js';
 import type { PersonRefDto } from './personRefDto.js';
 import type { UserRefDto } from './userRefDto.js';
 
@@ -11,6 +12,7 @@ export interface MessageDto {
   id: string;
   conversationId: string;
   body: string;
+  attachments: AttachmentDto[];
   author: PersonRefDto;
   /** @nullable */
   impersonator: UserRefDto | null;

@@ -70,7 +70,7 @@ export const en: Messages = {
   },
   errors: {
     CONVERSATION_CLOSED:
-      'This mentorship has ended, so the conversation is read-only.',
+      'This member is no longer active, so the conversation is read-only.',
     GROUP_MEMBER_NEEDS_MENTOR:
       'Only mentees with a current mentor can join a group as members.',
     GROUP_ALREADY_MEMBER: 'This person is already in the group.',
@@ -105,7 +105,7 @@ export const en: Messages = {
     MANAGER_NOT_MODERATOR:
       'Only moderators have a direct manager, and the manager must be a moderator.',
     MODERATOR_HAS_REPORTS: 'Move the people this moderator manages first.',
-    FILE_TOO_LARGE: 'The file is larger than 5 MB.',
+    FILE_TOO_LARGE: 'The file is too large.',
     FILE_TYPE: 'Use a JPG, PNG or WebP image.',
     PASSWORD_REAUTH_REQUIRED:
       'To set a password, sign out, sign in with a one-time code, and try again within 15 minutes.',
@@ -382,11 +382,8 @@ export const en: Messages = {
     mentor: 'Mentor',
     none: '—',
     deactivated: 'Deactivated',
-    adminNotes: 'Admin notes',
-    adminNotesHint:
-      'Seen only by the people who manage or mentor this member and by moderators; never by the member.',
     addNote: 'Add note',
-    notePlaceholder: 'Write a note…',
+    notePlaceholder: 'Write a note… type @ to mention someone',
     noNotes: 'No notes yet.',
     edit: 'Edit',
     edited: 'edited',
@@ -481,6 +478,7 @@ export const en: Messages = {
     noReadings: 'No updates yet',
     updated: 'Last logged: {{when}}',
     contact: 'Contact',
+    messageWith: 'Message {{name}}',
     contactWith: 'Log a follow-up with {{name}}',
     emptyFilter: 'No mentees match this filter.',
     upcoming: 'Upcoming',
@@ -553,18 +551,17 @@ export const en: Messages = {
   mentee: {
     notes: 'Notes',
     shared: 'Shared with {{name}}',
-    private: 'Private — mentor and moderators only',
-    visibility: 'Visibility',
-    sharedOption: 'Shared with the mentee',
-    privateOption: 'Private',
+    private: 'Private — those above them only',
+    privateHint:
+      'Only their mentors, managers and moderators will see this; never {{name}}.',
+    sharedHint: '{{name}} will see this too.',
+    sharedNote: 'Shared note',
+    privateNote: 'Private note',
+    logFollowUp: 'Log a follow-up',
     addNote: 'Add note',
-    newNote: 'New note',
     noteBody: 'Note',
     save: 'Save',
     cancel: 'Cancel',
-    widenTitle: 'Share this note?',
-    widenAsk: '{{name}} will be able to read it.',
-    widen: 'Yes, share it',
     tasks: 'Action items',
     noTasks: 'No tasks yet.',
     newTask: 'New task',
@@ -687,7 +684,7 @@ export const en: Messages = {
     fromMentee: 'Logged by the mentee',
     needsHelp: 'Asked for help',
     reply: 'Reply',
-    replyPlaceholder: 'Write a reply…',
+    replyPlaceholder: 'Write a reply… type @ to mention someone',
     sendReply: 'Send reply',
     updates: 'Trackable updates',
     trends: 'Trends',
@@ -797,7 +794,7 @@ export const en: Messages = {
     comments_many: '{{count}} comments',
     comments_other: '{{count}} comments',
     comment: 'Comment',
-    commentPlaceholder: 'Write a comment…',
+    commentPlaceholder: 'Write a comment… type @ to mention someone',
     send: 'Send',
     inFollowUp: 'in a follow-up',
     openTitle: 'Open challenges',
@@ -944,22 +941,86 @@ export const en: Messages = {
     myGatherings: 'My group gatherings',
     open: 'Open group',
   },
+  mentions: {
+    pick: 'Mention someone',
+    and: ', ',
+    notMember_zero:
+      '{{names}} isn’t in this conversation, so won’t see this message.',
+    notMember_one:
+      '{{names}} isn’t in this conversation, so won’t see this message.',
+    notMember_two:
+      '{{names}} aren’t in this conversation, so won’t see this message.',
+    notMember_few:
+      '{{names}} aren’t in this conversation, so won’t see this message.',
+    notMember_many:
+      '{{names}} aren’t in this conversation, so won’t see this message.',
+    notMember_other:
+      '{{names}} aren’t in this conversation, so won’t see this message.',
+    noteNoAccess_zero:
+      '{{names}} won’t be able to read this note, so won’t be notified.',
+    noteNoAccess_one:
+      '{{names}} won’t be able to read this note, so won’t be notified.',
+    noteNoAccess_two:
+      '{{names}} won’t be able to read this note, so won’t be notified.',
+    noteNoAccess_few:
+      '{{names}} won’t be able to read this note, so won’t be notified.',
+    noteNoAccess_many:
+      '{{names}} won’t be able to read this note, so won’t be notified.',
+    noteNoAccess_other:
+      '{{names}} won’t be able to read this note, so won’t be notified.',
+    noAccess_zero: '',
+    noAccess_one:
+      '{{names}} can’t see this mentee’s challenges, so won’t see this comment or be notified.',
+    noAccess_two:
+      '{{names}} can’t see this mentee’s challenges, so won’t see this comment or be notified.',
+    noAccess_few:
+      '{{names}} can’t see this mentee’s challenges, so won’t see this comment or be notified.',
+    noAccess_many:
+      '{{names}} can’t see this mentee’s challenges, so won’t see this comment or be notified.',
+    noAccess_other:
+      '{{names}} can’t see this mentee’s challenges, so won’t see this comment or be notified.',
+  },
   messages: {
     title: 'Messages',
     search: 'Search conversations',
-    none: 'No conversations yet. Your mentor, mentees and groups show here.',
+    none: 'No conversations yet. Your mentor, mentees and groups show here, and you can message any member.',
+    new: 'New conversation',
+    newWith: 'Message a member by name or email…',
     noMatch: 'No matching conversations.',
     pick: 'Pick a conversation.',
+    files: {
+      attach: 'Attach files',
+      pending: 'Files to send',
+      remove: 'Remove {{name}}',
+      download: 'Download {{name}}',
+      tooLarge: 'Files can be up to 20 MB.',
+      kb: '{{size}} KB',
+      mb: '{{size}} MB',
+    },
+    chat: {
+      kind: 'Group chat',
+      new: 'New group chat',
+      name: 'Chat name',
+      people: 'People',
+      add: 'Add people by name or email…',
+      addHint: 'People you add see messages from when they join.',
+      remove: 'Remove {{name}}',
+      create: 'Start chat',
+      members: 'Members',
+      me: 'you',
+      leave: 'Leave chat',
+    },
     relation: {
       MY_MENTOR: 'My mentor',
       MY_MENTEE: 'My mentee',
-      FORMER: 'Former mentorship',
     },
     you: 'You: ',
     noMessages: 'No messages yet.',
+    writeMention: 'Write a message… type @ to mention someone',
     write: 'Write a message',
     send: 'Send',
-    closed: 'This mentorship has ended, so the conversation is read-only.',
+    closed:
+      'This member is no longer active, so the conversation is read-only.',
     empty: 'No messages yet. Start the conversation.',
     today: 'Today',
     yesterday: 'Yesterday',
@@ -1026,6 +1087,7 @@ export const en: Messages = {
       MENTOR_REPLIED: 'Mentor replied',
       TASK_ASSIGNED: 'New task',
       NEW_MESSAGE: 'New message',
+      MENTIONED: 'Mentions of me',
     },
     text: {
       MENTORSHIP_ASSIGNED: {
@@ -1070,6 +1132,8 @@ export const en: Messages = {
       TASK_ASSIGNED: 'New task: “{{title}}”',
       TASK_ASSIGNED_body: 'From {{byName}}.',
       NEW_MESSAGE: 'New message from {{byName}}',
+      MENTIONED: '{{byName}} mentioned you in “{{title}}”',
+      MENTIONED_note: '{{byName}} mentioned you in a note on {{title}}',
     },
   },
   account: {

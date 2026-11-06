@@ -7,6 +7,7 @@ import {
   type TrackableDetailDto,
   type TrackableTemplateDto,
 } from '@tarbya/api-client';
+import { matchesSearch } from '@tarbya/shared';
 import { Badge, Button, Checkbox, cn, Input } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { useMe } from '../../auth/session';
@@ -76,14 +77,10 @@ export function LibraryList({
   const me = useMe();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  const q = query.trim().toLowerCase();
   const shown = templates.filter(
     (x) =>
       (filter === 'all' || (filter === 'mine') === (x.author.id === me.id)) &&
-      (!q ||
-        x.name.toLowerCase().includes(q) ||
-        x.goal?.toLowerCase().includes(q) ||
-        x.author.name.toLowerCase().includes(q)),
+      matchesSearch(query, x.name, x.goal, x.author.name),
   );
 
   return (

@@ -13,7 +13,7 @@ import {
   cn,
 } from '@tarbya/ui';
 import { useMe } from '../../auth/session';
-import { Avatar } from '../profile/avatar';
+import { ConversationAvatar } from './conversation-avatar';
 import { conversationName, useConversations, when } from './format';
 
 /** The header's messages button: unread badge and the latest conversations (US-7.3). */
@@ -68,11 +68,7 @@ export function MessagesMenu() {
             onSelect={() => navigate({ to: '/messages', search: { c: c.id } })}
             className="items-start gap-3 py-2.5"
           >
-            <Avatar
-              name={conversationName(c)}
-              url={c.other?.avatarUrl ?? null}
-              className="size-9 shrink-0"
-            />
+            <ConversationAvatar conversation={c} className="size-9 shrink-0" />
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="flex items-baseline gap-2">
                 <span

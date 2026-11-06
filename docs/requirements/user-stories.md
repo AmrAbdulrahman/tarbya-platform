@@ -112,13 +112,13 @@ As a moderator, I want to set or clear a moderator's direct manager with typeahe
 - A choice that would create a cycle is refused.
 - Refs: BR-MGR-1…3
 
-### US-3.7 Keep admin notes on a member — v1
+### US-3.7 Keep notes on a member — v1
 
-As someone who manages or mentors a member (or a moderator), I want to keep notes on their profile that the member never sees.
+As someone above a member (their mentors, their managers, or a moderator), I want to keep notes on their profile, private or shared with them.
 
-- Notes show on the member's profile page, newest first, with author and date.
+- Notes show on the member's profile page, newest first, with author and date; private ones in amber.
 - Only the author edits a note.
-- Refs: BR-NOTE-3
+- Refs: BR-NOTE-1, BR-NOTE-3
 
 ### US-3.8 View the app as a user — v1
 
@@ -157,6 +157,7 @@ As a mentor, I want to see all my mentees at a glance, so that I know who needs 
 - Headline numbers: mentees, needing contact, follow-ups this month, trackables improving.
 - Table: last contact with status (regular / due / late) and type, open challenges, main trackable, trend sparkline with label.
 - Filters: all, needs contact, trackables getting worse.
+- Clicking a row opens the mentee's page; each row has a message button (opens our conversation) and a "+" that logs a follow-up.
 - Side panels: upcoming items, my mentor, latest notifications.
 - Refs: BR-FU-5, BR-PLAN-4 · `Main.dc.html`
 
@@ -168,6 +169,7 @@ As a mentor, I want a mentee's full picture: trackables with trend charts, timel
 - A trend card per active trackable (trend, latest value, sparkline) sits above the cycles.
 - Each trackable shows its cycles for "this week", "this month" or picked dates: logged values (done as a green check, not done as a red cross), missed cycles, and cycles still to log. This week shows every day in its own column, with the days to come as placeholders; a weekly trackable's log sits under its chosen weekday (the week's first day if none). Clicking a past cycle logs or re-logs it in place, even before the trackable's start (which then moves back); notes and replies show under it.
 - Breadcrumbs above every page lead back to where I came from.
+- The header has a "Log a follow-up" button for the mentee's mentor.
 - Refs: BR-TRK-4, BR-TRK-5, BR-NOTE-1, BR-FU-4 · `Mentee.dc.html`
 
 ### US-4.3 Log a follow-up — v1
@@ -216,13 +218,15 @@ As a mentor, I want to reuse a trackable I made for one mentee with others, and 
 As a mentor, I want to raise challenges for a mentee, discuss them with the mentee, and mark them resolved.
 
 - Open challenges first; resolved ones stay visible, struck through, with who resolved them and when.
+- Typing "@" in a comment mentions any member; a warning under the field names those who can't see the challenge (they aren't notified).
 - Refs: BR-CHL-1…3
 
 ### US-4.6 Write notes — v1
 
 As a mentor, I want to write shared or private notes on a mentee.
 
-- Visibility can't be widened after saving without confirmation.
+- Shared and private notes are written in two separate boxes, the private one in amber; a note keeps the visibility it was written with.
+- Typing "@" mentions a member; those who could read the note are notified, and the box names those who couldn't.
 - Refs: BR-NOTE-1 · `Mentee.dc.html`
 
 ### US-4.7 Reply to a check-in — v1
@@ -330,10 +334,14 @@ As a user, I get emails for the types I enabled, in my language, with a link int
 
 ### US-7.3 Messages — v1
 
-As a mentor or mentee, I want one-to-one conversations with my mentor or mentee, and a conversation per group I belong to.
+As a member, I want one-to-one conversations with my mentor, my mentees or any other member, and a conversation per group I belong to.
 
 - Header drop-down like notifications; full screen with list and thread; unread counts; live delivery.
-- Refs: BR-MSG-1, BR-MSG-2 · `Messages.dc.html`
+- "New conversation" finds any active member by name or email.
+- "New group chat" takes a name and people; members see who's in it, add people and leave. People who join a group or chat see messages from then on.
+- A paperclip attaches files to a message; images show in the thread, other files download.
+- In groups and chats, typing "@" mentions a member; those not in the conversation are flagged.
+- Refs: BR-MSG-1, BR-MSG-2, BR-MSG-4, BR-MSG-5 · `Messages.dc.html`
 
 ---
 

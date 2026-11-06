@@ -19,12 +19,24 @@ CREATE TEMP TABLE e2e_groups ON COMMIT DROP AS
 UPDATE "User" SET "managerId" = NULL WHERE "managerId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Notification" WHERE "userId" IN (SELECT id FROM e2e_users);
 DELETE FROM "NotificationPreference" WHERE "userId" IN (SELECT id FROM e2e_users);
--- Members and messages go with their conversation (ON DELETE CASCADE).
-DELETE FROM "Message" WHERE "authorId" IN (SELECT id FROM e2e_users);
-DELETE FROM "ConversationMember" WHERE "userId" IN (SELECT id FROM e2e_users);
+-- Members and messages go with their conversation (ON DELETE CASCADE): the
+-- e2e groups', and every direct one an e2e user took part in, even with a real
+-- user such as the super admin (or left with fewer than two members).
+-- Files sent by e2e users; their rows go with the conversation or below.
+CREATE TEMP TABLE e2e_attachment_files ON COMMIT DROP AS
+  SELECT "fileId" AS id FROM "MessageAttachment" WHERE "uploaderId" IN (SELECT id FROM e2e_users);
+DELETE FROM "MessageAttachment" WHERE "uploaderId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Conversation"
   WHERE "groupId" IN (SELECT id FROM e2e_groups)
-     OR (kind = 'DIRECT' AND NOT EXISTS (SELECT 1 FROM "ConversationMember" cm WHERE cm."conversationId" = "Conversation".id));
+     OR (kind = 'DIRECT' AND (
+       EXISTS (SELECT 1 FROM "ConversationMember" cm
+               WHERE cm."conversationId" = "Conversation".id AND cm."userId" IN (SELECT id FROM e2e_users))
+       OR (SELECT count(*) FROM "ConversationMember" cm WHERE cm."conversationId" = "Conversation".id) < 2))
+     OR (kind = 'CHAT' AND (title LIKE 'e2e %'
+       OR NOT EXISTS (SELECT 1 FROM "ConversationMember" cm
+                      WHERE cm."conversationId" = "Conversation".id)));
+DELETE FROM "Message" WHERE "authorId" IN (SELECT id FROM e2e_users);
+DELETE FROM "ConversationMember" WHERE "userId" IN (SELECT id FROM e2e_users);
 -- RSVPs and attendance go with their gathering (ON DELETE CASCADE).
 DELETE FROM "Rsvp" WHERE "userId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Attendance"
@@ -39,9 +51,6 @@ DELETE FROM "GroupMembership"
   WHERE "groupId" IN (SELECT id FROM e2e_groups) OR "userId" IN (SELECT id FROM e2e_users);
 DELETE FROM "ActivityType" WHERE "groupId" IN (SELECT id FROM e2e_groups);
 DELETE FROM "Group" WHERE id IN (SELECT id FROM e2e_groups);
-DELETE FROM "AdminNote"
-  WHERE "subjectId" IN (SELECT id FROM e2e_users)
-     OR "authorId" IN (SELECT id FROM e2e_users);
 -- Replies go with their entry, comments with their challenge (ON DELETE CASCADE).
 DELETE FROM "TrackableEntry"
   WHERE "authorId" IN (SELECT id FROM e2e_users)
@@ -60,7 +69,8 @@ DELETE FROM "Challenge"
      OR "createdById" IN (SELECT id FROM e2e_users)
      OR "resolvedById" IN (SELECT id FROM e2e_users);
 DELETE FROM "Note"
-  WHERE "mentorshipId" IN (SELECT id FROM e2e_mentorships)
+  WHERE "subjectId" IN (SELECT id FROM e2e_users)
+     OR "mentorshipId" IN (SELECT id FROM e2e_mentorships)
      OR "authorId" IN (SELECT id FROM e2e_users);
 DELETE FROM "Task"
   WHERE "assigneeId" IN (SELECT id FROM e2e_users)
@@ -86,7 +96,8 @@ CREATE TEMP TABLE e2e_files ON COMMIT DROP AS
 DELETE FROM "OneTimeCode" WHERE email LIKE '%@tarbya.test';
 DELETE FROM "User" WHERE id IN (SELECT id FROM e2e_users);
 -- The objects stay in the bucket; local test files are small and harmless.
-DELETE FROM "FileObject" WHERE id IN (SELECT id FROM e2e_files);
+DELETE FROM "FileObject" WHERE id IN (SELECT id FROM e2e_files)
+  OR id IN (SELECT id FROM e2e_attachment_files);
 
 DELETE FROM "ActivityType" WHERE "nameEn" LIKE 'e2e %';
 

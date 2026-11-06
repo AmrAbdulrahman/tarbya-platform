@@ -16,6 +16,8 @@ import {
   ChallengesQuery,
   CommentBodyDto,
   CreateChallengeDto,
+  MentionAccessDto,
+  MentionAccessQuery,
   UpdateChallengeDto,
 } from './challenges.dto';
 import { ChallengesService } from './challenges.service';
@@ -32,6 +34,20 @@ export class ChallengesController {
     @Query() query: ChallengesQuery,
   ): Promise<ChallengeDto[]> {
     return this.challenges.list(auth.userId, query.menteeId);
+  }
+
+  /** Who of the mentioned people can't see the mentee's challenges; asked by a commenter. */
+  @Get('mention-access')
+  @ApiOkResponse({ type: MentionAccessDto })
+  mentionAccess(
+    @CurrentAuth() auth: AuthContext,
+    @Query() query: MentionAccessQuery,
+  ): Promise<MentionAccessDto> {
+    return this.challenges.mentionAccess(
+      query.menteeId,
+      query.userIds,
+      auth.userId,
+    );
   }
 
   @Post()

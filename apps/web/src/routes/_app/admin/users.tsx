@@ -14,6 +14,7 @@ import { RoleChips } from '../../../components/role-chips';
 import { useDebounced } from '../../../lib/use-debounced';
 import { Avatar } from '../../../components/profile/avatar';
 import { Breadcrumbs } from '../../../components/breadcrumbs';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-3.1 · design/screens/Admin.dc.html (users table) */
 export const Route = createFileRoute('/_app/admin/users')({
@@ -45,12 +46,12 @@ function UsersPage() {
       <Breadcrumbs
         items={[{ label: t('nav.admin') }, { label: t('nav.users') }]}
       />
-      <div className="flex flex-col gap-1">
+      <PageHeader>
         <h1 className="text-2xl font-bold text-brand">
           {t('admin.users.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">{t('admin.users.lead')}</p>
-      </div>
+      </PageHeader>
 
       <section className="flex flex-col overflow-hidden rounded-card border border-border bg-card">
         <div className="flex flex-wrap items-center gap-3 border-b border-divider px-6 py-4">

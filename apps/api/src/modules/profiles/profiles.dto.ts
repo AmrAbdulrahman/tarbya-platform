@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ROLES, type Role } from '@tarbya/shared';
-import { Transform } from 'class-transformer';
-import { IsString, MaxLength, MinLength } from 'class-validator';
 import { UserRefDto } from '../users/users.dto';
 
 export class ProfileDto {
@@ -15,34 +13,12 @@ export class ProfileDto {
   @ApiProperty({ type: UserRefDto, nullable: true }) mentor!: UserRefDto | null;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   deactivatedAt!: string | null;
-  /** The viewer manages, mentors or administers this user (never true for the user themself). */
-  @ApiProperty() canSeeAdminNotes!: boolean;
+  /** The viewer is above this member (mentoring chain, management line) or an admin: reads every note and writes them (BR-NOTE-1, BR-NOTE-3). */
+  @ApiProperty() canWriteNotes!: boolean;
   /** The member themself, their current mentor, or an admin: trackables, challenges, tasks, history. */
   @ApiProperty() canSeeMentoring!: boolean;
   /** Their current mentor or an admin: creates trackables, challenges and tasks (BR-TRK-6). */
   @ApiProperty() canManageMentoring!: boolean;
   /** The viewer is their current mentor: logs follow-ups and writes notes (US-4.3, US-4.6). */
   @ApiProperty() isMentor!: boolean;
-}
-
-export class AdminNoteDto {
-  @ApiProperty({ format: 'uuid' }) id!: string;
-  @ApiProperty() body!: string;
-  @ApiProperty({ type: UserRefDto }) author!: UserRefDto;
-  /** The super admin who wrote this while impersonating the author (BR-ADM-5). */
-  @ApiProperty({ type: UserRefDto, nullable: true })
-  impersonator!: UserRefDto | null;
-  @ApiProperty({ format: 'date-time' }) createdAt!: string;
-  @ApiProperty({ format: 'date-time' }) updatedAt!: string;
-  /** Only the author edits a note. */
-  @ApiProperty() canEdit!: boolean;
-}
-
-export class AdminNoteBodyDto {
-  @ApiProperty({ minLength: 1, maxLength: 5000 })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  @IsString()
-  @MinLength(1)
-  @MaxLength(5000)
-  body!: string;
 }

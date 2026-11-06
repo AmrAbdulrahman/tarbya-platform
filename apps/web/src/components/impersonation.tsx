@@ -65,6 +65,8 @@ export function ImpersonateButton() {
           title={t('impersonation.title')}
           description={t('impersonation.hint')}
           closeLabel={t('admin.common.close')}
+          // Tall enough that the picker's suggestions show without scrolling.
+          className="min-h-[min(30rem,90vh)]"
         >
           <div className="flex flex-col gap-2">
             <label htmlFor="impersonate-user" className="text-sm font-semibold">

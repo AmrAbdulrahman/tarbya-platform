@@ -19,6 +19,8 @@ export interface ConversationDto {
   /** @nullable */
   group: UserRefDto | null;
   /** @nullable */
+  title: string | null;
+  /** @nullable */
   memberCount: number | null;
   /** @nullable */
   lastMessage: LastMessageDto | null;

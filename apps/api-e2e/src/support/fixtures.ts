@@ -41,6 +41,7 @@ export async function createUser(
     moderator?: boolean;
     deactivated?: boolean;
     password?: string | null;
+    name?: string;
   } = {},
 ): Promise<TestUser> {
   const c = await db();
@@ -52,7 +53,7 @@ export async function createUser(
      VALUES ($1, $2, $3, $4, $5, now())`,
     [
       id,
-      `E2E ${id.slice(0, 4)}`,
+      opts.name ?? `E2E ${id.slice(0, 4)}`,
       email,
       !!opts.moderator,
       opts.deactivated ? new Date() : null,

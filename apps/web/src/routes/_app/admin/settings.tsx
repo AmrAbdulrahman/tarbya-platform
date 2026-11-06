@@ -16,6 +16,7 @@ import { Button, Checkbox, Input } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { Field, FormError } from '../../../components/login/fields';
 import { Breadcrumbs } from '../../../components/breadcrumbs';
+import { PageHeader } from '../../../components/page-header';
 
 /** US-3.6 */
 export const Route = createFileRoute('/_app/admin/settings')({
@@ -123,14 +124,14 @@ function SettingsPage() {
       <Breadcrumbs
         items={[{ label: t('nav.admin') }, { label: t('nav.settings') }]}
       />
-      <div className="flex flex-col gap-1">
+      <PageHeader>
         <h1 className="text-2xl font-bold text-brand">
           {t('admin.settings.title')}
         </h1>
         <p className="text-[15px] text-ink-subtle">
           {t('admin.settings.lead')}
         </p>
-      </div>
+      </PageHeader>
       <form
         noValidate
         onSubmit={form.handleSubmit((v) => save.mutate(v))}

@@ -25,8 +25,10 @@ import type {
 
 import type {
   CreateNoteDto,
+  MentionAccessDto,
   NoteDto,
   NotesControllerListParams,
+  NotesControllerMentionAccessParams,
   UpdateNoteDto
 } from '../../model';
 
@@ -262,7 +264,128 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getNotesControllerCreateMutationOptions(options), queryClient);
     }
-    export type notesControllerUpdateResponse200 = {
+    export type notesControllerMentionAccessResponse200 = {
+  data: MentionAccessDto
+  status: 200
+}
+
+export type notesControllerMentionAccessResponseSuccess = (notesControllerMentionAccessResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notesControllerMentionAccessResponse = (notesControllerMentionAccessResponseSuccess)
+
+export const getNotesControllerMentionAccessUrl = (params: NotesControllerMentionAccessParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["userIds"];
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? 'null' : String(v));
+      });
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/notes/mention-access?${stringifiedParams}` : `/api/notes/mention-access`
+}
+
+export const notesControllerMentionAccess = async (params: NotesControllerMentionAccessParams, options?: Parameters<typeof apiFetch>[1]): Promise<notesControllerMentionAccessResponse> => {
+
+  return apiFetch<notesControllerMentionAccessResponse>(getNotesControllerMentionAccessUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNotesControllerMentionAccessQueryKey = (params?: NotesControllerMentionAccessParams,) => {
+    return [
+    `/api/notes/mention-access`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getNotesControllerMentionAccessQueryOptions = <TData = Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError = unknown>(params: NotesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNotesControllerMentionAccessQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notesControllerMentionAccess>>> = ({ signal }) => notesControllerMentionAccess(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NotesControllerMentionAccessQueryResult = NonNullable<Awaited<ReturnType<typeof notesControllerMentionAccess>>>
+export type NotesControllerMentionAccessQueryError = unknown
+
+
+export function useNotesControllerMentionAccess<TData = Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError = unknown>(
+ params: NotesControllerMentionAccessParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notesControllerMentionAccess>>,
+          TError,
+          Awaited<ReturnType<typeof notesControllerMentionAccess>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotesControllerMentionAccess<TData = Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError = unknown>(
+ params: NotesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notesControllerMentionAccess>>,
+          TError,
+          Awaited<ReturnType<typeof notesControllerMentionAccess>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotesControllerMentionAccess<TData = Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError = unknown>(
+ params: NotesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNotesControllerMentionAccess<TData = Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError = unknown>(
+ params: NotesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notesControllerMentionAccess>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNotesControllerMentionAccessQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type notesControllerUpdateResponse200 = {
   data: NoteDto
   status: 200
 }

@@ -18,15 +18,17 @@ export function useConversations() {
   });
 }
 
-/** The other person's name, or the group's. */
+/** The other person's name, the group's, or the chat's. */
 export const conversationName = (c: ConversationDto) =>
-  c.other?.name ?? c.group?.name ?? '';
+  c.other?.name ?? c.group?.name ?? c.title ?? '';
 
 /** The second line under the name: how they relate to me, or the group's size. */
 export function conversationRole(t: TFunction, c: ConversationDto): string {
   if (c.relation) return t(`messages.relation.${c.relation}`);
   if (c.group)
     return `${t('groups.eyebrow')} · ${t('groups.members', { count: c.memberCount ?? 0 })}`;
+  if (c.kind === 'CHAT')
+    return `${t('messages.chat.kind')} · ${t('groups.members', { count: c.memberCount ?? 0 })}`;
   return '';
 }
 

@@ -21,7 +21,9 @@ import type {
 
 import type {
   PeopleControllerSearchParams,
-  PersonDto
+  PersonDto,
+  PersonHitDto,
+  SearchControllerFindParams
 } from '../../model';
 
 import { apiFetch } from '../../../fetcher.js';
@@ -152,6 +154,119 @@ export function usePeopleControllerSearch<TData = Awaited<ReturnType<typeof peop
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getPeopleControllerSearchQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type searchControllerFindResponse200 = {
+  data: PersonHitDto[]
+  status: 200
+}
+
+export type searchControllerFindResponseSuccess = (searchControllerFindResponse200) & {
+  headers: Headers;
+};
+;
+
+export type searchControllerFindResponse = (searchControllerFindResponseSuccess)
+
+export const getSearchControllerFindUrl = (params?: SearchControllerFindParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/search/people?${stringifiedParams}` : `/api/search/people`
+}
+
+export const searchControllerFind = async (params?: SearchControllerFindParams, options?: Parameters<typeof apiFetch>[1]): Promise<searchControllerFindResponse> => {
+
+  return apiFetch<searchControllerFindResponse>(getSearchControllerFindUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSearchControllerFindQueryKey = (params?: SearchControllerFindParams,) => {
+    return [
+    `/api/search/people`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getSearchControllerFindQueryOptions = <TData = Awaited<ReturnType<typeof searchControllerFind>>, TError = unknown>(params?: SearchControllerFindParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchControllerFind>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchControllerFindQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchControllerFind>>> = ({ signal }) => searchControllerFind(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchControllerFind>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SearchControllerFindQueryResult = NonNullable<Awaited<ReturnType<typeof searchControllerFind>>>
+export type SearchControllerFindQueryError = unknown
+
+
+export function useSearchControllerFind<TData = Awaited<ReturnType<typeof searchControllerFind>>, TError = unknown>(
+ params: undefined |  SearchControllerFindParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchControllerFind>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchControllerFind>>,
+          TError,
+          Awaited<ReturnType<typeof searchControllerFind>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchControllerFind<TData = Awaited<ReturnType<typeof searchControllerFind>>, TError = unknown>(
+ params?: SearchControllerFindParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchControllerFind>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchControllerFind>>,
+          TError,
+          Awaited<ReturnType<typeof searchControllerFind>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchControllerFind<TData = Awaited<ReturnType<typeof searchControllerFind>>, TError = unknown>(
+ params?: SearchControllerFindParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchControllerFind>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useSearchControllerFind<TData = Awaited<ReturnType<typeof searchControllerFind>>, TError = unknown>(
+ params?: SearchControllerFindParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchControllerFind>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSearchControllerFindQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

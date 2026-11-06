@@ -665,6 +665,39 @@
         ]
       }
     },
+    "/api/search/people": {
+      "get": {
+        "operationId": "SearchController_find",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonHitDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "people"
+        ]
+      }
+    },
     "/api/auth/sign-in/password": {
       "post": {
         "operationId": "AuthController_signInWithPassword",
@@ -1869,6 +1902,57 @@
         ]
       }
     },
+    "/api/notes/mention-access": {
+      "get": {
+        "operationId": "NotesController_mentionAccess",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/NoteVisibility"
+            }
+          },
+          {
+            "name": "userIds",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentionAccessDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "notes"
+        ]
+      }
+    },
     "/api/notes/{id}": {
       "patch": {
         "operationId": "NotesController_update",
@@ -1932,117 +2016,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProfileDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "profiles"
-        ]
-      }
-    },
-    "/api/people/{id}/admin-notes": {
-      "get": {
-        "operationId": "ProfilesController_notes",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AdminNoteDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "profiles"
-        ]
-      },
-      "post": {
-        "operationId": "ProfilesController_addNote",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminNoteBodyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminNoteDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "profiles"
-        ]
-      }
-    },
-    "/api/admin-notes/{id}": {
-      "patch": {
-        "operationId": "ProfilesController_editNote",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminNoteBodyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminNoteDto"
                 }
               }
             }
@@ -2317,6 +2290,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ChallengeDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "challenges"
+        ]
+      }
+    },
+    "/api/challenges/mention-access": {
+      "get": {
+        "operationId": "ChallengesController_mentionAccess",
+        "parameters": [
+          {
+            "name": "menteeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userIds",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentionAccessDto"
                 }
               }
             }
@@ -3273,6 +3289,188 @@
         ]
       }
     },
+    "/api/conversations/contacts": {
+      "get": {
+        "operationId": "MessagesController_contacts",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonRefDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/api/conversations/direct": {
+      "post": {
+        "operationId": "MessagesController_direct",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartDirectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationRefDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/api/conversations/chats": {
+      "post": {
+        "operationId": "MessagesController_createChat",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationRefDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/api/conversations/{id}/members": {
+      "get": {
+        "operationId": "MessagesController_members",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonRefDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      },
+      "post": {
+        "operationId": "MessagesController_addMembers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMembersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/api/conversations/{id}/members/me": {
+      "delete": {
+        "operationId": "MessagesController_leave",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
     "/api/conversations/{id}/messages": {
       "get": {
         "operationId": "MessagesController_page",
@@ -3361,6 +3559,86 @@
         ]
       }
     },
+    "/api/conversations/{id}/attachments": {
+      "post": {
+        "operationId": "MessagesController_upload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/api/conversations/{id}/attachments/{attachmentId}": {
+      "get": {
+        "operationId": "MessagesController_attachment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file"
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
     "/api/conversations/{id}/read": {
       "post": {
         "operationId": "MessagesController_read",
@@ -3436,7 +3714,8 @@
           "CHALLENGE_RESOLVED",
           "MENTOR_REPLIED",
           "TASK_ASSIGNED",
-          "NEW_MESSAGE"
+          "NEW_MESSAGE",
+          "MENTIONED"
         ]
       },
       "NotificationCategory": {
@@ -4059,6 +4338,36 @@
         "required": [
           "id",
           "name",
+          "isMyMentee"
+        ]
+      },
+      "PersonHitDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "isMyMentee": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "avatarUrl",
+          "phone",
           "isMyMentee"
         ]
       },
@@ -5763,6 +6072,21 @@
           "updatedAt"
         ]
       },
+      "MentionAccessDto": {
+        "type": "object",
+        "properties": {
+          "blocked": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "blocked"
+        ]
+      },
       "CreateNoteDto": {
         "type": "object",
         "properties": {
@@ -5856,7 +6180,7 @@
             "format": "date-time",
             "nullable": true
           },
-          "canSeeAdminNotes": {
+          "canWriteNotes": {
             "type": "boolean"
           },
           "canSeeMentoring": {
@@ -5878,67 +6202,10 @@
           "manager",
           "mentor",
           "deactivatedAt",
-          "canSeeAdminNotes",
+          "canWriteNotes",
           "canSeeMentoring",
           "canManageMentoring",
           "isMentor"
-        ]
-      },
-      "AdminNoteDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "body": {
-            "type": "string"
-          },
-          "author": {
-            "$ref": "#/components/schemas/UserRefDto"
-          },
-          "impersonator": {
-            "nullable": true,
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserRefDto"
-              }
-            ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "canEdit": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "body",
-          "author",
-          "impersonator",
-          "createdAt",
-          "updatedAt",
-          "canEdit"
-        ]
-      },
-      "AdminNoteBodyDto": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5000
-          }
-        },
-        "required": [
-          "body"
         ]
       },
       "MyProfileDto": {
@@ -7599,6 +7866,7 @@
         "enum": [
           "DIRECT",
           "GROUP",
+          "CHAT",
           "TEAM"
         ]
       },
@@ -7606,8 +7874,7 @@
         "type": "string",
         "enum": [
           "MY_MENTOR",
-          "MY_MENTEE",
-          "FORMER"
+          "MY_MENTEE"
         ]
       },
       "LastMessageDto": {
@@ -7670,6 +7937,10 @@
               }
             ]
           },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
           "memberCount": {
             "type": "number",
             "nullable": true
@@ -7696,6 +7967,7 @@
           "other",
           "relation",
           "group",
+          "title",
           "memberCount",
           "lastMessage",
           "unread",
@@ -7713,6 +7985,94 @@
           "conversations"
         ]
       },
+      "StartDirectDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "ConversationRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "CreateChatDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "userIds"
+        ]
+      },
+      "AddMembersDto": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "userIds"
+        ]
+      },
+      "AttachmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mime": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "mime",
+          "size",
+          "url"
+        ]
+      },
       "MessageDto": {
         "type": "object",
         "properties": {
@@ -7726,6 +8086,12 @@
           },
           "body": {
             "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttachmentDto"
+            }
           },
           "author": {
             "$ref": "#/components/schemas/PersonRefDto"
@@ -7748,6 +8114,7 @@
           "id",
           "conversationId",
           "body",
+          "attachments",
           "author",
           "impersonator",
           "createdAt"
@@ -7779,6 +8146,13 @@
           "body": {
             "type": "string",
             "maxLength": 4000
+          },
+          "attachmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         },
         "required": [

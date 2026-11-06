@@ -138,6 +138,13 @@ const copy: Record<
           title: `رسالة جديدة من ${s(p, 'byName')}`,
           body: s(p, 'preview'),
         };
+      case 'MENTIONED':
+        return {
+          title: p['noteId']
+            ? `أشار إليك ${s(p, 'byName')} في ملاحظة عن ${s(p, 'title')}`
+            : `أشار إليك ${s(p, 'byName')} في «${s(p, 'title')}»`,
+          body: s(p, 'preview'),
+        };
     }
   },
   en: (type, p, me) => {
@@ -248,6 +255,13 @@ const copy: Record<
       case 'NEW_MESSAGE':
         return {
           title: `New message from ${s(p, 'byName')}`,
+          body: s(p, 'preview'),
+        };
+      case 'MENTIONED':
+        return {
+          title: p['noteId']
+            ? `${s(p, 'byName')} mentioned you in a note on ${s(p, 'title')}`
+            : `${s(p, 'byName')} mentioned you in “${s(p, 'title')}”`,
           body: s(p, 'preview'),
         };
     }

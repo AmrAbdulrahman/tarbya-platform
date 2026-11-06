@@ -15,6 +15,10 @@ interface Registration {
   handler: Handler;
   /** Cron in the organisation zone, for recurring jobs. */
   cron?: string;
+  /** Jobs of this name run at once on this instance; 1 unless they're independent. */
+  concurrency?: number;
+  /** How often an idle worker looks for jobs; pg-boss's default is 2 s. */
+  pollSeconds?: number;
 }
 
 /**
@@ -31,9 +35,18 @@ export class JobsService
 
   constructor(private readonly config: ConfigService<Env, true>) {}
 
-  /** Runs `handler` for each job sent to `name`; with `cron`, also schedules it. */
-  register(name: string, handler: Handler, cron?: string) {
-    this.registrations.push({ name, handler, cron });
+  /**
+   * Runs `handler` for each job sent to `name`; with `cron`, also schedules it.
+   * `concurrency` lets independent jobs (one email each) run side by side;
+   * `pollSeconds` picks them up sooner, since a worker takes one job per look.
+   */
+  register(
+    name: string,
+    handler: Handler,
+    cron?: string,
+    options: { concurrency?: number; pollSeconds?: number } = {},
+  ) {
+    this.registrations.push({ name, handler, cron, ...options });
   }
 
   /** Queues a job; runs it inline when jobs are off (tests, one-shot runs). */
@@ -65,11 +78,19 @@ export class JobsService
     boss.on('error', (error) => this.logger.error(error));
     await boss.start();
     const tz = this.config.get('ORG_TIMEZONE', { infer: true });
-    for (const { name, handler, cron } of this.registrations) {
+    for (const { name, handler, cron, concurrency, pollSeconds } of this
+      .registrations) {
       await boss.createQueue(name);
-      await boss.work<Record<string, unknown>>(name, async (jobs) => {
-        for (const job of jobs) await handler(job.data ?? {});
-      });
+      await boss.work<Record<string, unknown>>(
+        name,
+        {
+          localConcurrency: concurrency ?? 1,
+          ...(pollSeconds && { pollingIntervalSeconds: pollSeconds }),
+        },
+        async (jobs) => {
+          for (const job of jobs) await handler(job.data ?? {});
+        },
+      );
       if (cron) await boss.schedule(name, cron, {}, { tz });
     }
     this.boss = boss;

@@ -26,8 +26,10 @@ import type {
 import type {
   ChallengeDto,
   ChallengesControllerListParams,
+  ChallengesControllerMentionAccessParams,
   CommentBodyDto,
   CreateChallengeDto,
+  MentionAccessDto,
   UpdateChallengeDto
 } from '../../model';
 
@@ -263,7 +265,128 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getChallengesControllerCreateMutationOptions(options), queryClient);
     }
-    export type challengesControllerUpdateResponse200 = {
+    export type challengesControllerMentionAccessResponse200 = {
+  data: MentionAccessDto
+  status: 200
+}
+
+export type challengesControllerMentionAccessResponseSuccess = (challengesControllerMentionAccessResponse200) & {
+  headers: Headers;
+};
+;
+
+export type challengesControllerMentionAccessResponse = (challengesControllerMentionAccessResponseSuccess)
+
+export const getChallengesControllerMentionAccessUrl = (params: ChallengesControllerMentionAccessParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["userIds"];
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? 'null' : String(v));
+      });
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/challenges/mention-access?${stringifiedParams}` : `/api/challenges/mention-access`
+}
+
+export const challengesControllerMentionAccess = async (params: ChallengesControllerMentionAccessParams, options?: Parameters<typeof apiFetch>[1]): Promise<challengesControllerMentionAccessResponse> => {
+
+  return apiFetch<challengesControllerMentionAccessResponse>(getChallengesControllerMentionAccessUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getChallengesControllerMentionAccessQueryKey = (params?: ChallengesControllerMentionAccessParams,) => {
+    return [
+    `/api/challenges/mention-access`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getChallengesControllerMentionAccessQueryOptions = <TData = Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError = unknown>(params: ChallengesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChallengesControllerMentionAccessQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof challengesControllerMentionAccess>>> = ({ signal }) => challengesControllerMentionAccess(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChallengesControllerMentionAccessQueryResult = NonNullable<Awaited<ReturnType<typeof challengesControllerMentionAccess>>>
+export type ChallengesControllerMentionAccessQueryError = unknown
+
+
+export function useChallengesControllerMentionAccess<TData = Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError = unknown>(
+ params: ChallengesControllerMentionAccessParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof challengesControllerMentionAccess>>,
+          TError,
+          Awaited<ReturnType<typeof challengesControllerMentionAccess>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChallengesControllerMentionAccess<TData = Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError = unknown>(
+ params: ChallengesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof challengesControllerMentionAccess>>,
+          TError,
+          Awaited<ReturnType<typeof challengesControllerMentionAccess>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChallengesControllerMentionAccess<TData = Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError = unknown>(
+ params: ChallengesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useChallengesControllerMentionAccess<TData = Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError = unknown>(
+ params: ChallengesControllerMentionAccessParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof challengesControllerMentionAccess>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChallengesControllerMentionAccessQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type challengesControllerUpdateResponse200 = {
   data: ChallengeDto
   status: 200
 }

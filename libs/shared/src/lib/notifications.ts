@@ -21,6 +21,7 @@ export const NOTIFICATION_TYPES = [
   'MENTOR_REPLIED',
   'TASK_ASSIGNED',
   'NEW_MESSAGE',
+  'MENTIONED',
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
@@ -50,6 +51,7 @@ export const NOTIFICATION_CATEGORY: Record<
   MENTOR_REPLIED: 'journey',
   TASK_ASSIGNED: 'journey',
   NEW_MESSAGE: 'other',
+  MENTIONED: 'other',
 };
 
 /** Always delivered in-app; email stays the user's choice. */
@@ -91,6 +93,7 @@ export const NOTIFICATION_DEFAULTS: Record<NotificationType, Delivery> = {
   MENTOR_REPLIED: { inApp: true, email: true },
   TASK_ASSIGNED: { inApp: true, email: true },
   NEW_MESSAGE: { inApp: false, email: true },
+  MENTIONED: { inApp: true, email: true },
 };
 
 /** The user's choice over the default; mandatory types always arrive in-app. */
@@ -128,6 +131,15 @@ export function notificationLink(
     case 'CHALLENGE_RAISED':
     case 'CHALLENGE_COMMENTED':
     case 'CHALLENGE_RESOLVED':
+      return menteePage;
+    case 'MENTIONED':
+      // In a message, on a trackable, or on a mentee's challenges.
+      if (str(payload, 'conversationId'))
+        return `/messages?c=${str(payload, 'conversationId')}`;
+      if (str(payload, 'trackableId'))
+        return `/trackables/${str(payload, 'trackableId')}`;
+      // Notes show on the member's profile, theirs included.
+      if (str(payload, 'noteId')) return `/people/${mentee}`;
       return menteePage;
     case 'GATHERING_RSVP_REQUEST':
     case 'GATHERING_REMINDER':

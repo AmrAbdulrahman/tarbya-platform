@@ -27,4 +27,5 @@ export const NotificationType = {
   MENTOR_REPLIED: 'MENTOR_REPLIED',
   TASK_ASSIGNED: 'TASK_ASSIGNED',
   NEW_MESSAGE: 'NEW_MESSAGE',
+  MENTIONED: 'MENTIONED',
 } as const;

@@ -17,6 +17,7 @@ import { Button, cn } from '@tarbya/ui';
 import { errorMessage } from '../../auth/error-message';
 import { NotificationItem } from '../../components/notifications/notification-item';
 import { useUnreadNotifications } from '../../components/notifications/notifications-menu';
+import { PageHeader } from '../../components/page-header';
 
 const FILTERS = ['all', 'unread', 'mentees', 'journey', 'groups'] as const;
 type Filter = (typeof FILTERS)[number];
@@ -71,7 +72,7 @@ function NotificationsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
+      <PageHeader className="flex-row flex-wrap items-center gap-3">
         <h1 className="flex-1 text-2xl font-bold text-brand">
           {t('notifications.title')}
         </h1>
@@ -89,7 +90,7 @@ function NotificationsPage() {
             {t('notifications.preferences')}
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
       <div
         role="tablist"

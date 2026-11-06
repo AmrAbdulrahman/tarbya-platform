@@ -215,6 +215,30 @@ export class InteractionsService {
         { actorId },
       );
     }
+    // Comments on open challenges can mention people too.
+    const commented = notes.filter((n) => n.comment);
+    if (commented.length) {
+      const titles = new Map(
+        (
+          await this.prisma.challenge.findMany({
+            where: { id: { in: commented.map((n) => n.challengeId) } },
+            select: { id: true, title: true },
+          })
+        ).map((c) => [c.id, c.title]),
+      );
+      for (const note of commented) {
+        await this.notifications.notifyMentions(
+          actorId,
+          note.comment ?? '',
+          (userId) => this.access.canView(userId, dto.menteeId),
+          {
+            challengeId: note.challengeId,
+            menteeId: dto.menteeId,
+            title: titles.get(note.challengeId) ?? '',
+          },
+        );
+      }
+    }
     return this.get(actorId, created.id);
   }
 

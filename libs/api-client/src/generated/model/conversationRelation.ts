@@ -11,5 +11,4 @@ export type ConversationRelation = typeof ConversationRelation[keyof typeof Conv
 export const ConversationRelation = {
   MY_MENTOR: 'MY_MENTOR',
   MY_MENTEE: 'MY_MENTEE',
-  FORMER: 'FORMER',
 } as const;

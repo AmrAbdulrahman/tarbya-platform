@@ -18,7 +18,7 @@ import {
   formatDate,
   toZoned,
 } from '@tarbya/shared';
-import { Badge, Button, cn, Input, Textarea, useToast } from '@tarbya/ui';
+import { Badge, Button, cn, Input, useToast } from '@tarbya/ui';
 import { errorMessage } from '../../../auth/error-message';
 import { useMe } from '../../../auth/session';
 import { actedBy } from '../../../components/acted-by';
@@ -33,8 +33,15 @@ import {
 import { TemplateCard } from '../../../components/trackables/template-card';
 import { TrackableDialog } from '../../../components/trackables/trackable-dialog';
 import { Sparkline, TrendBadge } from '../../../components/trackables/trend';
+import { PageHeader } from '../../../components/page-header';
 
-/** A trackable with its cycles: US-5.2 (log), US-4.7 (reply) · design/screens/MyPlan.dc.html */
+/** A trackable with its cycles: US-5.2 (log), US-4.7 (reply) · design/screens/MyPlan.dc.html */ import {
+  MentionAccessWarning,
+  MentionText,
+  MentionTextarea,
+  useMentionDraft,
+} from '../../../components/mention-textarea';
+
 export const Route = createFileRoute('/_app/trackables/$id')({
   component: TrackablePage,
 });
@@ -99,7 +106,7 @@ function TrackablePage() {
           { label: tr.name },
         ]}
       />
-      <div className="flex flex-wrap items-start gap-4">
+      <PageHeader className="flex-row flex-wrap items-start gap-4">
         <div className="flex flex-1 flex-col gap-1">
           <h1 className="text-2xl font-bold text-brand">{tr.name}</h1>
           {tr.goal && <p className="text-[15px] text-ink-muted">{tr.goal}</p>}
@@ -148,7 +155,7 @@ function TrackablePage() {
             </>
           )}
         </div>
-      </div>
+      </PageHeader>
 
       <section className="flex flex-col gap-3 rounded-card border border-border bg-card p-4">
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
@@ -350,15 +357,15 @@ function Entry({
   const me = useMe();
   const formatValue = useFormatValue();
   const cycleLabel = useCycleLabel();
-  const [body, setBody] = useState('');
+  const draft = useMentionDraft();
   const [replying, setReplying] = useState(false);
   const [editing, setEditing] = useState(false);
   const reply = useMutation({
     mutationFn: async () =>
-      (await trackablesControllerReply(entry.id, { body }))
+      (await trackablesControllerReply(entry.id, { body: draft.body() }))
         .data as TrackableDetailDto,
     onSuccess: (next) => {
-      setBody('');
+      draft.reset();
       setReplying(false);
       onSaved(next);
     },
@@ -436,7 +443,9 @@ function Entry({
           <p className="text-[13px] text-ink-subtle">
             {actedBy(t, r.author, r.impersonator)} · {date(r.createdAt)}
           </p>
-          <p className="whitespace-pre-line text-[15px]">{r.body}</p>
+          <p className="whitespace-pre-line text-[15px]">
+            <MentionText body={r.body} />
+          </p>
         </div>
       ))}
       {tr.canManage &&
@@ -446,16 +455,22 @@ function Entry({
             className="ms-6 flex flex-col gap-2"
             onSubmit={(e) => {
               e.preventDefault();
-              if (body.trim()) reply.mutate();
+              if (draft.text.trim()) reply.mutate();
             }}
           >
-            <Textarea
-              aria-label={t('trackables.reply')}
-              rows={2}
+            <MentionTextarea
+              label={t('trackables.reply')}
               placeholder={t('trackables.replyPlaceholder')}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
+              value={draft.text}
+              onChange={draft.setText}
+              picked={draft.picked}
+              onPick={draft.pick}
+              maxLength={2000}
               autoFocus
+            />
+            <MentionAccessWarning
+              menteeId={tr.menteeId}
+              mentions={draft.mentioned}
             />
             <FormError
               message={reply.isError ? errorMessage(t, reply.error) : undefined}
@@ -464,7 +479,7 @@ function Entry({
               <Button
                 type="submit"
                 size="sm"
-                disabled={!body.trim() || reply.isPending}
+                disabled={!draft.text.trim() || reply.isPending}
               >
                 {t('trackables.sendReply')}
               </Button>
