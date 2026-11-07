@@ -1,5 +1,8 @@
 import type { Locale } from '@tarbya/db';
 
+/** The inline logo's content id: the mail service attaches it under this name. */
+export const EMAIL_LOGO_CID = 'tarbya-logo';
+
 /** Brand colours and fonts (design/README.md). Email clients need them inline. */
 export const emailBrand = {
   green: '#0E4D3A',
@@ -73,7 +76,7 @@ export function emailLayout({
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border:1px solid ${b.divider};border-radius:14px;overflow:hidden">
 <tr><td dir="${t.dir}" style="background:${b.green};padding:22px 28px;border-bottom:4px solid ${b.gold}">
 <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td style="vertical-align:middle"><img src="${appUrl}/email-logo.png" width="44" height="48" alt="" style="display:block;border:0"></td>
+<td style="vertical-align:middle"><img src="cid:${EMAIL_LOGO_CID}" width="44" height="48" alt="" style="display:block;border:0"></td>
 <td style="vertical-align:middle;padding-${t.dir === 'rtl' ? 'right' : 'left'}:12px;font-family:${font};text-align:${align}">
 <div style="font-size:22px;font-weight:700;color:#FFFFFF;line-height:1.2">${t.name}</div>
 <div style="font-size:13px;color:#CFE0D6;line-height:1.4">${t.tagline}</div>

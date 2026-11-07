@@ -47,7 +47,15 @@ describe('MailService with a Resend key', () => {
     });
     expect(body.html).toContain('<p>Hi</p>');
     expect(body.html).toContain('dir="rtl"');
-    expect(body.html).toContain('https://app.tarbya.test/email-logo.png');
+    // The logo rides along inline, so it shows even where APP_URL can't be reached.
+    expect(body.html).toContain('src="cid:tarbya-logo"');
+    expect(body.attachments).toEqual([
+      expect.objectContaining({
+        filename: 'tarbya-logo.png',
+        content_id: 'tarbya-logo',
+        content: expect.stringMatching(/^iVBORw0KGgo/),
+      }),
+    ]);
     expect(body).not.toHaveProperty('locale');
   });
 

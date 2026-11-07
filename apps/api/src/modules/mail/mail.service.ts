@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { createTransport, type Transporter } from 'nodemailer';
 import type { Locale } from '@tarbya/db';
 import type { Env } from '../../config/env';
-import { emailLayout } from './email-layout';
+import { EMAIL_LOGO_CID, emailLayout } from './email-layout';
+import { EMAIL_LOGO_PNG_BASE64 } from './email-logo';
 
 export interface Mail {
   to: string;
@@ -23,6 +24,12 @@ interface Outgoing {
   text: string;
   html: string;
 }
+
+const LOGO = {
+  filename: 'tarbya-logo.png',
+  contentType: 'image/png',
+  base64: EMAIL_LOGO_PNG_BASE64,
+};
 
 const RESEND_URL = 'https://api.resend.com/emails';
 const TIMEOUT_MS = 10_000;
@@ -71,10 +78,21 @@ export class MailService {
       text,
       html: emailLayout({ body: html, preheader, locale, appUrl: this.appUrl }),
     };
+    // The layout's logo travels inside the email (cid:), not as a remote image.
     if (this.resendKey) {
       await this.sendWithResend(outgoing, this.resendKey);
     } else {
-      await this.transport?.sendMail(outgoing);
+      await this.transport?.sendMail({
+        ...outgoing,
+        attachments: [
+          {
+            filename: LOGO.filename,
+            contentType: LOGO.contentType,
+            content: Buffer.from(LOGO.base64, 'base64'),
+            cid: EMAIL_LOGO_CID,
+          },
+        ],
+      });
     }
     this.logger.log(`Sent "${subject}"`);
   }
@@ -86,7 +104,17 @@ export class MailService {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(mail),
+      body: JSON.stringify({
+        ...mail,
+        attachments: [
+          {
+            filename: LOGO.filename,
+            content_type: LOGO.contentType,
+            content: LOGO.base64,
+            content_id: EMAIL_LOGO_CID,
+          },
+        ],
+      }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!res.ok) {
