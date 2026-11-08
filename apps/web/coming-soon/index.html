@@ -1,0 +1,143 @@
+<!doctype html>
+<!--
+  Served for every request in production while COMING_SOON is on (the default);
+  see apps/web/Caddyfile. Self-contained: nothing behind the gate is reachable.
+-->
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>تربية · قريبًا</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e4d3a" />
+    <meta name="robots" content="noindex" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 108'%3E%3Cpath d='M10.5 84V46C10.5 31 22 23 33 17C42 12 47 9 50 4C53 9 58 12 67 17C78 23 89.5 31 89.5 46V84' fill='none' stroke='%230E4D3A' stroke-width='9' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='38' r='10' fill='%23D7A84A'/%3E%3Cpath d='M50 99.5C38 91 22 86.5 3 87.5V95.5C22 94.5 37 98.5 50 107C63 98.5 78 94.5 97 95.5V87.5C78 86.5 62 91 50 99.5Z' fill='%230E4D3A'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&family=Tajawal:wght@400;500;800&display=swap"
+    />
+    <style>
+      :root {
+        --brand: #0e4d3a;
+        --brand-soft: #2f6b57;
+        --gold: #d7a84a;
+        --paper: #faf7f0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        padding: 24px 16px;
+        background:
+          radial-gradient(circle at 50% 0%, #fff 0%, transparent 60%),
+          var(--paper);
+        color: var(--brand);
+        font-family: Tajawal, Manrope, system-ui, sans-serif;
+        text-align: center;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 560px;
+      }
+      svg {
+        width: 104px;
+        height: auto;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(40px, 9vw, 56px);
+        font-weight: 800;
+        line-height: 1.1;
+      }
+      .slogan {
+        margin: 0;
+        font-size: clamp(20px, 5vw, 26px);
+        font-weight: 500;
+        color: var(--brand-soft);
+      }
+      .slogan[lang='en'] {
+        margin-top: -12px;
+        font-family: Manrope, system-ui, sans-serif;
+        font-size: 16px;
+        opacity: 0.85;
+      }
+      .divider {
+        width: 64px;
+        height: 3px;
+        border-radius: 3px;
+        background: var(--gold);
+      }
+      .soon {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+      }
+      .soon span {
+        display: block;
+        margin-top: 4px;
+        font-family: Manrope, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <svg viewBox="0 0 100 108" role="img" aria-label="تربية">
+        <mask id="c">
+          <rect width="100" height="108" fill="#fff" />
+          <circle cx="55" cy="34.5" r="8" fill="#000" />
+        </mask>
+        <path
+          d="M10.5 84V46C10.5 31 22 23 33 17C42 12 47 9 50 4C53 9 58 12 67 17C78 23 89.5 31 89.5 46V84"
+          fill="none"
+          stroke="#0E4D3A"
+          stroke-width="9"
+          stroke-linejoin="round"
+        />
+        <circle cx="50" cy="38" r="10" fill="#D7A84A" mask="url(#c)" />
+        <path
+          d="M28 77C27 68 31 61.5 39 57C45 53.5 48.5 52 50 49C51.5 52 55 53.5 61 57C69 61.5 73 68 72 77Z"
+          fill="#2F6B57"
+        />
+        <path
+          d="M50 99.5C38 91 22 86.5 3 87.5V95.5C22 94.5 37 98.5 50 107C63 98.5 78 94.5 97 95.5V87.5C78 86.5 62 91 50 99.5Z"
+          fill="#0E4D3A"
+        />
+        <path
+          d="M50 92C39 82 25 76.5 9 76.5V86C25 85.5 39 89 50 97Z"
+          fill="#D7A84A"
+        />
+        <path
+          d="M50 92C61 82 75 76.5 91 76.5V86C75 85.5 61 89 50 97Z"
+          fill="#D7A84A"
+        />
+      </svg>
+      <h1>تربية</h1>
+      <p class="slogan">مكانٌ لتعلّم تفسير القرآن الكريم</p>
+      <p class="slogan" lang="en" dir="ltr">
+        A place to learn the tafsir of the Quran
+      </p>
+      <div class="divider" aria-hidden="true"></div>
+      <p class="soon">قريبًا <span lang="en">Coming soon</span></p>
+    </main>
+  </body>
+</html>

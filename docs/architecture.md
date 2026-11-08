@@ -147,6 +147,7 @@ Gathering occurrences are materialised ahead by a daily job (next 8 weeks), so R
 - Local: `docker compose up` for Postgres, Mailpit and SeaweedFS (S3); `pnpm nx run-many -t serve -p api web`.
 - Config is validated at boot with Zod: `DATABASE_URL`, `JWT_SECRET`, `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD` (first boot only), `SMTP_*`, `S3_*`, `APP_URL`, `ORG_TIMEZONE` (default `Africa/Cairo`).
 - Railway: `api` runs `prisma migrate deploy` before start; `web` is a static build served with a proxy rule `/api/* → api`, so cookies stay same-site.
+- Coming soon: until launch, the `web` service answers every request with `apps/web/coming-soon/index.html` (and `503` for `/api/*`), so nothing behind it is reachable. It's on by default; set `COMING_SOON=off` on the `web` service and redeploy to open the app.
 
 ## CI (GitHub Actions)
 

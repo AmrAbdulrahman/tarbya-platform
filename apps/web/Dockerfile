@@ -10,3 +10,4 @@ RUN pnpm nx build web
 FROM caddy:2-alpine
 COPY apps/web/Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /repo/apps/web/dist /srv
+COPY apps/web/coming-soon /coming-soon

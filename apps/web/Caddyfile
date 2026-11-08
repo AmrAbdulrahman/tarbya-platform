@@ -9,24 +9,43 @@
 	@compressible not path /api/events
 	encode @compressible zstd gzip
 
-	handle /api/* {
-		reverse_proxy {$API_URL} {
-			# Railway's edge sets X-Real-IP to the caller; the api trusts one proxy hop
-			# and rate-limits sign-in per client IP.
-			header_up X-Forwarded-For {http.request.header.X-Real-IP}
+	# Coming soon: on unless COMING_SOON=off, so every request (the app, sign-in,
+	# the api) gets the holding page until launch. Read at start-up; restart to apply.
+	@comingSoon expression `"{$COMING_SOON:on}" != "off"`
+
+	# route keeps the handles in written order, so the gate runs first.
+	route {
+		handle @comingSoon {
+			handle /api/* {
+				respond "Coming soon" 503
+			}
+			handle {
+				root * /coming-soon
+				header Cache-Control "no-cache"
+				rewrite * /index.html
+				file_server
+			}
 		}
-	}
 
-	handle /assets/* {
-		root * /srv
-		header Cache-Control "public, max-age=31536000, immutable"
-		file_server
-	}
+		handle /api/* {
+			reverse_proxy {$API_URL} {
+				# Railway's edge sets X-Real-IP to the caller; the api trusts one proxy hop
+				# and rate-limits sign-in per client IP.
+				header_up X-Forwarded-For {http.request.header.X-Real-IP}
+			}
+		}
 
-	handle {
-		root * /srv
-		header Cache-Control "no-cache"
-		try_files {path} /index.html
-		file_server
+		handle /assets/* {
+			root * /srv
+			header Cache-Control "public, max-age=31536000, immutable"
+			file_server
+		}
+
+		handle {
+			root * /srv
+			header Cache-Control "no-cache"
+			try_files {path} /index.html
+			file_server
+		}
 	}
 }
